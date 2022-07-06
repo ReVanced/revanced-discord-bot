@@ -38,6 +38,10 @@ fn contains_match(strings: &Vec<String>, text: &String) -> bool {
 	strings.iter().any(|regex| Regex::new(regex).unwrap().is_match(&text))
 }
 
+fn load_configuration() -> BotConfiguration {
+	BotConfiguration::load().expect("Failed to load configuration")
+}
+
 #[async_trait]
 impl EventHandler for Handler {
 	async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
@@ -72,8 +76,7 @@ impl EventHandler for Handler {
 					if permission_granted {
 						trace!("{:?} reloading configuration.", command.user);
 
-						let new_config =
-							BotConfiguration::load().expect("Could not load configuration.");
+						let new_config = load_configuration();
 
 						configuration.administrators = new_config.administrators;
 						configuration.message_responders = new_config.message_responders;
@@ -105,11 +108,10 @@ impl EventHandler for Handler {
 	}
 
 	async fn message(&self, ctx: Context, msg: Message) {
+		trace!("Received message: {}", msg.content);
 		if msg.guild_id.is_none() || msg.author.bot {
 			return;
 		}
-
-		trace!("Received message: {}", msg.content);
 
 		if let Some(response) =
 			get_configuration_lock(&ctx).await.read().await.message_responders.iter().find(
@@ -156,6 +158,7 @@ impl EventHandler for Handler {
 
 		let configuration_lock = get_configuration_lock(&ctx).await;
 		let configuration = configuration_lock.read().await;
+
 		if let Some(introducer) = &configuration.thread_introductions.iter().find(|introducer| {
 			introducer.channels.iter().any(|channel_id| *channel_id == thread.parent_id.unwrap().0)
 		}) {
@@ -182,7 +185,7 @@ async fn main() {
 		.map(|()| log::set_max_level(LevelFilter::Warn))
 		.expect("Could not set logger.");
 
-	let configuration = BotConfiguration::load().expect("Failed to load configuration");
+	let configuration = load_configuration();
 
 	let mut client = Client::builder(
 		&configuration.discord_authorization_token,
@@ -192,9 +195,7 @@ async fn main() {
 	.await
 	.expect("Failed to create client");
 
-	client.data.write().await.insert::<Configuration>(Arc::new(RwLock::new(
-		BotConfiguration::load().expect("Failed to load configuration"),
-	)));
+	client.data.write().await.insert::<Configuration>(Arc::new(RwLock::new(configuration)));
 
 	if let Err(why) = client.start().await {
 		error!("{:?}", why);
