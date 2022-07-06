@@ -33,7 +33,6 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["channels", "message"],
 				"properties": {
 					"channels": {
 						"$ref": "#/$defs/channels",

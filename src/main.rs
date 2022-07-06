@@ -1,14 +1,15 @@
 use std::sync::Arc;
 
+use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use configuration::BotConfiguration;
-use log::{error, info, trace, LevelFilter};
+use log::{error, info, trace, warn, LevelFilter};
 use logger::logging::SimpleLogger;
+use regex::Regex;
 use serenity::client::{Context, EventHandler};
 use serenity::model::application::command::Command;
 use serenity::model::channel::{GuildChannel, Message};
 use serenity::model::gateway::Ready;
-use serenity::model::prelude::interaction::{Interaction, InteractionResponseType};
-use serenity::model::Timestamp;
+use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
 use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
 use serenity::{async_trait, Client};
 mod configuration;
@@ -33,37 +34,68 @@ async fn get_configuration_lock(ctx: &Context) -> Arc<RwLock<BotConfiguration>> 
 		.clone()
 }
 
+fn contains_match(strings: &Vec<String>, text: &String) -> bool {
+	strings.iter().any(|regex| Regex::new(regex).unwrap().is_match(&text))
+}
+
 #[async_trait]
 impl EventHandler for Handler {
 	async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
 		trace!("Created an interaction: {:?}", interaction);
 
+		let configuration_lock = get_configuration_lock(&ctx).await;
+		let mut configuration = configuration_lock.write().await;
+
 		if let Interaction::ApplicationCommand(command) = interaction {
 			let content = match command.data.name.as_str() {
 				"reload" => {
-					trace!("{:?} reloading configuration.", command.user);
+					let member = command.member.as_ref().unwrap();
+					let user_id = member.user.id.0;
 
-					let configuration_lock = get_configuration_lock(&ctx).await;
+					let administrators = &configuration.administrators;
 
-					let mut configuration = configuration_lock.write().await;
+					let mut permission_granted = false;
 
-					let new_config =
-						BotConfiguration::load().expect("Could not load configuration.");
+					// check if the user is an administrator
+					if administrators.users.iter().any(|&id| user_id == id) {
+						permission_granted = true
+					}
+					// check if the user has an administrating role
+					if !permission_granted
+						&& administrators.roles.iter().any(|role_id| {
+							member.roles.iter().any(|member_role| member_role == role_id)
+						}) {
+						permission_granted = true
+					}
 
-					configuration.administrators = new_config.administrators;
-					configuration.message_responders = new_config.message_responders;
-					configuration.thread_introductions = new_config.thread_introductions;
+					// if permission is granted, reload the configuration
+					if permission_granted {
+						trace!("{:?} reloading configuration.", command.user);
 
-					"Successfully reload configuration.".to_string()
+						let new_config =
+							BotConfiguration::load().expect("Could not load configuration.");
+
+						configuration.administrators = new_config.administrators;
+						configuration.message_responders = new_config.message_responders;
+						configuration.thread_introductions = new_config.thread_introductions;
+
+						"Successfully reloaded configuration.".to_string()
+					} else {
+						// else return an error message
+						"You do not have permission to use this command.".to_string()
+					}
 				},
 				_ => "Unknown command.".to_string(),
 			};
 
+			// send the response
 			if let Err(why) = command
 				.create_interaction_response(&ctx.http, |response| {
 					response
 						.kind(InteractionResponseType::ChannelMessageWithSource)
-						.interaction_response_data(|message| message.content(content))
+						.interaction_response_data(|message| {
+							message.content(content).flags(MessageFlags::EPHEMERAL)
+						})
 				})
 				.await
 			{
@@ -73,32 +105,48 @@ impl EventHandler for Handler {
 	}
 
 	async fn message(&self, ctx: Context, msg: Message) {
+		if msg.guild_id.is_none() || msg.author.bot {
+			return;
+		}
+
 		trace!("Received message: {}", msg.content);
 
-		let configuration_lock = get_configuration_lock(&ctx).await;
-		let configuration = configuration_lock.read().await;
+		if let Some(response) =
+			get_configuration_lock(&ctx).await.read().await.message_responders.iter().find(
+				|&responder| {
+					// check if the message was sent in a channel that is included in the responder
+					responder.includes.channels.iter().any(|&channel_id| channel_id == msg.channel_id.0)
+					// check if the message was sent by a user that is not excluded from the responder
+					&& !responder.excludes.roles.iter().any(|&role_id| role_id == msg.author.id.0)
+					// check if the message does not match any of the excludes
+					&& !contains_match(&responder.excludes.match_field, &msg.content)
+					// check if the message matches any of the includes
+					&& contains_match(&responder.includes.match_field, &msg.content)
+				},
+			) {
+			let min_age = response.condition.user.server_age;
 
-		if let Some(message_responders) = &configuration.message_responders {
-			if let Some(responder) = message_responders.iter().find(|responder| {
-				responder.includes.iter().any(|include| {
-					include.channels.iter().any(|channel| todo!("Implement inclusion check"))
-				}) && responder.excludes.iter().all(|exclude| todo!("Implement exclusion check"))
-			}) {
-				if let Some(condition) = &responder.condition {
-					let join_date = ctx
-						.http
-						.get_member(msg.guild_id.unwrap().0, msg.author.id.0)
-						.await
-						.unwrap()
-						.joined_at
-						.unwrap();
+			if min_age != 0 {
+				let joined_at = ctx
+					.http
+					.get_member(msg.guild_id.unwrap().0, msg.author.id.0)
+					.await
+					.unwrap()
+					.joined_at
+					.unwrap()
+					.unix_timestamp();
 
-					let member_age = Timestamp::now().unix_timestamp() - join_date.unix_timestamp();
+				let must_joined_at =
+					DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(joined_at, 0), Utc);
+				let but_joined_at = Utc::now() - Duration::days(min_age);
 
-					if let Some(age) = condition.user.server_age {
-						todo!("Implement age check")
-					}
+				if must_joined_at <= but_joined_at {
+					return;
 				}
+
+				msg.reply_ping(&ctx.http, &response.message)
+					.await
+					.expect("Could not reply to message author.");
 			}
 		}
 	}
@@ -108,17 +156,11 @@ impl EventHandler for Handler {
 
 		let configuration_lock = get_configuration_lock(&ctx).await;
 		let configuration = configuration_lock.read().await;
-
-		if let Some(introducers) = &configuration.thread_introductions {
-			if let Some(introducer) = introducers.iter().find(|introducer| {
-				introducer
-					.channels
-					.iter()
-					.any(|channel_id| *channel_id == thread.parent_id.unwrap().0)
-			}) {
-				if let Err(why) = thread.say(&ctx.http, &introducer.message).await {
-					error!("Error sending message: {:?}", why);
-				}
+		if let Some(introducer) = &configuration.thread_introductions.iter().find(|introducer| {
+			introducer.channels.iter().any(|channel_id| *channel_id == thread.parent_id.unwrap().0)
+		}) {
+			if let Err(why) = thread.say(&ctx.http, &introducer.message).await {
+				error!("Error sending message: {:?}", why);
 			}
 		}
 	}
@@ -137,7 +179,7 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
 	log::set_logger(&LOGGER)
-		.map(|()| log::set_max_level(LevelFilter::Info))
+		.map(|()| log::set_max_level(LevelFilter::Warn))
 		.expect("Could not set logger.");
 
 	let configuration = BotConfiguration::load().expect("Failed to load configuration");

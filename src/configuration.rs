@@ -10,16 +10,16 @@ pub struct BotConfiguration {
 	pub discord_authorization_token: String,
 	pub administrators: Administrators,
 	#[serde(rename = "thread-introductions")]
-	pub thread_introductions: Option<Vec<Introduction>>,
+	pub thread_introductions: Vec<Introduction>,
 	#[serde(rename = "message-responders")]
-	pub message_responders: Option<Vec<MessageResponder>>,
+	pub message_responders: Vec<MessageResponder>,
 }
 
 #[derive(Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Administrators {
 	pub roles: Vec<u64>,
-	pub users: Option<Vec<u64>>,
+	pub users: Vec<u64>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -32,26 +32,26 @@ pub struct Introduction {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageResponder {
-	pub includes: Option<Includes>,
-	pub excludes: Option<Excludes>,
-	pub condition: Option<Condition>,
+	pub includes: Includes,
+	pub excludes: Excludes,
+	pub condition: Condition,
 	pub message: String,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Includes {
-	pub channels: Option<Vec<u64>>,
+	pub channels: Vec<u64>,
 	#[serde(rename = "match")]
-	pub match_field: Option<Vec<String>>,
+	pub match_field: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Excludes {
-	pub roles: Option<Vec<u64>>,
+	pub roles: Vec<u64>,
 	#[serde(rename = "match")]
-	pub match_field: Option<Vec<String>>,
+	pub match_field: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -64,7 +64,7 @@ pub struct Condition {
 #[serde(rename_all = "camelCase")]
 pub struct User {
 	#[serde(rename = "server-age")]
-	pub server_age: Option<i16>,
+	pub server_age: i64,
 }
 
 impl BotConfiguration {
