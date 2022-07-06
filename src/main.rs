@@ -1,7 +1,5 @@
 use std::sync::Arc;
-use std::time::{Duration, SystemTime};
 
-use chrono::{DateTime, Datelike, NaiveDateTime, Utc};
 use configuration::BotConfiguration;
 use log::{error, info, trace, LevelFilter};
 use logger::logging::SimpleLogger;
@@ -9,7 +7,6 @@ use serenity::client::{Context, EventHandler};
 use serenity::model::application::command::Command;
 use serenity::model::channel::{GuildChannel, Message};
 use serenity::model::gateway::Ready;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
 use serenity::model::prelude::interaction::{Interaction, InteractionResponseType};
 use serenity::model::Timestamp;
 use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
