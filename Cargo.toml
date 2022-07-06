@@ -1,0 +1,29 @@
+[package]
+authors = ["oSumAtrIX"]
+description = "The official Discord bot assisting the ReVanced Discord server"
+homepage = "https://revanced.app"
+keywords = ["ReVanced"]
+license = "GPL-3.0"
+name = "revanced-discord-bot"
+repository = "https://github.com/revanced/revanced-discord-bot"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+strip = true
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0" 
+tokio = { version = "1.0", features = ["rt-multi-thread"] }
+log = "0.4"
+chrono = "0.4"
+
+[dependencies.serenity]
+default-features = false
+features = ["client", "gateway", "rustls_backend", "model"] 
+path = "submodules/serenity"  # submodule due to serenity just recently including global slash commands

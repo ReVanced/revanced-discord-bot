@@ -1,0 +1,136 @@
+{
+	"$schema": "https://json-schema.org/draft-07/schema",
+	"$id": "https://github.com/ReVancedTeam/revanced-signatures/blob/main/signatures.schema.json",
+	"title": "Configuration schema",
+	"description": "The Revanced Discord bot configuration schema.",
+	"type": "object",
+	"required": ["discord-authorization-token"],
+	"properties": {
+		"discord-authorization-token": {
+			"type": "string",
+			"description": "The authorization token for the Discord bot."
+		},
+		"administrators": {
+			"type": "object",
+			"properties": {
+				"roles": {
+					"$ref": "#/$defs/roles",
+					"description": "A list of role ids. Users with these roles have administrative privileges over this Discord bot."
+				},
+				"users": {
+					"type": "array",
+					"items": {
+						"type": "integer"
+					},
+					"description": "A list of user ids. Users with these ids have administrative privileges over this Discord bot.",
+					"minItems": 1,
+					"uniqueItems": true
+				}
+			},
+			"description": "The list of administrators to control the Discord bot."
+		},
+		"thread-introductions": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": ["channels", "message"],
+				"properties": {
+					"channels": {
+						"$ref": "#/$defs/channels",
+						"description": "A list of channel ids. The bot will only introduce in threads under these channels."
+					},
+					"message": {
+						"$ref": "#/$defs/message",
+						"description": "The message to send when the thread has been created."
+					}
+				}
+			},
+			"description": "Introduce new threads with a message.",
+			"minItems": 1,
+			"uniqueItems": true
+		},
+		"message-responders": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"includes": {
+						"type": "object",
+						"channels": {
+							"$ref": "#/$defs/channels",
+							"description": "A list of channel ids. The bot will only respond to messages in these channels."
+						},
+						"match": {
+							"$ref": "#/$defs/match",
+							"description": "The message must match this regex to be responded to."
+						}
+					},
+					"excludes": {
+						"type": "object",
+						"roles": {
+							"$ref": "#/$defs/roles",
+							"description": "A list of role ids. The bot will not respond to messages from users with these roles."
+						},
+						"match": {
+							"$ref": "#/$defs/match",
+							"description": "Messages matching this regex will not be responded to."
+						}
+					},
+					"condition": {
+						"type": "object",
+						"properties": {
+							"user": {
+								"type": "object",
+								"properties": {
+									"server-age": {
+										"type": "integer",
+										"description": "The user must be at least this many days old on the server."
+									}
+								},
+								"description": "User condition."
+							}
+						},
+						"description": "The conditions to respond to the message."
+					},
+					"message": {
+						"$ref": "#/$defs/message",
+						"description": "The message to send when the message is responded to."
+					}
+				},
+				"description": "The conditions to respond to a message."
+			},
+			"description": "A list of responses the Discord bot should send based on given conditions."
+		}
+	},
+	"$defs": {
+		"roles": {
+			"type": "array",
+			"items": {
+				"type": "integer"
+			},
+			"description": "A list of role ids.",
+			"uniqueItems": true,
+			"minItems": 1
+		},
+		"channels": {
+			"type": "array",
+			"items": {
+				"type": "integer"
+			},
+			"uniqueItems": true,
+			"minItems": 1
+		},
+		"match": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"description": "A list of regex strings.",
+			"uniqueItems": true,
+			"minItems": 1
+		},
+		"message": {
+			"type": "string"
+		}
+	}
+}

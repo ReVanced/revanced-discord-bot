@@ -1,0 +1,32 @@
+{
+	"$schema": "./configuration.schema.json",
+	"discord-authorization-token": "",
+	"administrators": {
+		"roles": [0],
+		"users": [0]
+	},
+	"thread-introductions": [
+		{
+			"channels": [0],
+			"message": ""
+		}
+	],
+	"message-responders": [
+		{
+			"includes": {
+				"channels": [0],
+				"match": [""]
+			},
+			"excludes": {
+				"roles": [0],
+				"match": [""]
+			},
+			"condition": {
+				"user": {
+					"server-age": 2
+				}
+			},
+			"message": ""
+		}
+	]
+}

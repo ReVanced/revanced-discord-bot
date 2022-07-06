@@ -1,0 +1,41 @@
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'revanced-discord-bot'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=revanced-discord-bot",
+					"--package=revanced-discord-bot"
+				],
+				"filter": {
+					"name": "revanced-discord-bot",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'revanced-discord-bot'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=revanced-discord-bot",
+					"--package=revanced-discord-bot"
+				],
+				"filter": {
+					"name": "revanced-discord-bot",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
