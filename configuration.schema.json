@@ -38,9 +38,9 @@
 						"$ref": "#/$defs/channels",
 						"description": "A list of channel ids. The bot will only introduce in threads under these channels."
 					},
-					"message": {
-						"$ref": "#/$defs/message",
-						"description": "The message to send when the thread has been created."
+					"response": {
+						"$ref": "#/$defs/response",
+						"description": "The response to send when the thread has been created."
 					}
 				}
 			},
@@ -91,9 +91,9 @@
 						},
 						"description": "The conditions to respond to the message."
 					},
-					"message": {
-						"$ref": "#/$defs/message",
-						"description": "The message to send when the message is responded to."
+					"response": {
+						"$ref": "#/$defs/response",
+						"description": "The response to send when the message is responded to."
 					}
 				},
 				"description": "The conditions to respond to a message."
@@ -128,8 +128,110 @@
 			"uniqueItems": true,
 			"minItems": 1
 		},
-		"message": {
-			"type": "string"
+		"embed": {
+			"type": "object",
+			"properties": {
+				"title": {
+					"type": "string",
+					"description": "The title of the embed."
+				},
+				"description": {
+					"type": "string",
+					"description": "The description of the embed."
+				},
+				"color": {
+					"type": "integer",
+					"description": "The color of the embed."
+				},
+				"fields": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "The name of the field."
+							},
+							"value": {
+								"type": "string",
+								"description": "The value of the field."
+							},
+							"inline": {
+								"type": "boolean",
+								"description": "Whether the field is inline."
+							}
+						},
+						"description": "The field to add to the embed."
+					},
+					"description": "The fields to add to the embed."
+				},
+				"image": {
+					"type": "object",
+					"properties": {
+						"url": {
+							"type": "string",
+							"description": "The url of the image."
+						}
+					},
+					"description": "The image to add to the embed."
+				},
+				"thumbnail": {
+					"type": "object",
+					"properties": {
+						"url": {
+							"type": "string",
+							"description": "The url of the thumbnail."
+						}
+					},
+					"description": "The thumbnail to add to the embed."
+				},
+				"author": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string",
+							"description": "The name of the author."
+						},
+						"url": {
+							"type": "string",
+							"description": "The url of the author."
+						},
+						"icon_url": {
+							"type": "string",
+							"description": "The url of the author's icon."
+						}
+					},
+					"description": "The author to add to the embed."
+				},
+				"footer": {
+					"type": "object",
+					"properties": {
+						"text": {
+							"type": "string",
+							"description": "The text of the footer."
+						},
+						"icon_url": {
+							"type": "string",
+							"description": "The url of the footer's icon."
+						}
+					},
+					"description": "The footer to add to the embed."
+				}
+			}
+		},
+		"response": {
+			"type": "object",
+			"properties": {
+				"message": {
+					"type": "string",
+					"description": "The message. Can be empty if the embed is not empty"
+				},
+				"embed": {
+					"$ref": "#/$defs/embed",
+					"description": "The embed to send."
+				}
+			},
+			}
 		}
 	}
 }

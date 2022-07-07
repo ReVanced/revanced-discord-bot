@@ -26,7 +26,7 @@ pub struct Administrators {
 #[serde(rename_all = "camelCase")]
 pub struct Introduction {
 	pub channels: Vec<u64>,
-	pub message: String,
+	pub response: Response,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -35,7 +35,64 @@ pub struct MessageResponder {
 	pub includes: Includes,
 	pub excludes: Excludes,
 	pub condition: Condition,
-	pub message: String,
+	pub response: Response,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Response {
+	pub message: Option<String>,
+	pub embed: Option<Embed>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Embed {
+	pub title: String,
+	pub description: String,
+	pub color: i32,
+	pub fields: Vec<Field>,
+	pub footer: Footer,
+	pub image: Image,
+	pub thumbnail: Thumbnail,
+	pub author: Author,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Field {
+	pub name: String,
+	pub value: String,
+	pub inline: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Footer {
+	pub text: String,
+	#[serde(rename = "icon_url")]
+	pub icon_url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Image {
+	pub url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Thumbnail {
+	pub url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Author {
+	pub name: String,
+	#[serde(rename = "icon_url")]
+	pub icon_url: String,
+	pub url: String,
 }
 
 #[derive(Serialize, Deserialize)]

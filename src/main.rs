@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use configuration::BotConfiguration;
-use log::{error, info, trace, warn, LevelFilter};
+use log::{error, info, trace, LevelFilter};
 use logger::logging::SimpleLogger;
 use regex::Regex;
 use serenity::client::{Context, EventHandler};
-use serenity::model::application::command::Command;
 use serenity::model::channel::{GuildChannel, Message};
 use serenity::model::gateway::Ready;
+use serenity::model::prelude::command::Command;
 use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
 use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
 use serenity::{async_trait, Client};
@@ -47,34 +47,34 @@ impl EventHandler for Handler {
 	async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
 		trace!("Created an interaction: {:?}", interaction);
 
-		let configuration_lock = get_configuration_lock(&ctx).await;
-		let mut configuration = configuration_lock.write().await;
-
 		if let Interaction::ApplicationCommand(command) = interaction {
-			let content = match command.data.name.as_str() {
-				"reload" => {
-					let member = command.member.as_ref().unwrap();
-					let user_id = member.user.id.0;
+			let configuration_lock = get_configuration_lock(&ctx).await;
+			let mut configuration = configuration_lock.write().await;
 
-					let administrators = &configuration.administrators;
+			let administrators = &configuration.administrators;
+			let member = command.member.as_ref().unwrap();
+			let user_id = member.user.id.0;
+			let mut stop_command = false;
+			let mut permission_granted = false;
 
-					let mut permission_granted = false;
+			// check if the user is an administrator
+			if administrators.users.iter().any(|&id| user_id == id) {
+				permission_granted = true
+			}
+			// check if the user has an administrating role
+			if !permission_granted
+				&& administrators
+					.roles
+					.iter()
+					.any(|role_id| member.roles.iter().any(|member_role| member_role == role_id))
+			{
+				permission_granted = true
+			}
 
-					// check if the user is an administrator
-					if administrators.users.iter().any(|&id| user_id == id) {
-						permission_granted = true
-					}
-					// check if the user has an administrating role
-					if !permission_granted
-						&& administrators.roles.iter().any(|role_id| {
-							member.roles.iter().any(|member_role| member_role == role_id)
-						}) {
-						permission_granted = true
-					}
-
-					// if permission is granted, reload the configuration
-					if permission_granted {
-						trace!("{:?} reloading configuration.", command.user);
+			let content = if permission_granted {
+				match command.data.name.as_str() {
+					"reload" => {
+						trace!("{:?} reloaded the configuration.", command.user);
 
 						let new_config = load_configuration();
 
@@ -83,12 +83,16 @@ impl EventHandler for Handler {
 						configuration.thread_introductions = new_config.thread_introductions;
 
 						"Successfully reloaded configuration.".to_string()
-					} else {
-						// else return an error message
-						"You do not have permission to use this command.".to_string()
-					}
-				},
-				_ => "Unknown command.".to_string(),
+					},
+					"stop" => {
+						trace!("{:?} stopped the bot.", command.user);
+						stop_command = true;
+						"Stopped the bot.".to_string()
+					},
+					_ => "Unknown command.".to_string(),
+				}
+			} else {
+				"You do not have permission to use this command.".to_string()
 			};
 
 			// send the response
@@ -104,6 +108,10 @@ impl EventHandler for Handler {
 			{
 				error!("Cannot respond to slash command: {}", why);
 			}
+
+			if stop_command {
+				std::process::exit(0);
+			}
 		}
 	}
 
@@ -113,7 +121,7 @@ impl EventHandler for Handler {
 			return;
 		}
 
-		if let Some(response) =
+		if let Some(responder) =
 			get_configuration_lock(&ctx).await.read().await.message_responders.iter().find(
 				|&responder| {
 					// check if the message was sent in a channel that is included in the responder
@@ -126,7 +134,7 @@ impl EventHandler for Handler {
 					&& contains_match(&responder.includes.match_field, &msg.content)
 				},
 			) {
-			let min_age = response.condition.user.server_age;
+			let min_age = responder.condition.user.server_age;
 
 			if min_age != 0 {
 				let joined_at = ctx
@@ -146,7 +154,30 @@ impl EventHandler for Handler {
 					return;
 				}
 
-				msg.reply_ping(&ctx.http, &response.message)
+				msg.channel_id
+					.send_message(&ctx.http, |m| {
+						m.reference_message(&msg);
+						match &responder.response.embed {
+							Some(embed) => m.embed(|e| {
+								e.title(&embed.title)
+									.description(&embed.description)
+									.color(embed.color)
+									.fields(embed.fields.iter().map(|field| {
+										(field.name.clone(), field.value.clone(), field.inline)
+									}))
+									.footer(|f| {
+										f.text(&embed.footer.text);
+										f.icon_url(&embed.footer.icon_url)
+									})
+									.thumbnail(&embed.thumbnail.url)
+									.image(&embed.image.url)
+									.author(|a| {
+										a.name(&embed.author.name).icon_url(&embed.author.icon_url)
+									})
+							}),
+							None => m.content(responder.response.message.as_ref().unwrap()),
+						}
+					})
 					.await
 					.expect("Could not reply to message author.");
 			}
@@ -162,7 +193,9 @@ impl EventHandler for Handler {
 		if let Some(introducer) = &configuration.thread_introductions.iter().find(|introducer| {
 			introducer.channels.iter().any(|channel_id| *channel_id == thread.parent_id.unwrap().0)
 		}) {
-			if let Err(why) = thread.say(&ctx.http, &introducer.message).await {
+			if let Err(why) =
+				thread.say(&ctx.http, &introducer.response.message.as_ref().unwrap()).await
+			{
 				error!("Error sending message: {:?}", why);
 			}
 		}
@@ -171,11 +204,15 @@ impl EventHandler for Handler {
 	async fn ready(&self, ctx: Context, ready: Ready) {
 		info!("Connected as {}", ready.user.name);
 
-		Command::create_global_application_command(&ctx.http, |command| {
-			command.name("reload").description("Reloads the configuration.")
-		})
-		.await
-		.expect("Could not create command.");
+		for (cmd, description) in
+			[("repload", "Reloads the configuration."), ("stop", "Stop the Discord bot.")]
+		{
+			Command::create_global_application_command(&ctx.http, |command| {
+				command.name(cmd).description(description)
+			})
+			.await
+			.expect("Could not create command.");
+		}
 	}
 }
 
