@@ -1,3 +1,4 @@
+use std::env;
 use std::sync::Arc;
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
@@ -223,22 +224,37 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+	// Initialize the logging framework.
 	log::set_logger(&LOGGER)
 		.map(|()| log::set_max_level(LevelFilter::Warn))
 		.expect("Could not set logger.");
 
+	// Set up the configuration.
 	let configuration = load_configuration();
 
+	// Get the Discord authorization token.
+	dotenv::dotenv().ok();
+	let token = match env::vars().find(|(key, _)| key == "DISCORD_AUTHORIZATION_TOKEN") {
+		Some((_, value)) => value,
+		None => {
+			error!("Environment variable DISCORD_AUTHORIZATION_TOKEN unset.");
+			std::process::exit(1);
+		},
+	};
+
+	// Create the Discord bot client.
 	let mut client = Client::builder(
-		&configuration.discord_authorization_token,
+		&token,
 		GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT,
 	)
 	.event_handler(Handler)
 	.await
 	.expect("Failed to create client");
 
+	// Save the configuration.
 	client.data.write().await.insert::<BotConfiguration>(Arc::new(RwLock::new(configuration)));
 
+	// Start the Discord bot.
 	if let Err(why) = client.start().await {
 		error!("{:?}", why);
 	} else {

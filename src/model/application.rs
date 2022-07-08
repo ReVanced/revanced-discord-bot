@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Configuration {
-	pub discord_authorization_token: String,
 	pub administrators: Administrators,
 	pub thread_introductions: Vec<Introduction>,
 	pub message_responses: Vec<MessageResponse>,

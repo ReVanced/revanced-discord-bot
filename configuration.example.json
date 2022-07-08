@@ -1,6 +1,5 @@
 {
 	"$schema": "./configuration.schema.json",
-	"discord_authorization_token": "",
 	"administrators": {
 		"roles": [0],
 		"users": [0]

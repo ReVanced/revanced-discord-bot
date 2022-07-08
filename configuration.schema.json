@@ -4,12 +4,7 @@
 	"title": "Configuration schema",
 	"description": "The Revanced Discord bot configuration schema.",
 	"type": "object",
-	"required": ["discord_authorization_token"],
 	"properties": {
-		"discord_authorization_token": {
-			"type": "string",
-			"description": "The authorization token for the Discord bot."
-		},
 		"administrators": {
 			"type": "object",
 			"properties": {
