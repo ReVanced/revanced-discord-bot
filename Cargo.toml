@@ -24,8 +24,4 @@ log = "0.4"
 regex = "1.0"
 serde_regex = "1.1"
 chrono = "0.4"
-
-[dependencies.serenity]
-default-features = false
-features = ["client", "gateway", "rustls_backend", "model"] 
-path = "submodules/serenity"  # submodule due to serenity just recently including global slash commands
+serenity = { git = "https://github.com/serenity-rs/serenity.git", default_features = false,  features = ["client", "gateway", "rustls_backend", "model"] }
