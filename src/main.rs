@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use configuration::application::Configuration;
 use log::{error, info, trace, LevelFilter};
 use logger::logging::SimpleLogger;
+use model::application::Configuration;
 use regex::Regex;
 use serenity::client::{Context, EventHandler};
 use serenity::model::channel::{GuildChannel, Message};
@@ -12,8 +12,8 @@ use serenity::model::prelude::command::Command;
 use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
 use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
 use serenity::{async_trait, Client};
-mod configuration;
 mod logger;
+mod model;
 
 static LOGGER: SimpleLogger = SimpleLogger;
 
@@ -34,8 +34,8 @@ async fn get_configuration_lock(ctx: &Context) -> Arc<RwLock<Configuration>> {
 		.clone()
 }
 
-fn contains_match(strings: &Vec<String>, text: &String) -> bool {
-	strings.iter().any(|regex| Regex::new(regex).unwrap().is_match(&text))
+fn contains_match(regex: &Vec<Regex>, text: &String) -> bool {
+	regex.iter().any(|r| r.is_match(&text))
 }
 
 fn load_configuration() -> Configuration {

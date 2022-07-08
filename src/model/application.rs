@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{Error, Read, Write};
 
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
@@ -107,14 +108,16 @@ pub struct Author {
 pub struct Includes {
 	pub channels: Vec<u64>,
 	#[serde(rename = "match")]
-	pub match_field: Vec<String>,
+	#[serde(with = "serde_regex")]
+	pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
 	pub roles: Vec<u64>,
 	#[serde(rename = "match")]
-	pub match_field: Vec<String>,
+	#[serde(with = "serde_regex")]
+	pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
