@@ -185,7 +185,12 @@ impl EventHandler for Handler {
 	}
 
 	async fn thread_create(&self, ctx: Context, thread: GuildChannel) {
-		trace!("Thread created: {}", thread.name);
+		if let Some(_) = thread.member {
+			trace!("Thread was joined. Block dispatch.");
+			return;
+		}
+
+		info!("Thread created: {:?}", thread);
 
 		let configuration_lock = get_configuration_lock(&ctx).await;
 		let configuration = configuration_lock.read().await;
