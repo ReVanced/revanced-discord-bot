@@ -9,7 +9,7 @@ pub struct Configuration {
 	pub discord_authorization_token: String,
 	pub administrators: Administrators,
 	pub thread_introductions: Vec<Introduction>,
-	pub message_responders: Vec<MessageResponder>,
+	pub message_responses: Vec<MessageResponse>,
 }
 
 impl Configuration {
@@ -49,7 +49,7 @@ pub struct Introduction {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct MessageResponder {
+pub struct MessageResponse {
 	pub includes: Includes,
 	pub excludes: Excludes,
 	pub condition: Condition,

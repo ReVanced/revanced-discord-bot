@@ -13,7 +13,7 @@
 			}
 		}
 	],
-	"message_responders": [
+	"message_responses": [
 		{
 			"includes": {
 				"channels": [0],

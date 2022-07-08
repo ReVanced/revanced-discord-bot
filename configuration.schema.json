@@ -48,7 +48,7 @@
 			"minItems": 1,
 			"uniqueItems": true
 		},
-		"message_responders": {
+		"message_responses": {
 			"type": "array",
 			"items": {
 				"type": "object",

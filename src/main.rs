@@ -79,7 +79,7 @@ impl EventHandler for Handler {
 						let new_config = load_configuration();
 
 						configuration.administrators = new_config.administrators;
-						configuration.message_responders = new_config.message_responders;
+						configuration.message_responses = new_config.message_responses;
 						configuration.thread_introductions = new_config.thread_introductions;
 
 						"Successfully reloaded configuration.".to_string()
@@ -121,20 +121,20 @@ impl EventHandler for Handler {
 			return;
 		}
 
-		if let Some(responder) =
-			get_configuration_lock(&ctx).await.read().await.message_responders.iter().find(
-				|&responder| {
+		if let Some(message_response) =
+			get_configuration_lock(&ctx).await.read().await.message_responses.iter().find(
+				|&response| {
 					// check if the message was sent in a channel that is included in the responder
-					responder.includes.channels.iter().any(|&channel_id| channel_id == msg.channel_id.0)
+					response.includes.channels.iter().any(|&channel_id| channel_id == msg.channel_id.0)
 					// check if the message was sent by a user that is not excluded from the responder
-					&& !responder.excludes.roles.iter().any(|&role_id| role_id == msg.author.id.0)
+					&& !response.excludes.roles.iter().any(|&role_id| role_id == msg.author.id.0)
 					// check if the message does not match any of the excludes
-					&& !contains_match(&responder.excludes.match_field, &msg.content)
+					&& !contains_match(&response.excludes.match_field, &msg.content)
 					// check if the message matches any of the includes
-					&& contains_match(&responder.includes.match_field, &msg.content)
+					&& contains_match(&response.includes.match_field, &msg.content)
 				},
 			) {
-			let min_age = responder.condition.user.server_age;
+			let min_age = message_response.condition.user.server_age;
 
 			if min_age != 0 {
 				let joined_at = ctx
@@ -157,7 +157,7 @@ impl EventHandler for Handler {
 				msg.channel_id
 					.send_message(&ctx.http, |m| {
 						m.reference_message(&msg);
-						match &responder.response.embed {
+						match &message_response.response.embed {
 							Some(embed) => m.embed(|e| {
 								e.title(&embed.title)
 									.description(&embed.description)
@@ -175,7 +175,7 @@ impl EventHandler for Handler {
 										a.name(&embed.author.name).icon_url(&embed.author.icon_url)
 									})
 							}),
-							None => m.content(responder.response.message.as_ref().unwrap()),
+							None => m.content(message_response.response.message.as_ref().unwrap()),
 						}
 					})
 					.await
