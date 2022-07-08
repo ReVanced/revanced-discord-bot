@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use configuration::BotConfiguration;
+use configuration::application::Configuration;
 use log::{error, info, trace, LevelFilter};
 use logger::logging::SimpleLogger;
 use regex::Regex;
@@ -17,19 +17,19 @@ mod logger;
 
 static LOGGER: SimpleLogger = SimpleLogger;
 
-struct Configuration;
+struct BotConfiguration;
 
-impl TypeMapKey for Configuration {
-	type Value = Arc<RwLock<BotConfiguration>>;
+impl TypeMapKey for BotConfiguration {
+	type Value = Arc<RwLock<Configuration>>;
 }
 
 pub struct Handler;
 
-async fn get_configuration_lock(ctx: &Context) -> Arc<RwLock<BotConfiguration>> {
+async fn get_configuration_lock(ctx: &Context) -> Arc<RwLock<Configuration>> {
 	ctx.data
 		.read()
 		.await
-		.get::<Configuration>()
+		.get::<BotConfiguration>()
 		.expect("Expected Configuration in TypeMap.")
 		.clone()
 }
@@ -38,8 +38,8 @@ fn contains_match(strings: &Vec<String>, text: &String) -> bool {
 	strings.iter().any(|regex| Regex::new(regex).unwrap().is_match(&text))
 }
 
-fn load_configuration() -> BotConfiguration {
-	BotConfiguration::load().expect("Failed to load configuration")
+fn load_configuration() -> Configuration {
+	Configuration::load().expect("Failed to load configuration")
 }
 
 #[async_trait]
@@ -232,7 +232,7 @@ async fn main() {
 	.await
 	.expect("Failed to create client");
 
-	client.data.write().await.insert::<Configuration>(Arc::new(RwLock::new(configuration)));
+	client.data.write().await.insert::<BotConfiguration>(Arc::new(RwLock::new(configuration)));
 
 	if let Err(why) = client.start().await {
 		error!("{:?}", why);

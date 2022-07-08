@@ -1,17 +1,19 @@
 {
 	"$schema": "./configuration.schema.json",
-	"discord-authorization-token": "",
+	"discord_authorization_token": "",
 	"administrators": {
 		"roles": [0],
 		"users": [0]
 	},
-	"thread-introductions": [
+	"thread_introductions": [
 		{
 			"channels": [0],
-			"message": ""
+			"response": {
+				"message": ""
+			}
 		}
 	],
-	"message-responders": [
+	"message_responders": [
 		{
 			"includes": {
 				"channels": [0],
@@ -23,10 +25,12 @@
 			},
 			"condition": {
 				"user": {
-					"server-age": 2
+					"server_age": 2
 				}
 			},
-			"message": ""
+			"response": {
+				"message": ""
+			}
 		}
 	]
 }
