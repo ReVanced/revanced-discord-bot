@@ -20,7 +20,7 @@
     }],
     ["@semantic-release/github", {
       "assets": [{
-        "path": "target/release/revanced-discord-bot"
+        "path": "target/x86_64-unknown-linux-musl/release/revanced-discord-bot"
       }]
     }]
   ]

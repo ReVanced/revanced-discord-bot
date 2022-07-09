@@ -4,6 +4,10 @@ on:
   push:
     branches: [main, dev]
 
+  pull_request:
+
+  workflow_dispatch:
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -25,6 +29,7 @@ jobs:
           components: clippy
 
       - name: Setup Node.js
+        if: github.event_name != 'pull_request'
         uses: actions/setup-node@v2
         with:
           node-version: "lts/*"
@@ -42,7 +47,8 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release
+          args: --release --target=x86_64-unknown-linux-musl
+          use-cross: true
 
       - name: cargo clippy
         uses: actions-rs/cargo@v1
@@ -50,10 +56,18 @@ jobs:
           command: clippy
           args: --no-deps -- -D warnings
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: revanced-discord-bot
+          path: target/x86_64-unknown-linux-musl/release/revanced-discord-bot
+
       - name: Setup semantic-release
+        if: github.event_name != 'pull_request'
         run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog -D
 
       - name: Release
+        if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
