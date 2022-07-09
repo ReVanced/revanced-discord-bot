@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::{env, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use tracing::{error, info, debug};
 use model::application::Configuration;
 use regex::Regex;
 use serenity::client::{Context, EventHandler};
@@ -12,6 +11,7 @@ use serenity::model::prelude::command::Command;
 use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
 use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
 use serenity::{async_trait, Client};
+use tracing::{debug, error, info};
 
 mod logger;
 mod model;
@@ -228,15 +228,16 @@ async fn main() {
 	// Set up the configuration.
 	let configuration = load_configuration();
 
-	// Get the Discord authorization token.
+	// Load environment variables from .env file
 	dotenv::dotenv().ok();
-	let token = match env::vars().find(|(key, _)| key == "DISCORD_AUTHORIZATION_TOKEN") {
-		Some((_, value)) => value,
-		None => {
-			error!("Environment variable DISCORD_AUTHORIZATION_TOKEN unset.");
-			process::exit(1);
-		},
-	};
+
+	// Get the Discord authorization token.
+	let token = env::var("DISCORD_AUTHORIZATION_TOKEN")
+		.expect("Could not load Discord authorization token");
+	if token.len() != 70 {
+		error!("Invalid Discord authorization token.");
+		process::exit(1);
+	}
 
 	// Create the Discord bot client.
 	let mut client = Client::builder(
