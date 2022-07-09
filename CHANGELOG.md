@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/revanced/revanced-discord-bot/compare/v1.0.1...v1.0.2) (2022-07-09)
+
+
+### Bug Fixes
+
+* **ci:** build binaries for musl ([#9](https://github.com/revanced/revanced-discord-bot/issues/9)) ([aae1b07](https://github.com/revanced/revanced-discord-bot/commit/aae1b07edf507f9efbf5fa5434de5214aeee8464))
+
 ## [1.0.1](https://github.com/revanced/revanced-discord-bot/compare/v1.0.0...v1.0.1) (2022-07-09)
 
 
