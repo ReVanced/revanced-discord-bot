@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::{env, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use log::{error, info, debug};
+use tracing::{error, info, debug};
 use model::application::Configuration;
 use regex::Regex;
 use serenity::client::{Context, EventHandler};
@@ -223,7 +223,7 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
 	// Initialize the logging framework.
-	logger::init().expect("failed to init logger");
+	logger::init();
 
 	// Set up the configuration.
 	let configuration = load_configuration();
