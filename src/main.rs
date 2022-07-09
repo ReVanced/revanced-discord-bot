@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::{env, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use log::{error, info, trace};
+use log::{error, info, debug};
 use model::application::Configuration;
 use regex::Regex;
 use serenity::client::{Context, EventHandler};
@@ -44,7 +44,7 @@ fn load_configuration() -> Configuration {
 #[async_trait]
 impl EventHandler for Handler {
 	async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-		trace!("Created an interaction: {:?}", interaction);
+		debug!("Created an interaction: {:?}", interaction);
 
 		if let Interaction::ApplicationCommand(command) = interaction {
 			let configuration_lock = get_configuration_lock(&ctx).await;
@@ -73,7 +73,7 @@ impl EventHandler for Handler {
 			let content = if permission_granted {
 				match command.data.name.as_str() {
 					"reload" => {
-						trace!("{:?} reloaded the configuration.", command.user);
+						debug!("{:?} reloaded the configuration.", command.user);
 
 						let new_config = load_configuration();
 
@@ -84,7 +84,7 @@ impl EventHandler for Handler {
 						"Successfully reloaded configuration.".to_string()
 					},
 					"stop" => {
-						trace!("{:?} stopped the bot.", command.user);
+						debug!("{:?} stopped the bot.", command.user);
 						stop_command = true;
 						"Stopped the bot.".to_string()
 					},
@@ -115,7 +115,7 @@ impl EventHandler for Handler {
 	}
 
 	async fn message(&self, ctx: Context, msg: Message) {
-		trace!("Received message: {}", msg.content);
+		debug!("Received message: {}", msg.content);
 		if msg.guild_id.is_none() || msg.author.bot {
 			return;
 		}
@@ -185,7 +185,7 @@ impl EventHandler for Handler {
 
 	async fn thread_create(&self, ctx: Context, thread: GuildChannel) {
 		if thread.member.is_some() {
-			trace!("Thread was joined. Block dispatch.");
+			debug!("Thread was joined. Block dispatch.");
 			return;
 		}
 

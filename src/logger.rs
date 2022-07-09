@@ -11,7 +11,11 @@ pub fn init() -> anyhow::Result<()> {
 			TerminalMode::Mixed,
 			ColorChoice::Auto,
 		),
-		WriteLogger::new(LevelFilter::Info, Config::default(), File::create("logs.log")?),
+		WriteLogger::new(
+			LevelFilter::Info,
+			Config::default(),
+			File::create("logs.log")?
+		),
 	])?;
 
 	Ok(())
