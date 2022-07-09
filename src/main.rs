@@ -35,8 +35,8 @@ async fn get_configuration_lock(ctx: &Context) -> Arc<RwLock<Configuration>> {
 		.clone()
 }
 
-fn contains_match(regex: &Vec<Regex>, text: &String) -> bool {
-	regex.iter().any(|r| r.is_match(&text))
+fn contains_match(regex: &[Regex], text: &str) -> bool {
+	regex.iter().any(|r| r.is_match(text))
 }
 
 fn load_configuration() -> Configuration {
@@ -186,7 +186,7 @@ impl EventHandler for Handler {
 	}
 
 	async fn thread_create(&self, ctx: Context, thread: GuildChannel) {
-		if let Some(_) = thread.member {
+		if thread.member.is_some() {
 			trace!("Thread was joined. Block dispatch.");
 			return;
 		}
