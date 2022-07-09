@@ -41,7 +41,7 @@ jobs:
       - name: cargo build
         uses: actions-rs/cargo@v1
         with:
-          command: build
+          command: build --release
 
       - name: cargo clippy
         uses: actions-rs/cargo@v1
