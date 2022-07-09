@@ -189,7 +189,7 @@ impl EventHandler for Handler {
 			return;
 		}
 
-		info!("Thread created: {:?}", thread);
+		debug!("Thread created: {:?}", thread);
 
 		let configuration_lock = get_configuration_lock(&ctx).await;
 		let configuration = configuration_lock.read().await;
