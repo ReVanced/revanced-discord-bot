@@ -31,7 +31,7 @@ impl Configuration {
 	}
 
 	pub fn load() -> Result<Configuration> {
-		let sys_config_dir = config_dir().expect("find config dir");
+		let sys_config_dir = config_dir().expect("Can not find the configuration directory.");
 		let sys_config =
 			format!("{}/revanced-discord-bot/{CONFIG_PATH}", sys_config_dir.to_string_lossy());
 
