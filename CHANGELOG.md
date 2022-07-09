@@ -1,0 +1,28 @@
+# 1.0.0 (2022-07-09)
+
+
+### Bug Fixes
+
+* **clippy:** fix clippy warning ([96ce886](https://github.com/revanced/revanced-discord-bot/commit/96ce88666b3908d9461ab04597e2937fc6be7c90))
+* clone submodules recursively ([63c351d](https://github.com/revanced/revanced-discord-bot/commit/63c351daf44c421e0e92d01d63b583444dcba38b))
+* do not create unnecessary instances of `Regex` ([a3e6d88](https://github.com/revanced/revanced-discord-bot/commit/a3e6d88cfb0a7727fd5cbde9ff59c27d47ef8bbf))
+* missing opening bracket ([018c8f6](https://github.com/revanced/revanced-discord-bot/commit/018c8f6e4587b5211de1f9438d29430d4e97c8d5))
+* only log debug level in debug builds ([6d8eb9a](https://github.com/revanced/revanced-discord-bot/commit/6d8eb9a4044b8bf234716423467f007cae7c10ec))
+* release builds not logging ([d69ae96](https://github.com/revanced/revanced-discord-bot/commit/d69ae966c5643eb41408420f372c162e48ecbcf6))
+* specify github token to semantic-release ([61167ab](https://github.com/revanced/revanced-discord-bot/commit/61167abbd7b1bb48ce4df9128f36c40c0cbf3611))
+* thread created should be debug, not info ([8afda24](https://github.com/revanced/revanced-discord-bot/commit/8afda248beb140678d14a4eca6ff1c3562ad315e))
+* use snake case and module for configuration ([179ad3e](https://github.com/revanced/revanced-discord-bot/commit/179ad3e8244ec09ee00f922b88bb530e1550c805))
+* use tracing to fix serenity logging ([704d05f](https://github.com/revanced/revanced-discord-bot/commit/704d05f45bc6cc325737f7f49655846301a10b59))
+
+
+### Features
+
+* `message-responders` & `reload` command ([8fb0ab8](https://github.com/revanced/revanced-discord-bot/commit/8fb0ab88355b31083fe14d729b411d4bb8f98118))
+* `thread_introductions` ([b34c9b3](https://github.com/revanced/revanced-discord-bot/commit/b34c9b3a66a803e4c2fb129d77af24421bb97c71))
+* add `rust.yml` workflow ([507656b](https://github.com/revanced/revanced-discord-bot/commit/507656b97c373f4473df922236a850a9b51bca7f))
+* embeds ([4293dd5](https://github.com/revanced/revanced-discord-bot/commit/4293dd5518a95b1e5bd4fae7fd4bc20fc4c6479d))
+* initial commit ([c07ad28](https://github.com/revanced/revanced-discord-bot/commit/c07ad28a60b20661d9014d4c850f906d4adbebf8))
+* license ([b51c50b](https://github.com/revanced/revanced-discord-bot/commit/b51c50b7744e49e747f31280784f24c8685f656a))
+* move `DISCORD_AUTHORIZATION_TOKEN` to `.env` ([42098b9](https://github.com/revanced/revanced-discord-bot/commit/42098b9db54900cae49e6adaac39cbd1630a8de1))
+* update logger and other small changes ([cee17a1](https://github.com/revanced/revanced-discord-bot/commit/cee17a11eb4e4174a26e38498c385ee4b3a7c1e2))
+* use cargo git dependency instead of submodule ([3c14cbe](https://github.com/revanced/revanced-discord-bot/commit/3c14cbe6a4efbb5040fe140beb3916bf8fd2e659))
