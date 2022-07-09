@@ -15,7 +15,7 @@ impl Configuration {
 	fn save(&self) -> Result<(), Error> {
 		let mut file = File::create("configuration.json")?;
 		let json = serde_json::to_string_pretty(&self)?;
-		file.write(json.as_bytes())?;
+		file.write_all(json.as_bytes())?;
 		Ok(())
 	}
 
