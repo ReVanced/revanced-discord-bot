@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/revanced/revanced-discord-bot/compare/v1.0.0...v1.0.1) (2022-07-09)
+
+
+### Bug Fixes
+
+* create release build to fix ci ([e7d26fd](https://github.com/revanced/revanced-discord-bot/commit/e7d26fdc6813c638061248c2b442b801e817b8f3))
+* fix release arg for cargo build ([eab7b1d](https://github.com/revanced/revanced-discord-bot/commit/eab7b1d3ff6c1598f38502010603214b0c4b0c80))
+
 # 1.0.0 (2022-07-09)
 
 
