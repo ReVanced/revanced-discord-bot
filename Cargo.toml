@@ -28,3 +28,4 @@ chrono = "0.4"
 serenity = { git = "https://github.com/serenity-rs/serenity.git", default_features = false,  features = ["client", "gateway", "rustls_backend", "model"] }
 simplelog = "0.12.0"
 anyhow = "1.0.58"
+dirs = "4.0.0"

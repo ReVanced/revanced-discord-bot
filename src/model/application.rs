@@ -1,8 +1,10 @@
 use std::{
-	fs::File,
+	fs::{self, File},
 	io::{Read, Result, Write},
+	path::Path,
 };
 
+use dirs::config_dir;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +19,11 @@ const CONFIG_PATH: &str = "configuration.json";
 
 impl Configuration {
 	fn save(&self) -> Result<()> {
+		let sys_config_dir = config_dir().expect("find config dir");
+
+		fs::create_dir_all(format!("{}/revanced-discord-bot", sys_config_dir.to_string_lossy()))
+			.expect("create config dir");
+
 		let mut file = File::create(CONFIG_PATH)?;
 		let json = serde_json::to_string_pretty(&self)?;
 		file.write_all(json.as_bytes())?;
@@ -24,13 +31,24 @@ impl Configuration {
 	}
 
 	pub fn load() -> Result<Configuration> {
-		let mut file = match File::open(CONFIG_PATH) {
-			Ok(file) => file,
-			Err(_) => {
-				let configuration = Configuration::default();
-				configuration.save()?;
-				return Ok(configuration);
-			},
+		let sys_config_dir = config_dir().expect("find config dir");
+		let sys_config =
+			format!("{}/revanced-discord-bot/{CONFIG_PATH}", sys_config_dir.to_string_lossy());
+
+		// config file in current dir
+		let mut file = if Path::new(CONFIG_PATH).exists() {
+			File::open(CONFIG_PATH)?
+		}
+		// config file in system dir (on *nix: `~/.config/revanced-discord-bot/`)
+		else if Path::new(&sys_config).exists() {
+			File::open(sys_config)?
+		}
+		// create defalt config
+		else {
+			let default_config = Configuration::default();
+			default_config.save()?;
+
+			File::open(sys_config)?
 		};
 
 		let mut buf = String::new();
