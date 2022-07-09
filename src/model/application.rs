@@ -1,6 +1,10 @@
-use std::fs::File;
-use std::io::{Error, Read, Write};
+use std::{
+	fs::{self, File},
+	io::{Read, Result, Write},
+	path::Path,
+};
 
+use dirs::config_dir;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -11,26 +15,45 @@ pub struct Configuration {
 	pub message_responses: Vec<MessageResponse>,
 }
 
+const CONFIG_PATH: &str = "configuration.json";
+
 impl Configuration {
-	fn save(&self) -> Result<(), Error> {
-		let mut file = File::create("configuration.json")?;
+	fn save(&self) -> Result<()> {
+		let sys_config_dir = config_dir().expect("find config dir");
+
+		fs::create_dir_all(format!("{}/revanced-discord-bot", sys_config_dir.to_string_lossy()))
+			.expect("create config dir");
+
+		let mut file = File::create(CONFIG_PATH)?;
 		let json = serde_json::to_string_pretty(&self)?;
 		file.write_all(json.as_bytes())?;
 		Ok(())
 	}
 
-	pub fn load() -> Result<Configuration, Error> {
-		let mut file = match File::open("configuration.json") {
-			Ok(file) => file,
-			Err(_) => {
-				let configuration = Configuration::default();
-				configuration.save()?;
-				return Ok(configuration);
-			},
+	pub fn load() -> Result<Configuration> {
+		let sys_config_dir = config_dir().expect("Can not find the configuration directory.");
+		let sys_config =
+			format!("{}/revanced-discord-bot/{CONFIG_PATH}", sys_config_dir.to_string_lossy());
+
+		// config file in current dir
+		let mut file = if Path::new(CONFIG_PATH).exists() {
+			File::open(CONFIG_PATH)?
+		}
+		// config file in system dir (on *nix: `~/.config/revanced-discord-bot/`)
+		else if Path::new(&sys_config).exists() {
+			File::open(sys_config)?
+		}
+		// create defalt config
+		else {
+			let default_config = Configuration::default();
+			default_config.save()?;
+
+			File::open(sys_config)?
 		};
 
 		let mut buf = String::new();
 		file.read_to_string(&mut buf)?;
+
 		Ok(serde_json::from_str(&buf)?)
 	}
 }
@@ -106,16 +129,14 @@ pub struct Author {
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
 	pub channels: Vec<u64>,
-	#[serde(rename = "match")]
-	#[serde(with = "serde_regex")]
+	#[serde(rename = "match", with = "serde_regex")]
 	pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
 	pub roles: Vec<u64>,
-	#[serde(rename = "match")]
-	#[serde(with = "serde_regex")]
+	#[serde(rename = "match", with = "serde_regex")]
 	pub match_field: Vec<Regex>,
 }
 
