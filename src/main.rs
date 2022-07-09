@@ -1,24 +1,17 @@
-use std::{env, process};
 use std::sync::Arc;
+use std::{env, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use log::{error, info, trace};
 use model::application::Configuration;
 use regex::Regex;
-use serenity::{
-	async_trait,
-	client::{Context, EventHandler},
-	model::{
-		channel::{GuildChannel, Message},
-		gateway::Ready,
-		prelude::{
-			command::Command,
-			interaction::{Interaction, InteractionResponseType, MessageFlags},
-		},
-	},
-	prelude::{GatewayIntents, RwLock, TypeMapKey},
-	Client,
-};
+use serenity::client::{Context, EventHandler};
+use serenity::model::channel::{GuildChannel, Message};
+use serenity::model::gateway::Ready;
+use serenity::model::prelude::command::Command;
+use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
+use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
+use serenity::{async_trait, Client};
 
 mod logger;
 mod model;
