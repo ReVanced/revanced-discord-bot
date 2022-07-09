@@ -1,5 +1,7 @@
-use std::fs::File;
-use std::io::{Error, Read, Write};
+use std::{
+	fs::File,
+	io::{Read, Result, Write},
+};
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -11,16 +13,18 @@ pub struct Configuration {
 	pub message_responses: Vec<MessageResponse>,
 }
 
+const CONFIG_PATH: &str = "configuration.json";
+
 impl Configuration {
-	fn save(&self) -> Result<(), Error> {
-		let mut file = File::create("configuration.json")?;
+	fn save(&self) -> Result<()> {
+		let mut file = File::create(CONFIG_PATH)?;
 		let json = serde_json::to_string_pretty(&self)?;
 		file.write_all(json.as_bytes())?;
 		Ok(())
 	}
 
-	pub fn load() -> Result<Configuration, Error> {
-		let mut file = match File::open("configuration.json") {
+	pub fn load() -> Result<Configuration> {
+		let mut file = match File::open(CONFIG_PATH) {
 			Ok(file) => file,
 			Err(_) => {
 				let configuration = Configuration::default();
@@ -31,6 +35,7 @@ impl Configuration {
 
 		let mut buf = String::new();
 		file.read_to_string(&mut buf)?;
+
 		Ok(serde_json::from_str(&buf)?)
 	}
 }
@@ -106,16 +111,14 @@ pub struct Author {
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
 	pub channels: Vec<u64>,
-	#[serde(rename = "match")]
-	#[serde(with = "serde_regex")]
+	#[serde(rename = "match", with = "serde_regex")]
 	pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
 	pub roles: Vec<u64>,
-	#[serde(rename = "match")]
-	#[serde(with = "serde_regex")]
+	#[serde(rename = "match", with = "serde_regex")]
 	pub match_field: Vec<Regex>,
 }
 

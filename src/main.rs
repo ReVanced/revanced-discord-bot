@@ -1,22 +1,27 @@
-use std::env;
+use std::{env, process};
 use std::sync::Arc;
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use log::{error, info, trace, LevelFilter};
-use logger::logging::SimpleLogger;
+use log::{error, info, trace};
 use model::application::Configuration;
 use regex::Regex;
-use serenity::client::{Context, EventHandler};
-use serenity::model::channel::{GuildChannel, Message};
-use serenity::model::gateway::Ready;
-use serenity::model::prelude::command::Command;
-use serenity::model::prelude::interaction::{Interaction, InteractionResponseType, MessageFlags};
-use serenity::prelude::{GatewayIntents, RwLock, TypeMapKey};
-use serenity::{async_trait, Client};
+use serenity::{
+	async_trait,
+	client::{Context, EventHandler},
+	model::{
+		channel::{GuildChannel, Message},
+		gateway::Ready,
+		prelude::{
+			command::Command,
+			interaction::{Interaction, InteractionResponseType, MessageFlags},
+		},
+	},
+	prelude::{GatewayIntents, RwLock, TypeMapKey},
+	Client,
+};
+
 mod logger;
 mod model;
-
-static LOGGER: SimpleLogger = SimpleLogger;
 
 struct BotConfiguration;
 
@@ -111,7 +116,7 @@ impl EventHandler for Handler {
 			}
 
 			if stop_command {
-				std::process::exit(0);
+				process::exit(0);
 			}
 		}
 	}
@@ -225,9 +230,7 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
 	// Initialize the logging framework.
-	log::set_logger(&LOGGER)
-		.map(|()| log::set_max_level(LevelFilter::Warn))
-		.expect("Could not set logger.");
+	logger::init().expect("failed to init logger");
 
 	// Set up the configuration.
 	let configuration = load_configuration();
@@ -238,7 +241,7 @@ async fn main() {
 		Some((_, value)) => value,
 		None => {
 			error!("Environment variable DISCORD_AUTHORIZATION_TOKEN unset.");
-			std::process::exit(1);
+			process::exit(1);
 		},
 	};
 
@@ -255,9 +258,7 @@ async fn main() {
 	client.data.write().await.insert::<BotConfiguration>(Arc::new(RwLock::new(configuration)));
 
 	// Start the Discord bot.
-	if let Err(why) = client.start().await {
-		error!("{:?}", why);
-	} else {
-		info!("Client started.");
-	}
+	client.start().await.expect("failed to start discord bot");
+
+	info!("Client started.");
 }

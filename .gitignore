@@ -1,3 +1,4 @@
 /target
 configuration.json
 .env
+*.log
