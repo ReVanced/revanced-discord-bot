@@ -1,25 +1,14 @@
-name: Rust
+name: Release
 
 on:
   push:
-    branches:
-      - main
-
-  pull_request:
-
-  workflow_dispatch:
+    branches: [main, dev]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: [stable, nightly]
-
-    name: ${{ matrix.rust }}
     runs-on: ubuntu-latest
 
     steps:
@@ -31,9 +20,14 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
           components: clippy
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "lts/*"
 
       - name: Cache
         uses: actions/cache@v3
@@ -42,7 +36,7 @@ jobs:
           path: |
             ~/.cargo/registry/cache/
             target/
-          key: ${{ matrix.rust }}-${{ steps.rust-toolchain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ steps.rust-toolchain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: cargo build
         uses: actions-rs/cargo@v1
@@ -54,3 +48,9 @@ jobs:
         with:
           command: clippy
           args: --no-deps -- -D warnings
+
+      - name: Setup semantic-release
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog -D
+
+      - name: Release
+        run: npx semantic-release
