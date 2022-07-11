@@ -1,0 +1,150 @@
+{
+	"administrators": {
+		"roles": [973886585294704640],
+		"users": []
+	},
+	"thread_introductions": [
+		{
+			"channels": [985666124068814888],
+			"response": {
+				"message": "Hi. Please wait for someone to help you with your problem.\r\nUnderstand that this channel is only meant to help you.\r\nIf you encounter a bug, please report it on the respective GitHub repository instead.\r\n\r\nThank you!"
+			}
+		}
+	],
+	"message_responses": [
+		{
+			"includes": {
+				"channels": [952946952348270626, 953965039105232906],
+				"match": ["(?i)(((vanced|download|install|get|manager).*){2,})"]
+			},
+			"excludes": {
+				"roles": [],
+				"match": ["(?i)music", "(?i)eta", "(?i)error"]
+			},
+			"condition": {
+				"user": {
+					"server_age": 5
+				}
+			},
+			"response": {
+				"embed": {
+					"title": "Where or how to get ReVanced ❓",
+					"description": "You have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"color": 14908858,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "You can download prebuild packages to build ReVanced. For now, please follow the documentation in <#953993848374325269> `III`.",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "",
+						"icon_url": ""
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			}
+		},
+		{
+			"includes": {
+				"channels": [952946952348270626, 953965039105232906],
+				"match": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
+			},
+			"excludes": {
+				"roles": [],
+				"match": ["(?i)download", "(?i)get"]
+			},
+			"condition": {
+				"user": {
+					"server_age": 5
+				}
+			},
+			"response": {
+				"embed": {
+					"title": "Do you have a problem or need help ❓",
+					"description": "You have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"color": 14908858,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "Please make sure to read the second half of <#953993848374325269> `XV`, if you have enough knowledge and ask your question in <#985666124068814888>, otherwise the first half applies.",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "",
+						"icon_url": ""
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			}
+		},
+		{
+			"includes": {
+				"channels": [952946952348270626, 953965039105232906],
+				"match": [
+					"(?i)(((vanced|when|where|release|out|progress|update|manager|eta).*){2,})"
+				]
+			},
+			"excludes": {
+				"roles": [],
+				"match": ["(?i)error", "(?i)problem"]
+			},
+			"condition": {
+				"user": {
+					"server_age": 5
+				}
+			},
+			"response": {
+				"embed": {
+					"title": "When will ReVanced release ❓",
+					"description": "You have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"color": 14908858,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "ReVanced has already been released and is under active development. Please check <#953993848374325269> `XII`.",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "",
+						"icon_url": ""
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			}
+		}
+	]
+}
