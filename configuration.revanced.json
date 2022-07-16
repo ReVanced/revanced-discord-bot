@@ -145,6 +145,46 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": {
+				"channels": [952946952348270626, 953965039105232906],
+				"match": [
+					"(?i)(((tg|telegram|revanced|channel).*){2,})"
+				]
+			},
+			"excludes": {
+				"roles": [],
+				"match": ["(?i)discord"]
+			},
+			"condition": {
+				"user": {
+					"server_age": 5
+				}
+			},
+			"response": {
+				"embed": {
+					"title": "ReVanced guh ",
+					"description": "You may have encountered a fake channel, please check out the official ReVanced social media links which are located in <#954066838856273960> channel.",
+					"color": 14908858,
+					"fields": [],
+					"footer": {
+						"text": "",
+						"icon_url": ""
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			}
 		}
 	]
 }
