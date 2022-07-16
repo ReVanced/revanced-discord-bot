@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/revanced/revanced-discord-bot/compare/v1.0.2...v1.1.0) (2022-07-16)
+
+
+### Bug Fixes
+
+* incorrect description for user age condition ([#16](https://github.com/revanced/revanced-discord-bot/issues/16)) ([999a345](https://github.com/revanced/revanced-discord-bot/commit/999a345f964df3af319fb2292bc48aeabc1ecae2))
+
+
+### Features
+
+* add `rustfmt` ([#14](https://github.com/revanced/revanced-discord-bot/issues/14)) ([422bed5](https://github.com/revanced/revanced-discord-bot/commit/422bed5364e8ca2711e6190d8bca59e04f9c90e9))
+* default configuration for ReVanced ([8a8e94a](https://github.com/revanced/revanced-discord-bot/commit/8a8e94a9779635d3cb4348ab64a2239a38b1ff8e))
+
 ## [1.0.2](https://github.com/revanced/revanced-discord-bot/compare/v1.0.1...v1.0.2) (2022-07-09)
 
 
