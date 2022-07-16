@@ -150,7 +150,7 @@
 			"includes": {
 				"channels": [952946952348270626, 953965039105232906],
 				"match": [
-					"(?i)(((tg|telegram|revanced|channel).*){2,})"
+					"(?i)(((tg|telegram|downloaded|download|revanced|channel).*){2,})"
 				]
 			},
 			"excludes": {
@@ -164,7 +164,7 @@
 			},
 			"response": {
 				"embed": {
-					"title": "ReVanced guh ",
+					"title": "Official ReVanced social media",
 					"description": "You may have encountered a fake channel, please check out the official ReVanced social media links which are located in <#954066838856273960> channel.",
 					"color": 14908858,
 					"fields": [],
