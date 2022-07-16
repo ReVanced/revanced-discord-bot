@@ -19,7 +19,7 @@
 			},
 			"excludes": {
 				"roles": [],
-				"match": ["(?i)music", "(?i)eta", "(?i)error"]
+				"match": ["(?i)music", "(?i)eta", "(?i)error", "(?i)tg", "(?i)telegram", "(?i)channel"]
 			},
 			"condition": {
 				"user": {
@@ -63,7 +63,7 @@
 			},
 			"excludes": {
 				"roles": [],
-				"match": ["(?i)download", "(?i)get"]
+				"match": ["(?i)download", "(?i)get", "(?i)tg", "(?i)telegram"]
 			},
 			"condition": {
 				"user": {
@@ -150,12 +150,12 @@
 			"includes": {
 				"channels": [952946952348270626, 953965039105232906],
 				"match": [
-					"(?i)(((tg|telegram|downloaded|download|revanced|channel).*){2,})"
+					"(?i)(((tg|telegram|downloaded|download|revanced|channel).*){3,})"
 				]
 			},
 			"excludes": {
 				"roles": [],
-				"match": ["(?i)discord"]
+				"match": ["(?i)discord, (?i)error", "(?i)problem", "(?i)get"]
 			},
 			"condition": {
 				"user": {
