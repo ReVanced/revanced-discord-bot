@@ -78,7 +78,7 @@
 								"properties": {
 									"server_age": {
 										"type": "integer",
-										"description": "The user must be at least this many days old on the server."
+										"description": "The user must be less than this many days old on the server."
 									}
 								},
 								"description": "User condition."
