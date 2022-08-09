@@ -5,6 +5,14 @@
 	"description": "The Revanced Discord bot configuration schema.",
 	"type": "object",
 	"properties": {
+		"general": {
+			"type": "object",
+			"properties": {
+				"embed_color": {
+					"$ref": "#/$defs/color"
+				}
+			}
+		},
 		"administrators": {
 			"type": "object",
 			"properties": {
@@ -97,6 +105,10 @@
 		}
 	},
 	"$defs": {
+		"color": {
+			"type": "integer",
+			"description": "The color of the embed."
+		},
 		"roles": {
 			"type": "array",
 			"items": {
@@ -135,7 +147,7 @@
 					"description": "The description of the embed."
 				},
 				"color": {
-					"type": "integer",
+					"$ref": "#/$defs/color",
 					"description": "The color of the embed."
 				},
 				"fields": {

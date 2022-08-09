@@ -1,5 +1,8 @@
 {
 	"$schema": "./configuration.schema.json",
+	"general": {
+		"embed_color": 0
+	},
 	"administrators": {
 		"roles": [0],
 		"users": [0]

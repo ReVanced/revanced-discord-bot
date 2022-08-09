@@ -10,9 +10,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Configuration {
-	pub administrators: Administrators,
-	pub thread_introductions: Vec<Introduction>,
-	pub message_responses: Vec<MessageResponse>,
+    pub general: General,
+    pub administrators: Administrators,
+    pub thread_introductions: Vec<Introduction>,
+    pub message_responses: Vec<MessageResponse>,
 }
 
 const CONFIG_PATH: &str = "configuration.json";
@@ -56,6 +57,11 @@ impl Configuration {
 
 		Ok(serde_json::from_str(&buf)?)
 	}
+}
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct General {
+    pub embed_color: i32,
 }
 
 #[derive(Default, Serialize, Deserialize)]
