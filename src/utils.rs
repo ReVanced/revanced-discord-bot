@@ -1,5 +1,5 @@
 use decancer::Decancer;
-use poise::serenity_prelude::{self as serenity, CreateEmbed, RwLock};
+use poise::serenity_prelude::{self as serenity, CreateEmbed};
 use tracing::info;
 
 use crate::model::application::Configuration;

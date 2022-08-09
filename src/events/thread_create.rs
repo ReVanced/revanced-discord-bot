@@ -10,7 +10,7 @@ pub async fn thread_create(ctx: &serenity::Context, thread: &serenity::GuildChan
 
     debug!("Thread created: {:?}", thread);
 
-    let configuration_lock = get_configuration_lock(&ctx).await;
+    let configuration_lock = get_configuration_lock(ctx).await;
     let thread_introductions = &configuration_lock.read().await.thread_introductions;
 
     if let Some(introducer) = thread_introductions.iter().find(|introducer| {

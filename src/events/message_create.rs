@@ -14,7 +14,7 @@ pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Mes
         return;
     }
 
-    if let Some(message_response) = get_configuration_lock(&ctx)
+    if let Some(message_response) = get_configuration_lock(ctx)
 		.await
 		.read()
 		.await
