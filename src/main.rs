@@ -1,10 +1,12 @@
-use crate::model::application::Configuration;
-use std::{env, sync::Arc};
+use std::env;
+use std::sync::Arc;
 
 use commands::configuration;
 use events::Handler;
 use poise::serenity_prelude::{self as serenity, RwLock};
 use utils::load_configuration;
+
+use crate::model::application::Configuration;
 
 mod commands;
 mod events;
@@ -87,7 +89,9 @@ async fn main() {
     let mut client = serenity::Client::builder(
         env::var("DISCORD_AUTHORIZATION_TOKEN")
             .expect("Could not load Discord authorization token"),
-        serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT,
+        serenity::GatewayIntents::non_privileged()
+            | serenity::GatewayIntents::MESSAGE_CONTENT
+            | serenity::GatewayIntents::GUILD_MEMBERS,
     )
     .event_handler_arc(handler.clone())
     .await

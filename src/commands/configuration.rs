@@ -1,5 +1,7 @@
-use crate::{utils::load_configuration, Context, Error};
 use tracing::debug;
+
+use crate::utils::load_configuration;
+use crate::{Context, Error};
 
 #[poise::command(slash_command, prefix_command)]
 pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
