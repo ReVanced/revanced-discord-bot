@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/revanced/revanced-discord-bot/compare/v1.2.0...v1.3.0) (2022-08-09)
+
+
+### Features
+
+* ignore casing when curing user names ([6c68e73](https://github.com/revanced/revanced-discord-bot/commit/6c68e73657a206a696444ae57f8c8e270c806b30))
+
 # [1.2.0](https://github.com/revanced/revanced-discord-bot/compare/v1.1.0...v1.2.0) (2022-08-09)
 
 
