@@ -1,3 +1,12 @@
+# [1.2.0](https://github.com/revanced/revanced-discord-bot/compare/v1.1.0...v1.2.0) (2022-08-09)
+
+
+### Features
+
+* decancer user names ([28a19c4](https://github.com/revanced/revanced-discord-bot/commit/28a19c41204c6334e085bb52ca21d52b54ccd178))
+* migrate to command framework ([ba7b82a](https://github.com/revanced/revanced-discord-bot/commit/ba7b82a6de3624ad59b587fa52ee784c3f2c9cf8))
+* update ReVanced configuration to new framework ([b137217](https://github.com/revanced/revanced-discord-bot/commit/b1372177c9dc0600669df1367d98a0c15af1773b))
+
 # [1.1.0](https://github.com/revanced/revanced-discord-bot/compare/v1.0.2...v1.1.0) (2022-07-16)
 
 
