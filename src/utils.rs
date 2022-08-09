@@ -1,6 +1,6 @@
 use decancer::Decancer;
 use poise::serenity_prelude::{self as serenity, CreateEmbed};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::model::application::Configuration;
 
@@ -41,17 +41,18 @@ pub async fn cure(ctx: &serenity::Context, member: &serenity::Member) {
 
     let cured_user_name = DECANCER.cure(&name);
 
-    if name == cured_user_name {
+    if name.to_lowercase() == cured_user_name {
         return; // username is already cured
     }
 
-    info!("Cured user {}", name);
-
-    member
+    match member
         .guild_id
         .edit_member(&ctx.http, member.user.id, |edit_member| {
             edit_member.nickname(cured_user_name)
         })
         .await
-        .unwrap();
+    {
+        Ok(_) => info!("Cured user {}", member.user.tag()),
+        Err(err) => error!("Failed to cure user {}: {}", name, err),
+    }
 }
