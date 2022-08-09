@@ -1,4 +1,7 @@
-{
+{	
+	"general": {
+		"embed_color": 14908858
+	},
 	"administrators": {
 		"roles": [973886585294704640],
 		"users": []
