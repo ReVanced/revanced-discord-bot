@@ -18,7 +18,7 @@ panic = "abort"
 
 [dependencies]
 poise = "0.3.0"
-decancer = "1.4.1" # todo
+decancer = "1.4.1"
 tokio = { version = "1.20.1", features = ["rt-multi-thread"] }
 dotenv = "0.15"
 serde = { version = "1.0", features = ["derive"] }
