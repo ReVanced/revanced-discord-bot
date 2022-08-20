@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/revanced/revanced-discord-bot/compare/v1.3.0...v1.4.0) (2022-08-20)
+
+
+### Bug Fixes
+
+* allow lints ([c0bcc0a](https://github.com/revanced/revanced-discord-bot/commit/c0bcc0a12b12005abd955e39ff85b017521dc273))
+* remove unused cargo config ([0eb9356](https://github.com/revanced/revanced-discord-bot/commit/0eb9356c5ddf0487f21f98e05d2dc71c7600e043))
+
+
+### Features
+
+* moderation commands ([54171ba](https://github.com/revanced/revanced-discord-bot/commit/54171ba2ceaefb32acabdbaec1d6543bcc968d21))
+
 # [1.3.0](https://github.com/revanced/revanced-discord-bot/compare/v1.2.0...v1.3.0) (2022-08-09)
 
 
