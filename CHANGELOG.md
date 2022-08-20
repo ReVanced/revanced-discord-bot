@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/revanced/revanced-discord-bot/compare/v1.4.0...v1.5.0) (2022-08-20)
+
+
+### Bug Fixes
+
+* bot owners [skip ci] ([118ca8b](https://github.com/revanced/revanced-discord-bot/commit/118ca8bc6473b760183c172bcdce5e038d3df78a))
+* change administrating role [skip ci] ([40238e3](https://github.com/revanced/revanced-discord-bot/commit/40238e339cc5773f6a80dadebaee7738cdd864ba))
+* incorrect role [skip ci] ([946bd84](https://github.com/revanced/revanced-discord-bot/commit/946bd84fb73fae0d010bc24eb0c0e98449414b41))
+
+
+### Features
+
+* ephemeral response for permission error ([d87091b](https://github.com/revanced/revanced-discord-bot/commit/d87091bfe3c5159ef3ab9d418d2782ea10931faa))
+
 # [1.4.0](https://github.com/revanced/revanced-discord-bot/compare/v1.3.0...v1.4.0) (2022-08-20)
 
 
