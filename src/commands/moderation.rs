@@ -169,7 +169,7 @@ pub async fn mute(
         &ctx,
         ModerationKind::Mute(
             reason,
-            unmute_time.format("%d/%m/%Y %H:%M").to_string(),
+            format!("<t:{}:F>", unmute_time.timestamp()),
             result,
         ),
         &member.user,
