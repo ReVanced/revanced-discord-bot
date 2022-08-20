@@ -110,9 +110,8 @@ async fn main() {
                                 }))
                         {
                             if let Err(e) = ctx
-                                .channel_id()
-                                .send_message(&ctx.discord().http, |m| {
-                                    m.embed(|e| {
+                                .send(|m| {
+                                    m.ephemeral(true).embed(|e| {
                                         e.title("Permission error")
                                             .description(
                                                 "You do not have permission to use this command.",
