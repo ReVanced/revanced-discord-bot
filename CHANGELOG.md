@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/revanced/revanced-discord-bot/compare/v1.5.0...v1.6.0) (2022-08-20)
+
+
+### Features
+
+* format timestamp ([#17](https://github.com/revanced/revanced-discord-bot/issues/17)) ([55d0aaf](https://github.com/revanced/revanced-discord-bot/commit/55d0aaff219d2dbec6048c54a67ffb96e17f6f6e))
+
 # [1.5.0](https://github.com/revanced/revanced-discord-bot/compare/v1.4.0...v1.5.0) (2022-08-20)
 
 
