@@ -69,7 +69,7 @@
 				"match": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
 			},
 			"excludes": {
-				"roles": [],
+				"roles": [955220417969262612, 965267139902705744],
 				"match": ["(?i)download", "(?i)get"]
 			},
 			"condition": {
@@ -115,7 +115,7 @@
 				]
 			},
 			"excludes": {
-				"roles": [],
+				"roles": [955220417969262612, 965267139902705744],
 				"match": ["(?i)error", "(?i)problem"]
 			},
 			"condition": {
