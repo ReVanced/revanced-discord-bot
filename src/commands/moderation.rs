@@ -42,6 +42,7 @@ pub async fn unmute(
     .await
 }
 
+#[allow(clippy::too_many_arguments)]
 #[poise::command(slash_command)]
 pub async fn mute(
     ctx: Context<'_>,

@@ -79,6 +79,7 @@ impl Database {
         Ok(result)
     }
 
+    #[allow(dead_code)]
     pub async fn insert<T: Serialize>(
         &self,
         collection: &str,
@@ -90,6 +91,7 @@ impl Database {
         Ok(result)
     }
 
+    #[allow(dead_code)]
     pub async fn delete(
         &self,
         collection: &str,
