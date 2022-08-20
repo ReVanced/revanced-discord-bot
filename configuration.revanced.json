@@ -25,7 +25,7 @@
 				"match": ["(?i)(((vanced|download|install|get|manager).*){2,})"]
 			},
 			"excludes": {
-				"roles": [],
+				"roles": [934329947164667954],
 				"match": ["(?i)music", "(?i)eta", "(?i)error"]
 			},
 			"condition": {
@@ -69,7 +69,7 @@
 				"match": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
 			},
 			"excludes": {
-				"roles": [],
+				"roles": [934329947164667954],
 				"match": ["(?i)download", "(?i)get"]
 			},
 			"condition": {
@@ -115,7 +115,7 @@
 				]
 			},
 			"excludes": {
-				"roles": [],
+				"roles": [934329947164667954],
 				"match": ["(?i)error", "(?i)problem"]
 			},
 			"condition": {
