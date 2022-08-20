@@ -1,6 +1,7 @@
 use tracing::{debug, error};
 
 use super::*;
+use crate::utils::bot::get_data_lock;
 
 pub async fn thread_create(ctx: &serenity::Context, thread: &serenity::GuildChannel) {
     if thread.member.is_some() {
@@ -10,8 +11,14 @@ pub async fn thread_create(ctx: &serenity::Context, thread: &serenity::GuildChan
 
     debug!("Thread created: {:?}", thread);
 
-    let configuration_lock = get_configuration_lock(ctx).await;
-    let thread_introductions = &configuration_lock.read().await.thread_introductions;
+    let data_lock = get_data_lock(ctx).await;
+    let configuration_lock = data_lock.read().await;
+
+    let thread_introductions = &configuration_lock
+        .configuration
+        .read()
+        .await
+        .thread_introductions;
 
     if let Some(introducer) = thread_introductions.iter().find(|introducer| {
         introducer

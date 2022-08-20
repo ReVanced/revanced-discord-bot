@@ -3,6 +3,7 @@ use regex::Regex;
 use tracing::debug;
 
 use super::*;
+use crate::utils::bot::get_data_lock;
 
 fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
@@ -14,8 +15,11 @@ pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Mes
         return;
     }
 
-    if let Some(message_response) = get_configuration_lock(ctx)
+    if let Some(message_response) = get_data_lock(ctx)
 		.await
+		.read()
+		.await
+		.configuration
 		.read()
 		.await
 		.message_responses

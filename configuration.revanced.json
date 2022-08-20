@@ -1,6 +1,10 @@
-{	
+{
 	"general": {
-		"embed_color": 14908858
+		"embed_color": 14908858,
+		"mute": {
+			"role": 953984696491061289,
+			"take": [996121272897519687]
+		}
 	},
 	"administrators": {
 		"roles": [973886585294704640],

@@ -2,23 +2,13 @@ use std::sync::Arc;
 
 use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
 
-use crate::model::application::Configuration;
-use crate::Error;
+use crate::{Data, Error};
 
 mod guild_member_addition;
 mod guild_member_update;
 mod message_create;
+mod ready;
 mod thread_create;
-
-// Share the lock reference between the threads in serenity framework
-async fn get_configuration_lock(ctx: &serenity::Context) -> Arc<RwLock<Configuration>> {
-    ctx.data
-        .read()
-        .await
-        .get::<Configuration>()
-        .expect("Expected Configuration in TypeMap.")
-        .clone()
-}
 
 pub struct Handler<T> {
     options: poise::FrameworkOptions<T, Error>,
@@ -55,9 +45,11 @@ impl<T: Send + Sync> Handler<T> {
 
 // Manually dispatch events from serenity to poise
 #[serenity::async_trait]
-impl serenity::EventHandler for Handler<Arc<RwLock<Configuration>>> {
-    async fn ready(&self, _ctx: serenity::Context, ready: serenity::Ready) {
+impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
+    async fn ready(&self, ctx: serenity::Context, ready: serenity::Ready) {
         *self.bot_id.write().await = Some(ready.user.id);
+
+        ready::load_muted_members(&ctx, &ready).await;
     }
 
     async fn message(&self, ctx: serenity::Context, new_message: serenity::Message) {

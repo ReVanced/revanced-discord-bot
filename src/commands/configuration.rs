@@ -1,18 +1,18 @@
 use tracing::debug;
 
-use crate::utils::load_configuration;
+use crate::utils::bot::load_configuration;
 use crate::{Context, Error};
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(slash_command)]
 pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     // Update the configuration
     let configuration = load_configuration();
     // Use the embed color from the updated configuration
     let embed_color = configuration.general.embed_color;
     // Also save the new configuration to the user data
-    *ctx.data().write().await = configuration;
+    *ctx.data().write().await.configuration.write().await = configuration;
 
-    debug!("{:?} reloaded the configuration.", ctx.author().name);
+    debug!("{} reloaded the configuration.", ctx.author().name);
 
     ctx.send(|f| {
         f.ephemeral(true).embed(|f| {
@@ -25,18 +25,31 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(slash_command)]
 pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
-    debug!("{:?} stopped the bot.", ctx.author().name);
+    debug!("{} stopped the bot.", ctx.author().name);
 
-    let color = ctx.data().read().await.general.embed_color;
+    let color = ctx
+        .data()
+        .read()
+        .await
+        .configuration
+        .read()
+        .await
+        .general
+        .embed_color;
     ctx.send(|f| {
         f.ephemeral(true)
             .embed(|f| f.description("Stopped the bot.").color(color))
     })
     .await?;
 
-    ctx.discord().shard.shutdown_clean();
+    ctx.framework()
+        .shard_manager()
+        .lock()
+        .await
+        .shutdown_all()
+        .await;
 
     Ok(())
 }

@@ -10,6 +10,24 @@
 			"properties": {
 				"embed_color": {
 					"$ref": "#/$defs/color"
+				},
+				"mute": {
+					"type": "object",
+					"properties": {
+						"role": {
+							"type": "integer",
+							"description": "The id of the role."
+						},
+						"take": {
+							"type": "array",
+							"items": {
+								"type": "integer"
+							},
+							"description": "A list of role ids which will be revoked from the user.",
+							"minItems": 1,
+							"uniqueItems": true
+						}
+					}
 				}
 			}
 		},

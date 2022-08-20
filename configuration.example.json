@@ -1,7 +1,11 @@
 {
 	"$schema": "./configuration.schema.json",
 	"general": {
-		"embed_color": 0
+		"embed_color": 0,
+		"mute": {
+			"role": 0,
+			"take": [0]
+		}
 	},
 	"administrators": {
 		"roles": [0],
