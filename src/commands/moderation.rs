@@ -305,7 +305,7 @@ pub async fn ban(
     let ban_result = member
         .ban_with_reason(
             &ctx.discord().http,
-            cmp::min(dmd.or_else(|| Some(0)).unwrap(), 7),
+            cmp::min(dmd.unwrap_or(0), 7),
             reason,
         )
         .await;
