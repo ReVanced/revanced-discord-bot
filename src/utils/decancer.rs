@@ -1,20 +1,33 @@
 use ::decancer::Decancer;
-use tracing::{error, info};
+use tracing::{error, info, trace};
 
 use super::*;
 
 const DECANCER: Decancer = Decancer::new();
 
-pub async fn cure(ctx: &serenity::Context, member: &serenity::Member) {
-    println!("Curing {}", member.display_name());
+pub async fn cure(
+    ctx: &serenity::Context,
+    old_if_available: &Option<serenity::Member>,
+    member: &serenity::Member,
+) {
     let name = member.display_name().to_string();
+
+    if let Some(old) = old_if_available {
+        if old.display_name().to_string() == name {
+            trace!(
+                "Skipping decancer for {} because their name hasn't changed",
+                member.user.tag()
+            );
+            return;
+        }
+    }
 
     let mut cured_name = DECANCER
         .cure(&name)
         .replace(|c: char| !(c == ' ' || c.is_ascii_alphanumeric()), "");
 
     if cured_name.len() == 0 {
-        cured_name = "ReVanced user" .to_string();
+        cured_name = "ReVanced user".to_string();
     }
 
     if name.to_lowercase() == cured_name {
