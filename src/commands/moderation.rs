@@ -18,7 +18,7 @@ pub async fn unmute(
     let data = &ctx.data().read().await;
     let configuration = &data.configuration;
 
-    if let Some(pending_unmute) = data.pending_unmutes.lock().await.get(&member.user.id.0) {
+    if let Some(pending_unmute) = data.pending_unmutes.get(&member.user.id.0) {
         trace!("Cancelling pending unmute for {}", member.user.id.0);
         pending_unmute.abort();
     }
@@ -82,7 +82,7 @@ pub async fn mute(
 
     let unmute_time = now + mute_duration;
 
-    let data = ctx.data().read().await;
+    let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
     let embed_color = configuration.general.embed_color;
     let mute = &configuration.general.mute;
@@ -149,29 +149,25 @@ pub async fn mute(
             }
         };
 
-    let mut pending_unmute = data.pending_unmutes.lock().await;
-    if let Some(pending_unmute) = pending_unmute.get(&member.user.id.0) {
+    if let Some(pending_unmute) = data.pending_unmutes.get(&member.user.id.0) {
         trace!("Cancelling pending unmute for {}", member.user.id.0);
         pending_unmute.abort();
     }
 
-    let r = queue_unmute_member(
-        ctx.discord(),
-        &data.database,
-        &member,
-        mute_role_id,
-        mute_duration.num_seconds() as u64,
+    data.pending_unmutes.insert(
+        member.user.id.0,
+        queue_unmute_member(
+            ctx.discord(),
+            &data.database,
+            &member,
+            mute_role_id,
+            mute_duration.num_seconds() as u64,
+        ),
     );
-
-    pending_unmute.insert(member.user.id.0, r);
 
     respond_mute_command(
         &ctx,
-        ModerationKind::Mute(
-            reason,
-            format!("<t:{}:F>", unmute_time.timestamp()),
-            result,
-        ),
+        ModerationKind::Mute(reason, format!("<t:{}:F>", unmute_time.timestamp()), result),
         &member.user,
         embed_color,
     )

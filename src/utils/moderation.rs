@@ -10,7 +10,7 @@ pub enum ModerationKind {
     Unmute(Option<Error>),               // Error
 }
 
-pub fn queue_unmute_member(
+pub fn queue_unmute_member<'a>(
     ctx: &serenity::Context,
     database: &Database,
     member: &Member,

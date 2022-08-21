@@ -5,7 +5,7 @@ use std::sync::Arc;
 use commands::{configuration, moderation};
 use db::database::Database;
 use events::Handler;
-use poise::serenity_prelude::{self as serenity, Mutex, RwLock, UserId};
+use poise::serenity_prelude::{self as serenity, RwLock, UserId};
 use tokio::task::JoinHandle;
 use tracing::{error, trace};
 use utils::bot::load_configuration;
@@ -29,7 +29,7 @@ impl serenity::TypeMapKey for Data {
 pub struct Data {
     configuration: Configuration,
     database: Database,
-    pending_unmutes: Mutex<HashMap<u64, JoinHandle<Option<Error>>>>,
+    pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
 }
 
 #[tokio::main]
@@ -71,7 +71,7 @@ async fn main() {
         )
         .await
         .unwrap(),
-        pending_unmutes: Mutex::new(HashMap::new()),
+        pending_unmutes: HashMap::new(),
     }));
 
     let handler = Arc::new(Handler::new(

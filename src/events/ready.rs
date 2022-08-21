@@ -8,12 +8,11 @@ use crate::utils::moderation::queue_unmute_member;
 
 pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
     let data = get_data_lock(ctx).await;
-    let data = data.read().await;
-    let database = &data.database;
+    let data = &mut *data.write().await;
     let mute_role_id = data.configuration.general.mute.role;
-    let mut pending_unmutes = data.pending_unmutes.lock().await;
 
-    let mut cursor = database
+    let mut cursor = data
+        .database
         .find::<Muted>(
             "muted",
             Muted {
@@ -37,11 +36,11 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
                 let amount_left =
                     std::cmp::max(current.expires.unwrap() as i64 - Utc::now().timestamp(), 0);
 
-                pending_unmutes.insert(
+                data.pending_unmutes.insert(
                     member.user.id.0,
                     queue_unmute_member(
                         ctx,
-                        database,
+                        &data.database,
                         &member,
                         mute_role_id,
                         amount_left as u64, // i64 as u64 is handled properly here
