@@ -10,7 +10,7 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     // Use the embed color from the updated configuration
     let embed_color = configuration.general.embed_color;
     // Also save the new configuration to the user data
-    *ctx.data().write().await.configuration.write().await = configuration;
+    ctx.data().write().await.configuration = configuration;
 
     debug!("{} reloaded the configuration.", ctx.author().name);
 
@@ -29,15 +29,7 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
 pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
     debug!("{} stopped the bot.", ctx.author().name);
 
-    let color = ctx
-        .data()
-        .read()
-        .await
-        .configuration
-        .read()
-        .await
-        .general
-        .embed_color;
+    let color = ctx.data().read().await.configuration.general.embed_color;
     ctx.send(|f| {
         f.ephemeral(true)
             .embed(|f| f.description("Stopped the bot.").color(color))

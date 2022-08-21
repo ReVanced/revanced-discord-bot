@@ -16,9 +16,9 @@ pub async fn unmute(
     ctx.defer().await.expect("Failed to defer");
 
     let data = &ctx.data().read().await;
-    let configuration = data.configuration.read().await;
+    let configuration = &data.configuration;
 
-    if let Some(pending_unmute) = data.pending_unmutes.read().await.get(&member.user.id.0) {
+    if let Some(pending_unmute) = data.pending_unmutes.lock().await.get(&member.user.id.0) {
         trace!("Cancelling pending unmute for {}", member.user.id.0);
         pending_unmute.abort();
     }
@@ -83,7 +83,7 @@ pub async fn mute(
     let unmute_time = now + mute_duration;
 
     let data = ctx.data().read().await;
-    let configuration = data.configuration.read().await;
+    let configuration = &data.configuration;
     let embed_color = configuration.general.embed_color;
     let mute = &configuration.general.mute;
     let mute_role_id = mute.role;
@@ -149,21 +149,21 @@ pub async fn mute(
             }
         };
 
-    if let Some(pending_unmute) = data.pending_unmutes.read().await.get(&member.user.id.0) {
+    let mut pending_unmute = data.pending_unmutes.lock().await;
+    if let Some(pending_unmute) = pending_unmute.get(&member.user.id.0) {
         trace!("Cancelling pending unmute for {}", member.user.id.0);
         pending_unmute.abort();
     }
 
-    data.pending_unmutes.write().await.insert(
-        member.user.id.0,
-        queue_unmute_member(
-            ctx.discord(),
-            &data.database,
-            &member,
-            mute_role_id,
-            mute_duration.num_seconds() as u64,
-        ),
+    let r = queue_unmute_member(
+        ctx.discord(),
+        &data.database,
+        &member,
+        mute_role_id,
+        mute_duration.num_seconds() as u64,
     );
+
+    pending_unmute.insert(member.user.id.0, r);
 
     respond_mute_command(
         &ctx,
@@ -197,7 +197,7 @@ pub async fn purge(
     const MAX_BULK_DELETE_AGO_SECS: i64 = 60 * 60 * 24 * 14;
 
     let data = ctx.data().read().await;
-    let configuration = data.configuration.read().await;
+    let configuration = &data.configuration;
     let embed_color = configuration.general.embed_color;
     let channel = ctx.channel_id();
     let too_old_timestamp = Utc::now().timestamp() - MAX_BULK_DELETE_AGO_SECS;

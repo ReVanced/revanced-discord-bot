@@ -5,7 +5,7 @@ use std::sync::Arc;
 use commands::{configuration, moderation};
 use db::database::Database;
 use events::Handler;
-use poise::serenity_prelude::{self as serenity, RwLock, UserId};
+use poise::serenity_prelude::{self as serenity, Mutex, RwLock, UserId};
 use tokio::task::JoinHandle;
 use tracing::{error, trace};
 use utils::bot::load_configuration;
@@ -27,9 +27,9 @@ impl serenity::TypeMapKey for Data {
 }
 
 pub struct Data {
-    configuration: Arc<RwLock<Configuration>>,
-    database: Arc<Database>,
-    pending_unmutes: Arc<RwLock<HashMap<u64, JoinHandle<Option<Error>>>>>,
+    configuration: Configuration,
+    database: Database,
+    pending_unmutes: Mutex<HashMap<u64, JoinHandle<Option<Error>>>>,
 }
 
 #[tokio::main]
@@ -64,16 +64,14 @@ async fn main() {
         .collect();
 
     let data = Arc::new(RwLock::new(Data {
-        configuration: Arc::new(RwLock::new(configuration)),
-        database: Arc::new(
-            Database::new(
-                &env::var("MONGODB_URI").expect("MONGODB_URI environment variable not set"),
-                "revanced_discord_bot",
-            )
-            .await
-            .unwrap(),
-        ),
-        pending_unmutes: Arc::new(RwLock::new(HashMap::new())),
+        configuration,
+        database: Database::new(
+            &env::var("MONGODB_URI").expect("MONGODB_URI environment variable not set"),
+            "revanced_discord_bot",
+        )
+        .await
+        .unwrap(),
+        pending_unmutes: Mutex::new(HashMap::new()),
     }));
 
     let handler = Arc::new(Handler::new(
@@ -91,7 +89,7 @@ async fn main() {
                 Box::pin(async move {
                     if let Some(member) = ctx.author_member().await {
                         let data_lock = &ctx.data().read().await;
-                        let configuration = &data_lock.configuration.read().await;
+                        let configuration = &data_lock.configuration;
                         let administrators = &configuration.administrators;
 
                         if !(administrators

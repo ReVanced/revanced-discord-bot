@@ -20,8 +20,6 @@ pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Mes
 		.read()
 		.await
 		.configuration
-		.read()
-		.await
 		.message_responses
 		.iter()
 		.find(|&response| {

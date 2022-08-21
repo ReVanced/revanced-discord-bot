@@ -14,11 +14,7 @@ pub async fn thread_create(ctx: &serenity::Context, thread: &serenity::GuildChan
     let data_lock = get_data_lock(ctx).await;
     let configuration_lock = data_lock.read().await;
 
-    let thread_introductions = &configuration_lock
-        .configuration
-        .read()
-        .await
-        .thread_introductions;
+    let thread_introductions = &configuration_lock.configuration.thread_introductions;
 
     if let Some(introducer) = thread_introductions.iter().find(|introducer| {
         introducer
