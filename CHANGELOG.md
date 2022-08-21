@@ -1,3 +1,16 @@
+# [1.8.0](https://github.com/revanced/revanced-discord-bot/compare/v1.7.0...v1.8.0) (2022-08-21)
+
+
+### Bug Fixes
+
+* incorrect command option description ([25efe87](https://github.com/revanced/revanced-discord-bot/commit/25efe87776ddb4dc6b726778996d68c8bacc929b))
+
+
+### Features
+
+* ban command ([efaa619](https://github.com/revanced/revanced-discord-bot/commit/efaa6190e57ad996516c69c217340abe2b7c4194))
+* command descriptions ([8045e18](https://github.com/revanced/revanced-discord-bot/commit/8045e180e91f1123c1a4c92c1e7d697be61e4bf4))
+
 # [1.7.0](https://github.com/revanced/revanced-discord-bot/compare/v1.6.0...v1.7.0) (2022-08-21)
 
 
