@@ -1,3 +1,17 @@
+# [1.7.0](https://github.com/revanced/revanced-discord-bot/compare/v1.6.0...v1.7.0) (2022-08-21)
+
+
+### Bug Fixes
+
+* handle unavailable guilds ([5519bb2](https://github.com/revanced/revanced-discord-bot/commit/5519bb2ee54fd4b00ac37e52b20c1ee9e143af76))
+
+
+### Features
+
+* allow ascii only names ([3f05f8c](https://github.com/revanced/revanced-discord-bot/commit/3f05f8cd922e30755cc5a99a825c433bc4958e80))
+* only cure users on name change ([1f5063b](https://github.com/revanced/revanced-discord-bot/commit/1f5063b66f6c54cc19745bde47af24a784731a80))
+* take contributor roles on mute ([#19](https://github.com/revanced/revanced-discord-bot/issues/19)) [skip ci] ([e20e5b1](https://github.com/revanced/revanced-discord-bot/commit/e20e5b178f215b4a1784d24d60faf8ed419a99bf))
+
 # [1.6.0](https://github.com/revanced/revanced-discord-bot/compare/v1.5.0...v1.6.0) (2022-08-20)
 
 
