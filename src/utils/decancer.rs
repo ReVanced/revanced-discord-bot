@@ -26,7 +26,7 @@ pub async fn cure(
         .cure(&name)
         .replace(|c: char| !(c == ' ' || c.is_ascii_alphanumeric()), "");
 
-    if cured_name.len() == 0 {
+    if cured_name.is_empty() {
         cured_name = "ReVanced user".to_string();
     }
 
