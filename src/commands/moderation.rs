@@ -54,7 +54,7 @@ pub async fn mute(
     #[description = "Hours"] hours: Option<i64>,
     #[description = "Days"] days: Option<i64>,
     #[description = "Months"] months: Option<i64>,
-    #[description = "Months"] reason: String,
+    #[description = "The reason of the mute"] reason: String,
 ) -> Result<(), Error> {
     let now = Utc::now();
     let mut mute_duration = Duration::zero();
@@ -287,5 +287,3 @@ pub async fn purge(
         .await?;
     Ok(())
 }
-
-
