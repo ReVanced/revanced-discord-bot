@@ -1,3 +1,5 @@
+use std::cmp;
+
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
@@ -285,5 +287,48 @@ pub async fn purge(
             )
         })
         .await?;
+    Ok(())
+}
+
+/// Ban a member.
+#[poise::command(slash_command)]
+pub async fn ban(
+    ctx: Context<'_>,
+    #[description = "User"] member: Member,
+    #[description = "Amount of days to delete messages"] dmd: Option<u8>,
+    #[description = "Reason for the ban"] reason: Option<String>,
+) -> Result<(), Error> {
+    let reason = &reason
+        .or_else(|| Some("None specified".to_string()))
+        .unwrap();
+
+    let ban_result = member
+        .ban_with_reason(
+            &ctx.discord().http,
+            cmp::min(dmd.or_else(|| Some(0)).unwrap(), 7),
+            reason,
+        )
+        .await;
+
+    let embed_color = ctx.data().read().await.configuration.general.embed_color;
+
+    ctx.send(|f| {
+        f.embed(|e| {
+            if let Err(error) = ban_result {
+                e.title(format!("Failed to ban {}", member.user.tag()))
+                    .field("Error", error, false)
+            } else {
+                e.title(format!("Banned {}", member.user.tag()))
+                    .thumbnail(
+                        member
+                            .avatar_url()
+                            .unwrap_or_else(|| member.user.default_avatar_url()),
+                    )
+                    .field("Reason", reason, false)
+            }
+            .color(embed_color)
+        })
+    })
+    .await?;
     Ok(())
 }
