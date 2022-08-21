@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/revanced/revanced-discord-bot/compare/v1.8.0...v1.8.1) (2022-08-21)
+
+
+### Bug Fixes
+
+* add ban command to poise framework ([e66e8fd](https://github.com/revanced/revanced-discord-bot/commit/e66e8fd004ecc1644bb13f922aa5ed2197e287ba))
+
 # [1.8.0](https://github.com/revanced/revanced-discord-bot/compare/v1.7.0...v1.8.0) (2022-08-21)
 
 
