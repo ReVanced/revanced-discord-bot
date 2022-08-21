@@ -3,6 +3,7 @@ use tracing::debug;
 use crate::utils::bot::load_configuration;
 use crate::{Context, Error};
 
+/// Reload the Discord bot.
 #[poise::command(slash_command)]
 pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     // Update the configuration
@@ -25,6 +26,7 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+/// Stop the Discord bot.
 #[poise::command(slash_command)]
 pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
     debug!("{} stopped the bot.", ctx.author().name);
@@ -46,6 +48,7 @@ pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+/// Register slash commands.
 #[poise::command(prefix_command, slash_command, ephemeral = true)]
 pub async fn register(ctx: Context<'_>) -> Result<(), Error> {
     poise::builtins::register_application_commands_buttons(ctx).await?;

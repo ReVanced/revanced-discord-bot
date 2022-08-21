@@ -8,6 +8,7 @@ use crate::db::model::Muted;
 use crate::utils::moderation::{queue_unmute_member, respond_mute_command, ModerationKind};
 use crate::{Context, Error};
 
+/// Unmute a member.
 #[poise::command(slash_command)]
 pub async fn unmute(
     ctx: Context<'_>,
@@ -42,6 +43,7 @@ pub async fn unmute(
     .await
 }
 
+/// Mute a member.
 #[allow(clippy::too_many_arguments)]
 #[poise::command(slash_command)]
 pub async fn mute(
@@ -285,3 +287,5 @@ pub async fn purge(
         .await?;
     Ok(())
 }
+
+
