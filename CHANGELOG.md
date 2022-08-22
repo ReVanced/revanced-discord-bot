@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/revanced/revanced-discord-bot/compare/v1.8.1...v1.9.0) (2022-08-22)
+
+
+### Features
+
+* reply command ([e36df0e](https://github.com/revanced/revanced-discord-bot/commit/e36df0e9f73e9f95090d2130e4274cc68c133627))
+
 ## [1.8.1](https://github.com/revanced/revanced-discord-bot/compare/v1.8.0...v1.8.1) (2022-08-21)
 
 
