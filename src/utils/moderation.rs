@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use poise::serenity_prelude::Http;
 use tokio::task::JoinHandle;
 
 use super::*;
@@ -11,13 +14,13 @@ pub enum ModerationKind {
 }
 
 pub fn queue_unmute_member(
-    ctx: &serenity::Context,
-    database: &Database,
+    http: &Arc<Http>,
+    database: &Arc<Database>,
     member: &Member,
     mute_role_id: u64,
     mute_duration: u64,
 ) -> JoinHandle<Option<Error>> {
-    let ctx = ctx.clone();
+    let http = http.clone();
     let database = database.clone();
     let mut member = member.clone();
 
@@ -46,9 +49,9 @@ pub fn queue_unmute_member(
                 .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
                 .collect::<Vec<_>>();
 
-            if let Err(add_role_result) = member.add_roles(&ctx.http, &taken_roles).await {
+            if let Err(add_role_result) = member.add_roles(&http, &taken_roles).await {
                 Some(Error::from(add_role_result))
-            } else if let Err(remove_result) = member.remove_role(ctx.http, mute_role_id).await {
+            } else if let Err(remove_result) = member.remove_role(http, mute_role_id).await {
                 Some(Error::from(remove_result))
             } else {
                 None

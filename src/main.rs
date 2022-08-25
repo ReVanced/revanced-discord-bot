@@ -28,7 +28,7 @@ impl serenity::TypeMapKey for Data {
 
 pub struct Data {
     configuration: Configuration,
-    database: Database,
+    database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
 }
 
@@ -67,12 +67,14 @@ async fn main() {
 
     let data = Arc::new(RwLock::new(Data {
         configuration,
-        database: Database::new(
-            &env::var("MONGODB_URI").expect("MONGODB_URI environment variable not set"),
-            "revanced_discord_bot",
-        )
-        .await
-        .unwrap(),
+        database: Arc::new(
+            Database::new(
+                &env::var("MONGODB_URI").expect("MONGODB_URI environment variable not set"),
+                "revanced_discord_bot",
+            )
+            .await
+            .unwrap(),
+        ),
         pending_unmutes: HashMap::new(),
     }));
 

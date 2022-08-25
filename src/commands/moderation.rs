@@ -30,7 +30,7 @@ pub async fn unmute(
         &ctx,
         ModerationKind::Unmute(
             queue_unmute_member(
-                ctx.discord(),
+                &ctx.discord().http,
                 &data.database,
                 &member,
                 configuration.general.mute.role,
@@ -161,7 +161,7 @@ pub async fn mute(
     data.pending_unmutes.insert(
         member.user.id.0,
         queue_unmute_member(
-            ctx.discord(),
+            &ctx.discord().http,
             &data.database,
             &member,
             mute_role_id,
@@ -303,11 +303,7 @@ pub async fn ban(
         .unwrap();
 
     let ban_result = member
-        .ban_with_reason(
-            &ctx.discord().http,
-            cmp::min(dmd.unwrap_or(0), 7),
-            reason,
-        )
+        .ban_with_reason(&ctx.discord().http, cmp::min(dmd.unwrap_or(0), 7), reason)
         .await;
 
     let embed_color = ctx.data().read().await.configuration.general.embed_color;
