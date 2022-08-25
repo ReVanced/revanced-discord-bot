@@ -23,11 +23,17 @@
 		{
 			"includes": {
 				"channels": [0],
-				"match": [""]
+				"match": {
+					"text": [],
+					"ocr": [""]
+				}
 			},
 			"excludes": {
 				"roles": [0],
-				"match": [""]
+				"match": {
+					"text": [""],
+					"ocr": []
+				}
 			},
 			"condition": {
 				"user": {

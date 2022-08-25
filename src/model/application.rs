@@ -5,6 +5,7 @@ use std::path::Path;
 use dirs::config_dir;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use serde_with_macros::skip_serializing_none;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Configuration {
@@ -144,15 +145,24 @@ pub struct Author {
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
     pub channels: Vec<u64>,
-    #[serde(rename = "match", with = "serde_regex")]
-    pub match_field: Vec<Regex>,
+    #[serde(rename = "match")]
+    pub match_field: Match,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
     pub roles: Vec<u64>,
-    #[serde(rename = "match", with = "serde_regex")]
-    pub match_field: Vec<Regex>,
+    #[serde(rename = "match")]
+    pub match_field: Match,
+}
+
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize)]
+pub struct Match {
+    #[serde(with = "serde_regex")]
+    pub text: Vec<Regex>,
+    #[serde(with = "serde_regex")]
+    pub ocr: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
