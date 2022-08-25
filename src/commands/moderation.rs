@@ -98,21 +98,22 @@ pub async fn mute(
         if let Err(add_role_result) = member.add_role(&ctx.discord().http, mute_role_id).await {
             Some(Error::from(add_role_result))
         } else {
+            // accumulate all roles to take from the member
             let removed_roles = member
                 .roles
                 .iter()
                 .filter(|r| take.contains(&r.0))
                 .map(|r| r.to_string())
                 .collect::<Vec<_>>();
-
-            let removed = member
+            // take them from the member, get remaining roles
+            let remaining_roles = member
                 .remove_roles(
                     &ctx.discord().http,
                     &take.iter().map(|&r| RoleId::from(r)).collect::<Vec<_>>(),
                 )
                 .await;
 
-            if let Err(remove_role_result) = removed {
+            if let Err(remove_role_result) = remaining_roles {
                 Some(Error::from(remove_role_result))
             } else {
                 // Roles which were removed from the user

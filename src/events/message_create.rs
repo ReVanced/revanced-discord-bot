@@ -7,11 +7,11 @@ use super::*;
 use crate::utils::bot::get_data_lock;
 use crate::utils::ocr;
 
-fn contains_match(regex: &Vec<Regex>, text: &str) -> bool {
+fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
 }
 
-async fn attachments_contains(attachments: &Vec<Attachment>, regex: &Vec<Regex>) -> bool {
+async fn attachments_contains(attachments: &[Attachment], regex: &[Regex]) -> bool {
     for attachment in attachments {
         debug!("Checking attachment {}", &attachment.url);
 
@@ -31,7 +31,7 @@ async fn attachments_contains(attachments: &Vec<Attachment>, regex: &Vec<Regex>)
 
 pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Message) {
     debug!("Received message: {}", new_message.content);
-   
+
     if new_message.guild_id.is_none() || new_message.author.bot {
         return;
     }
@@ -64,18 +64,19 @@ pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Mes
         let contains_attachments = !new_message.attachments.is_empty();
 
         // check if the message does not match any of the excludes
-        if contains_match(&excludes.match_field.text, &message) {
+        if contains_match(&excludes.match_field.text, message) {
             continue;
         }
 
-        if contains_attachments && !excludes.match_field.ocr.is_empty() {
-            if attachments_contains(&new_message.attachments, &excludes.match_field.ocr).await {
-                continue;
-            }
+        if contains_attachments
+            && !excludes.match_field.ocr.is_empty()
+            && attachments_contains(&new_message.attachments, &excludes.match_field.ocr).await
+        {
+            continue;
         }
 
         // check if the message does match any of the includes
-        if !(contains_match(&response.includes.match_field.text, &message)
+        if !(contains_match(&response.includes.match_field.text, message)
             || (contains_attachments
                 && !response.includes.match_field.ocr.is_empty()
                 && attachments_contains(
