@@ -19,9 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt-get install pkg-config libssl-dev
-
       - name: Setup Rust toolchain
         id: rust-toolchain
         uses: actions-rs/toolchain@v1
@@ -30,12 +27,6 @@ jobs:
           toolchain: stable
           override: true
           components: clippy
-
-      - name: Setup Node.js
-        if: github.event_name != 'pull_request'
-        uses: actions/setup-node@v2
-        with:
-          node-version: "lts/*"
 
       - name: Cache
         uses: actions/cache@v3
@@ -50,7 +41,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --target=x86_64-unknown-linux-musl
+          args: --release
           use-cross: true
 
       - name: cargo clippy
@@ -63,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: revanced-discord-bot
-          path: target/x86_64-unknown-linux-musl/release/revanced-discord-bot
+          path: target/release/revanced-discord-bot
 
       - name: Setup semantic-release
         if: github.event_name != 'pull_request'
