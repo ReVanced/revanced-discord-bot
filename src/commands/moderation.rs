@@ -30,7 +30,7 @@ pub async fn unmute(
         &ctx,
         ModerationKind::Unmute(
             queue_unmute_member(
-                ctx.discord(),
+                &ctx.discord().http,
                 &data.database,
                 &member,
                 configuration.general.mute.role,
@@ -98,21 +98,22 @@ pub async fn mute(
         if let Err(add_role_result) = member.add_role(&ctx.discord().http, mute_role_id).await {
             Some(Error::from(add_role_result))
         } else {
+            // accumulate all roles to take from the member
             let removed_roles = member
                 .roles
                 .iter()
                 .filter(|r| take.contains(&r.0))
                 .map(|r| r.to_string())
                 .collect::<Vec<_>>();
-
-            let removed = member
+            // take them from the member, get remaining roles
+            let remaining_roles = member
                 .remove_roles(
                     &ctx.discord().http,
                     &take.iter().map(|&r| RoleId::from(r)).collect::<Vec<_>>(),
                 )
                 .await;
 
-            if let Err(remove_role_result) = removed {
+            if let Err(remove_role_result) = remaining_roles {
                 Some(Error::from(remove_role_result))
             } else {
                 // Roles which were removed from the user
@@ -161,7 +162,7 @@ pub async fn mute(
     data.pending_unmutes.insert(
         member.user.id.0,
         queue_unmute_member(
-            ctx.discord(),
+            &ctx.discord().http,
             &data.database,
             &member,
             mute_role_id,
@@ -303,11 +304,7 @@ pub async fn ban(
         .unwrap();
 
     let ban_result = member
-        .ban_with_reason(
-            &ctx.discord().http,
-            cmp::min(dmd.unwrap_or(0), 7),
-            reason,
-        )
+        .ban_with_reason(&ctx.discord().http, cmp::min(dmd.unwrap_or(0), 7), reason)
         .await;
 
     let embed_color = ctx.data().read().await.configuration.general.embed_color;

@@ -39,7 +39,7 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
                 data.pending_unmutes.insert(
                     member.user.id.0,
                     queue_unmute_member(
-                        ctx,
+                        &ctx.http,
                         &data.database,
                         &member,
                         mute_role_id,

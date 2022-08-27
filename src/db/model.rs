@@ -2,19 +2,16 @@ use std::fmt::Display;
 
 use bson::Document;
 use serde::{Deserialize, Serialize};
+use serde_with_macros::skip_serializing_none;
 
 // Models
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Muted {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub taken_roles: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub expires: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
 

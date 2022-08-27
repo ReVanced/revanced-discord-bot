@@ -18,16 +18,19 @@ panic = "abort"
 
 [dependencies]
 bson = "2.4"
+serde_with_macros = "2.0"
 mongodb = "2.3"
 poise = "0.3"
 decancer = "1.4"
-tokio = { version = "1.20.1", features = ["rt-multi-thread"] }
+tokio = { version = "1.20", features = ["rt-multi-thread"] }
 dotenv = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 regex = "1.0"
 serde_regex = "1.1"
+reqwest = { version = "0.11" }
 chrono = "0.4"
 dirs = "4.0"
+tesseract = "0.12"
 tracing = { version = "0.1", features = ["max_level_debug", "release_max_level_info"] }
 tracing-subscriber = "0.3"

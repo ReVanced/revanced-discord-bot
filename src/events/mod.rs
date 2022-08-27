@@ -87,8 +87,8 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         thread_create::thread_create(&ctx, &thread).await;
     }
 
-    async fn guild_member_addition(&self, ctx: serenity::Context, new_member: serenity::Member) {
-        guild_member_addition::guild_member_addition(&ctx, &new_member).await;
+    async fn guild_member_addition(&self, ctx: serenity::Context, mut new_member: serenity::Member) {
+        guild_member_addition::guild_member_addition(&ctx, &mut new_member).await;
     }
 
     async fn guild_member_update(

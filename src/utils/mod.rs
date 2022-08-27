@@ -4,3 +4,4 @@ pub mod bot;
 pub mod decancer;
 pub mod embed;
 pub mod moderation;
+pub mod ocr;
