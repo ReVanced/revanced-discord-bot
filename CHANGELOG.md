@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/revanced/revanced-discord-bot/compare/v1.9.0...v1.10.0) (2022-08-27)
+
+
+### Features
+
+* ocr & mute on rejoin ([#20](https://github.com/revanced/revanced-discord-bot/issues/20)) ([afb7e79](https://github.com/revanced/revanced-discord-bot/commit/afb7e79b6756f79c99e6db60e47ea054104fa415))
+
 # [1.9.0](https://github.com/revanced/revanced-discord-bot/compare/v1.8.1...v1.9.0) (2022-08-22)
 
 
