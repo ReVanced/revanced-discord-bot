@@ -45,7 +45,6 @@ jobs:
         with:
           command: build
           args: --release
-          use-cross: true
 
       - name: cargo clippy
         uses: actions-rs/cargo@v1
