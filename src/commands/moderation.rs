@@ -32,7 +32,7 @@ pub async fn unmute(
 
     respond_moderation(
         &ctx,
-        ModerationKind::Unmute(
+        &ModerationKind::Unmute(
             queue_unmute_member(
                 &ctx.discord().http,
                 &data.database,
@@ -44,6 +44,7 @@ pub async fn unmute(
             .unwrap(),
         ),
         &member.user,
+        &configuration,
     )
     .await
 }
@@ -174,8 +175,9 @@ pub async fn mute(
 
     respond_moderation(
         &ctx,
-        ModerationKind::Mute(reason, format!("<t:{}:F>", unmute_time.timestamp()), result),
+        &ModerationKind::Mute(reason, format!("<t:{}:F>", unmute_time.timestamp()), result),
         &member.user,
+        &configuration,
     )
     .await
 }
@@ -300,24 +302,35 @@ pub async fn ban(
     #[description = "Amount of days to delete messages"] dmd: Option<u8>,
     #[description = "Reason for the ban"] reason: Option<String>,
 ) -> Result<(), Error> {
-    respond_moderation(
-        &ctx,
-        ModerationKind::Ban(
-            reason.clone(),
-            ban_moderation(&ctx, BanKind::Ban(user.clone(), dmd, reason)).await,
-        ),
-        &user,
-    )
-    .await
+    handle_ban(&ctx, &BanKind::Ban(user, dmd, reason)).await
 }
 
 /// Unban a user.
 #[poise::command(slash_command)]
 pub async fn unban(ctx: Context<'_>, #[description = "User"] user: User) -> Result<(), Error> {
+    handle_ban(&ctx, &BanKind::Unban(user)).await
+}
+
+async fn handle_ban(ctx: &Context<'_>, kind: &BanKind) -> Result<(), Error> {
+    let data = ctx.data().read().await;
+
+    let ban_result = ban_moderation(&ctx, &kind).await;
+
+    let moderated_user;
     respond_moderation(
         &ctx,
-        ModerationKind::Unban(ban_moderation(&ctx, BanKind::Unban(user.clone())).await),
-        &user,
+        &match kind {
+            BanKind::Ban(user, _, reason) => {
+                moderated_user = user;
+                ModerationKind::Ban(reason.clone(), ban_result)
+            },
+            BanKind::Unban(user) => {
+                moderated_user = user;
+                ModerationKind::Unban(ban_result)
+            },
+        },
+        &moderated_user,
+        &data.configuration,
     )
     .await
 }

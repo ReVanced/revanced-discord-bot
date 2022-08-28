@@ -5,3 +5,5 @@ pub mod decancer;
 pub mod embed;
 pub mod moderation;
 pub mod ocr;
+pub mod autorespond;
+pub mod media_channel;

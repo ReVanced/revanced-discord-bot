@@ -19,15 +19,17 @@
 							"description": "The id of the role."
 						},
 						"take": {
-							"type": "array",
-							"items": {
-								"type": "integer"
-							},
-							"description": "A list of role ids which will be revoked from the user.",
-							"minItems": 1,
-							"uniqueItems": true
+							"$ref": "#/$defs/roles"
 						}
 					}
+				},
+				"media_channels": {
+					"$ref": "#/$defs/channels",
+					"description": "A list of channel ids where only media is allowed."
+				},
+				"logging_channel": {
+					"type": "integer",
+					"description": "The id of the channel to send logs to."
 				}
 			}
 		},
@@ -39,13 +41,8 @@
 					"description": "A list of role ids. Users with these roles have administrative privileges over this Discord bot."
 				},
 				"users": {
-					"type": "array",
-					"items": {
-						"type": "integer"
-					},
-					"description": "A list of user ids. Users with these ids have administrative privileges over this Discord bot.",
-					"minItems": 1,
-					"uniqueItems": true
+					"$ref": "#/$defs/users",
+					"description": "A list of user ids. Users with these ids have administrative privileges over this Discord bot."
 				}
 			},
 			"description": "The list of administrators to control the Discord bot."
@@ -127,16 +124,16 @@
 			"type": "integer",
 			"description": "The color of the embed."
 		},
+		"users": {
+			"$ref": "#/$defs/ids"
+		},
 		"roles": {
-			"type": "array",
-			"items": {
-				"type": "integer"
-			},
-			"description": "A list of role ids.",
-			"uniqueItems": true,
-			"minItems": 1
+			"$ref": "#/$defs/ids"
 		},
 		"channels": {
+			"$ref": "#/$defs/ids"
+		},
+		"ids": {
 			"type": "array",
 			"items": {
 				"type": "integer"

@@ -5,7 +5,9 @@
 		"mute": {
 			"role": 0,
 			"take": [0]
-		}
+		},
+		"media_channels": [0],
+		"logging_channel": 0
 	},
 	"administrators": {
 		"roles": [0],

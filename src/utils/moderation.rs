@@ -2,7 +2,7 @@ use std::cmp;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
-use poise::serenity_prelude::{Http, User};
+use poise::serenity_prelude::{ChannelId, Http, User};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, trace};
 
@@ -10,8 +10,10 @@ use super::bot::get_data_lock;
 use super::*;
 use crate::db::database::Database;
 use crate::db::model::Muted;
+use crate::model::application::Configuration;
 use crate::serenity::SerenityError;
 use crate::{Context, Error};
+
 pub enum ModerationKind {
     Mute(String, String, Option<Error>), // Reason, Expires, Error
     Unmute(Option<Error>),               // Error
@@ -112,84 +114,114 @@ pub fn queue_unmute_member(
 }
 
 // TODO: refactor
-pub async fn respond_moderation(
+pub async fn respond_moderation<'a>(
     ctx: &Context<'_>,
-    moderation: ModerationKind,
+    moderation: &ModerationKind,
     user: &serenity::User,
+    configuration: &Configuration,
 ) -> Result<(), Error> {
-    let tag = user.tag();
-    let image = user
-        .avatar_url()
-        .unwrap_or_else(|| user.default_avatar_url());
-
-    let embed_color = ctx.data().read().await.configuration.general.embed_color;
-
-    ctx.send(|f| {
-        f.embed(|f| {
-            match moderation {
-                ModerationKind::Mute(reason, expires, error) => match error {
-                    Some(err) => f.title(format!("Failed to mute {}", tag)).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
-                    ),
-                    None => f.title(format!("Muted {}", tag)),
-                }
-                .field("Reason", reason, false)
-                .field("Expires", expires, false),
-                ModerationKind::Unmute(error) => match error {
-                    Some(err) => f.title(format!("Failed to unmute {}", tag)).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
-                    ),
-                    None => f.title(format!("Unmuted {}", tag)),
-                },
-                ModerationKind::Ban(reason, error) => {
-                    let f = match error {
-                        Some(err) => f.title(format!("Failed to ban {}", tag)).field(
-                            "Exception",
-                            err.to_string(),
-                            false,
-                        ),
-                        None => f.title(format!("Banned {}", tag)),
-                    };
-                    if let Some(reason) = reason {
-                        f.field("Reason", reason, false)
-                    } else {
-                        f
-                    }
-                },
-                ModerationKind::Unban(error) => match error {
-                    Some(err) => f.title(format!("Failed to unban {}", tag)).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
-                    ),
-                    None => f.title(format!("Unbanned {}", tag)),
-                },
+    let create_embed = |f: &mut serenity::CreateEmbed| {
+        let tag = user.tag();
+        match moderation {
+            ModerationKind::Mute(reason, expires, error) => match error {
+                Some(err) => f.title(format!("Failed to mute {}", tag)).field(
+                    "Exception",
+                    err.to_string(),
+                    false,
+                ),
+                None => f.title(format!("Muted {}", tag)),
             }
-            .color(embed_color)
-            .thumbnail(image)
+            .field("Reason", reason, false)
+            .field("Expires", expires, false),
+            ModerationKind::Unmute(error) => match error {
+                Some(err) => f.title(format!("Failed to unmute {}", tag)).field(
+                    "Exception",
+                    err.to_string(),
+                    false,
+                ),
+                None => f.title(format!("Unmuted {}", tag)),
+            },
+            ModerationKind::Ban(reason, error) => {
+                let f = match error {
+                    Some(err) => f.title(format!("Failed to ban {}", tag)).field(
+                        "Exception",
+                        err.to_string(),
+                        false,
+                    ),
+                    None => f.title(format!("Banned {}", tag)),
+                };
+                if let Some(reason) = reason {
+                    f.field("Reason", reason, false)
+                } else {
+                    f
+                }
+            },
+            ModerationKind::Unban(error) => match error {
+                Some(err) => f.title(format!("Failed to unban {}", tag)).field(
+                    "Exception",
+                    err.to_string(),
+                    false,
+                ),
+                None => f.title(format!("Unbanned {}", tag)),
+            },
+        }
+        .color(configuration.general.embed_color)
+        .thumbnail(
+            &user
+                .avatar_url()
+                .unwrap_or_else(|| user.default_avatar_url()),
+        );
+    };
+
+    let reply = ctx
+        .send(|reply| {
+            reply.embed(|embed| {
+                create_embed(embed);
+                embed
+            })
         })
-    })
-    .await?;
+        .await?;
+
+    let response = reply.message().await?;
+    ChannelId(configuration.general.logging_channel)
+        .send_message(&ctx.discord().http, |reply| {
+            reply.embed(|embed| {
+                create_embed(embed);
+                embed.field(
+                    "Reference",
+                    format!(
+                        "[Jump to message](https://discord.com/channels/{}/{}/{})",
+                        ctx.guild_id().unwrap().0,
+                        response.channel_id,
+                        response.id
+                    ),
+                    false,
+                )
+            })
+        })
+        .await?;
 
     Ok(())
 }
 
-pub async fn ban_moderation(ctx: &Context<'_>, kind: BanKind) -> Option<SerenityError> {
+pub async fn ban_moderation(ctx: &Context<'_>, kind: &BanKind) -> Option<SerenityError> {
     let guild_id = ctx.guild_id().unwrap().0;
     let http = &ctx.discord().http;
 
     match kind {
         BanKind::Ban(user, dmd, reason) => {
-            let reason = &reason
+            let reason = reason
+                .clone()
                 .or_else(|| Some("None specified".to_string()))
                 .unwrap();
 
             let ban_result = http
-                .ban_user(guild_id, user.id.0, cmp::min(dmd.unwrap_or(0), 7), reason)
+                .ban_user(
+                    guild_id,
+                    user.id.0,
+                    cmp::min(dmd.unwrap_or(0), 7),
+                    reason.as_ref(),
+                )
                 .await;
 
             if let Err(err) = ban_result {

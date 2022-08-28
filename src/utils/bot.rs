@@ -11,10 +11,5 @@ pub fn load_configuration() -> Configuration {
 
 // Share the lock reference between the threads in serenity framework
 pub async fn get_data_lock(ctx: &serenity::Context) -> Arc<RwLock<Data>> {
-    ctx.data
-        .read()
-        .await
-        .get::<Data>()
-        .expect("Expected Configuration in TypeMap.")
-        .clone()
+    ctx.data.read().await.get::<Data>().unwrap().clone()
 }
