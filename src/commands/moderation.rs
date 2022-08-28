@@ -1,13 +1,17 @@
-use std::cmp;
-
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
-use poise::serenity_prelude::{self as serenity, Member, RoleId};
+use poise::serenity_prelude::{self as serenity, Member, RoleId, User};
 use tracing::{debug, trace};
 
 use crate::db::model::Muted;
-use crate::utils::moderation::{queue_unmute_member, respond_mute_command, ModerationKind};
+use crate::utils::moderation::{
+    ban_moderation,
+    queue_unmute_member,
+    respond_moderation,
+    BanKind,
+    ModerationKind,
+};
 use crate::{Context, Error};
 
 /// Unmute a member.
@@ -26,7 +30,7 @@ pub async fn unmute(
         pending_unmute.abort();
     }
 
-    respond_mute_command(
+    respond_moderation(
         &ctx,
         ModerationKind::Unmute(
             queue_unmute_member(
@@ -40,7 +44,6 @@ pub async fn unmute(
             .unwrap(),
         ),
         &member.user,
-        configuration.general.embed_color,
     )
     .await
 }
@@ -88,7 +91,6 @@ pub async fn mute(
 
     let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
-    let embed_color = configuration.general.embed_color;
     let mute = &configuration.general.mute;
     let mute_role_id = mute.role;
     let take = &mute.take;
@@ -170,11 +172,10 @@ pub async fn mute(
         ),
     );
 
-    respond_mute_command(
+    respond_moderation(
         &ctx,
         ModerationKind::Mute(reason, format!("<t:{}:F>", unmute_time.timestamp()), result),
         &member.user,
-        embed_color,
     )
     .await
 }
@@ -183,7 +184,7 @@ pub async fn mute(
 #[poise::command(slash_command)]
 pub async fn purge(
     ctx: Context<'_>,
-    #[description = "User"] member: Option<Member>,
+    #[description = "User"] user: Option<User>,
     #[description = "Until message"] until: Option<String>,
     #[min = 1]
     #[max = 1000]
@@ -203,10 +204,10 @@ pub async fn purge(
     let channel = ctx.channel_id();
     let too_old_timestamp = Utc::now().timestamp() - MAX_BULK_DELETE_AGO_SECS;
 
-    let user = ctx.discord().http.get_current_user().await?;
-    let image = user
+    let current_user = ctx.discord().http.get_current_user().await?;
+    let image = current_user
         .avatar_url()
-        .unwrap_or_else(|| user.default_avatar_url());
+        .unwrap_or_else(|| current_user.default_avatar_url());
 
     let handle = ctx
         .send(|f| {
@@ -238,13 +239,13 @@ pub async fn purge(
             .collect::<Vec<_>>();
 
         // Filter for messages from the user
-        if let Some(ref member) = member {
+        if let Some(ref user) = user {
             messages = messages
                 .into_iter()
-                .filter(|msg| msg.author.id == member.user.id)
+                .filter(|msg| msg.author.id == user.id)
                 .collect::<Vec<_>>();
 
-            debug!("Filtered messages by {}. Left: {}", member, messages.len());
+            debug!("Filtered messages by {}. Left: {}", user, messages.len());
         }
 
         // Filter for messages until the g/mutiven id
@@ -291,41 +292,32 @@ pub async fn purge(
     Ok(())
 }
 
-/// Ban a member.
+/// Ban a user.
 #[poise::command(slash_command)]
 pub async fn ban(
     ctx: Context<'_>,
-    #[description = "User"] member: Member,
+    #[description = "User"] user: User,
     #[description = "Amount of days to delete messages"] dmd: Option<u8>,
     #[description = "Reason for the ban"] reason: Option<String>,
 ) -> Result<(), Error> {
-    let reason = &reason
-        .or_else(|| Some("None specified".to_string()))
-        .unwrap();
+    respond_moderation(
+        &ctx,
+        ModerationKind::Ban(
+            reason.clone(),
+            ban_moderation(&ctx, BanKind::Ban(user.clone(), dmd, reason)).await,
+        ),
+        &user,
+    )
+    .await
+}
 
-    let ban_result = member
-        .ban_with_reason(&ctx.discord().http, cmp::min(dmd.unwrap_or(0), 7), reason)
-        .await;
-
-    let embed_color = ctx.data().read().await.configuration.general.embed_color;
-
-    ctx.send(|f| {
-        f.embed(|e| {
-            if let Err(error) = ban_result {
-                e.title(format!("Failed to ban {}", member.user.tag()))
-                    .field("Error", error, false)
-            } else {
-                e.title(format!("Banned {}", member.user.tag()))
-                    .thumbnail(
-                        member
-                            .avatar_url()
-                            .unwrap_or_else(|| member.user.default_avatar_url()),
-                    )
-                    .field("Reason", reason, false)
-            }
-            .color(embed_color)
-        })
-    })
-    .await?;
-    Ok(())
+/// Unban a user.
+#[poise::command(slash_command)]
+pub async fn unban(ctx: Context<'_>, #[description = "User"] user: User) -> Result<(), Error> {
+    respond_moderation(
+        &ctx,
+        ModerationKind::Unban(ban_moderation(&ctx, BanKind::Unban(user.clone())).await),
+        &user,
+    )
+    .await
 }

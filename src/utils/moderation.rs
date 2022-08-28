@@ -1,7 +1,8 @@
+use std::cmp;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
-use poise::serenity_prelude::Http;
+use poise::serenity_prelude::{Http, User};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, trace};
 
@@ -9,13 +10,18 @@ use super::bot::get_data_lock;
 use super::*;
 use crate::db::database::Database;
 use crate::db::model::Muted;
+use crate::serenity::SerenityError;
 use crate::{Context, Error};
-
 pub enum ModerationKind {
     Mute(String, String, Option<Error>), // Reason, Expires, Error
     Unmute(Option<Error>),               // Error
+    Ban(Option<String>, Option<SerenityError>), // Reason, Error
+    Unban(Option<SerenityError>),        // Error
 }
-
+pub enum BanKind {
+    Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
+    Unban(User),                           // User
+}
 pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Member) {
     let data = get_data_lock(ctx).await;
     let data = data.read().await;
@@ -105,16 +111,18 @@ pub fn queue_unmute_member(
     })
 }
 
-pub async fn respond_mute_command(
+// TODO: refactor
+pub async fn respond_moderation(
     ctx: &Context<'_>,
     moderation: ModerationKind,
     user: &serenity::User,
-    embed_color: i32,
 ) -> Result<(), Error> {
     let tag = user.tag();
     let image = user
         .avatar_url()
         .unwrap_or_else(|| user.default_avatar_url());
+
+    let embed_color = ctx.data().read().await.configuration.general.embed_color;
 
     ctx.send(|f| {
         f.embed(|f| {
@@ -137,6 +145,29 @@ pub async fn respond_mute_command(
                     ),
                     None => f.title(format!("Unmuted {}", tag)),
                 },
+                ModerationKind::Ban(reason, error) => {
+                    let f = match error {
+                        Some(err) => f.title(format!("Failed to ban {}", tag)).field(
+                            "Exception",
+                            err.to_string(),
+                            false,
+                        ),
+                        None => f.title(format!("Banned {}", tag)),
+                    };
+                    if let Some(reason) = reason {
+                        f.field("Reason", reason, false)
+                    } else {
+                        f
+                    }
+                },
+                ModerationKind::Unban(error) => match error {
+                    Some(err) => f.title(format!("Failed to unban {}", tag)).field(
+                        "Exception",
+                        err.to_string(),
+                        false,
+                    ),
+                    None => f.title(format!("Unbanned {}", tag)),
+                },
             }
             .color(embed_color)
             .thumbnail(image)
@@ -145,4 +176,38 @@ pub async fn respond_mute_command(
     .await?;
 
     Ok(())
+}
+
+pub async fn ban_moderation(ctx: &Context<'_>, kind: BanKind) -> Option<SerenityError> {
+    let guild_id = ctx.guild_id().unwrap().0;
+    let http = &ctx.discord().http;
+
+    match kind {
+        BanKind::Ban(user, dmd, reason) => {
+            let reason = &reason
+                .or_else(|| Some("None specified".to_string()))
+                .unwrap();
+
+            let ban_result = http
+                .ban_user(guild_id, user.id.0, cmp::min(dmd.unwrap_or(0), 7), reason)
+                .await;
+
+            if let Err(err) = ban_result {
+                error!("Failed to ban user {}: {}", user.id.0, err);
+                Some(err)
+            } else {
+                None
+            }
+        },
+        BanKind::Unban(user) => {
+            let unban_result = http.remove_ban(guild_id, user.id.0, None).await;
+
+            if let Err(err) = unban_result {
+                error!("Failed to unban user {}: {}", user.id.0, err);
+                Some(err)
+            } else {
+                None
+            }
+        },
+    }
 }
