@@ -7,7 +7,7 @@ use super::*;
 use crate::utils::bot::get_data_lock;
 use crate::utils::ocr;
 
-fn contains_match(regex: &[Regex], text: &str) -> bool {
+pub fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
 }
 
