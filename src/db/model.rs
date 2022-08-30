@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use bson::Document;
+use poise::serenity_prelude::{PermissionOverwrite};
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
 
@@ -15,10 +16,30 @@ pub struct Muted {
     pub reason: Option<String>,
 }
 
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct LockedChannel {
+    pub channel_id: Option<String>,
+    pub overwrites: Option<Vec<PermissionOverwrite>>,
+}
+
 impl From<Muted> for Document {
     fn from(muted: Muted) -> Self {
-        bson::to_document(&muted).unwrap()
+        to_document(&muted)
     }
+}
+
+impl From<LockedChannel> for Document {
+    fn from(locked: LockedChannel) -> Self {
+        to_document(&locked)
+    }
+}
+
+fn to_document<T>(t: &T) -> Document
+where
+    T: Serialize,
+{
+    bson::to_document(t).unwrap()
 }
 
 // Display trait

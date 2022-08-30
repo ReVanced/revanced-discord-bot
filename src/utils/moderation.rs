@@ -15,10 +15,12 @@ use crate::serenity::SerenityError;
 use crate::{Context, Error};
 
 pub enum ModerationKind {
-    Mute(String, String, Option<Error>), // Reason, Expires, Error
-    Unmute(Option<Error>),               // Error
-    Ban(Option<String>, Option<SerenityError>), // Reason, Error
-    Unban(Option<SerenityError>),        // Error
+    Mute(User, String, String, Option<Error>), // User, Reason, Expires, Error
+    Unmute(User, Option<Error>),               // User, Error
+    Ban(User, Option<String>, Option<SerenityError>), // User, Reason, Error
+    Unban(User, Option<SerenityError>),        // User, Error
+    Lock(String, Option<Error>),               // Channel name, Error
+    Unlock(String, Option<Error>),             // Channel name, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -117,38 +119,48 @@ pub fn queue_unmute_member(
 pub async fn respond_moderation<'a>(
     ctx: &Context<'_>,
     moderation: &ModerationKind,
-    user: &serenity::User,
     configuration: &Configuration,
 ) -> Result<(), Error> {
+    let current_user = ctx.discord().http.get_current_user().await?;
+
     let create_embed = |f: &mut serenity::CreateEmbed| {
-        let tag = user.tag();
-        match moderation {
-            ModerationKind::Mute(reason, expires, error) => match error {
-                Some(err) => f.title(format!("Failed to mute {}", tag)).field(
-                    "Exception",
-                    err.to_string(),
-                    false,
-                ),
-                None => f.title(format!("Muted {}", tag)),
-            }
-            .field("Reason", reason, false)
-            .field("Expires", expires, false),
-            ModerationKind::Unmute(error) => match error {
-                Some(err) => f.title(format!("Failed to unmute {}", tag)).field(
-                    "Exception",
-                    err.to_string(),
-                    false,
-                ),
-                None => f.title(format!("Unmuted {}", tag)),
-            },
-            ModerationKind::Ban(reason, error) => {
-                let f = match error {
-                    Some(err) => f.title(format!("Failed to ban {}", tag)).field(
+        let mut moderated_user: Option<&User> = None;
+
+        let result = match moderation {
+            ModerationKind::Mute(user, reason, expires, error) => {
+                moderated_user = Some(user);
+
+                match error {
+                    Some(err) => f.title(format!("Failed to mute {}", user.tag())).field(
                         "Exception",
                         err.to_string(),
                         false,
                     ),
-                    None => f.title(format!("Banned {}", tag)),
+                    None => f.title(format!("Muted {}", user.tag())),
+                }
+                .field("Reason", reason, false)
+                .field("Expires", expires, false)
+            },
+            ModerationKind::Unmute(user, error) => {
+                moderated_user = Some(user);
+                match error {
+                    Some(err) => f.title(format!("Failed to unmute {}", user.tag())).field(
+                        "Exception",
+                        err.to_string(),
+                        false,
+                    ),
+                    None => f.title(format!("Unmuted {}", user.tag())),
+                }
+            },
+            ModerationKind::Ban(user, reason, error) => {
+                moderated_user = Some(user);
+                let f = match error {
+                    Some(err) => f.title(format!("Failed to ban {}", user.tag())).field(
+                        "Exception",
+                        err.to_string(),
+                        false,
+                    ),
+                    None => f.title(format!("Banned {}", user.tag())),
                 };
                 if let Some(reason) = reason {
                     f.field("Reason", reason, false)
@@ -156,21 +168,47 @@ pub async fn respond_moderation<'a>(
                     f
                 }
             },
-            ModerationKind::Unban(error) => match error {
-                Some(err) => f.title(format!("Failed to unban {}", tag)).field(
+            ModerationKind::Unban(user, error) => {
+                moderated_user = Some(user);
+                match error {
+                    Some(err) => f.title(format!("Failed to unban {}", user.tag())).field(
+                        "Exception",
+                        err.to_string(),
+                        false,
+                    ),
+                    None => f.title(format!("Unbanned {}", user.tag())),
+                }
+            },
+            ModerationKind::Lock(channel, error) => match error {
+                Some(err) => f.title(format!("Failed to lock {} ", channel)).field(
                     "Exception",
                     err.to_string(),
                     false,
                 ),
-                None => f.title(format!("Unbanned {}", tag)),
+                None => f.title(format!("Locked {}", channel)).description(
+                    "Unlocking the channel will restore the original permission overwrites.",
+                ),
+            },
+            ModerationKind::Unlock(channel, error) => match error {
+                Some(err) => f.title(format!("Failed to unlock {}", channel)).field(
+                    "Exception",
+                    err.to_string(),
+                    false,
+                ),
+                None => f
+                    .title(format!("Unlocked {}", channel))
+                    .description("Restored original permission overwrites."),
             },
         }
-        .color(configuration.general.embed_color)
-        .thumbnail(
-            &user
-                .avatar_url()
-                .unwrap_or_else(|| user.default_avatar_url()),
-        );
+        .color(configuration.general.embed_color);
+
+        let user = if let Some(user) = moderated_user {
+            user.face()
+        } else {
+            current_user.face()
+        };
+
+        result.thumbnail(&user);
     };
 
     let reply = ctx

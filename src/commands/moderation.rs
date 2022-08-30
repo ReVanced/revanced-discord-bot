@@ -1,10 +1,17 @@
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
-use poise::serenity_prelude::{self as serenity, Member, RoleId, User};
+use poise::serenity_prelude::{
+    self as serenity,
+    Member,
+    PermissionOverwrite,
+    Permissions,
+    RoleId,
+    User,
+};
 use tracing::{debug, trace};
 
-use crate::db::model::Muted;
+use crate::db::model::{LockedChannel, Muted};
 use crate::utils::moderation::{
     ban_moderation,
     queue_unmute_member,
@@ -13,6 +20,135 @@ use crate::utils::moderation::{
     ModerationKind,
 };
 use crate::{Context, Error};
+
+/// Lock a channel.
+#[poise::command(slash_command)]
+pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
+    let data = &ctx.data().read().await;
+    let configuration = &data.configuration;
+    let database = &data.database;
+    let discord = &ctx.discord();
+    let cache = &discord.cache;
+    let http = &discord.http;
+
+    let channel_id = ctx.channel_id().0;
+    let channel = &cache.guild_channel(channel_id).unwrap();
+
+    let query: Document = LockedChannel {
+        channel_id: Some(channel_id.to_string()),
+        ..Default::default()
+    }
+    .into();
+
+    // Check if channel is already muted, if so succeed.
+    if let Ok(mut cursor) = database
+        .find::<LockedChannel>("locked", query.clone(), None)
+        .await
+    {
+        if cursor.advance().await.unwrap() {
+            respond_moderation(
+                &ctx,
+                &ModerationKind::Lock(
+                    channel.name.clone(),
+                    Some(Error::from("Channel already locked")),
+                ),
+                configuration,
+            )
+            .await?;
+            return Ok(());
+        }
+    }
+
+    // accumulate all roles with write permissions
+    let permission_overwrites: Vec<_> = channel
+        .permission_overwrites
+        .iter()
+        .filter_map(|r| {
+            if r.allow.send_messages() || !r.deny.send_messages() {
+                Some(r.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    // lock the channel by and creating the new permission overwrite
+    for permission_overwrite in &permission_overwrites {
+        let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
+        channel
+            .create_permission(http, &PermissionOverwrite {
+                allow: permission_overwrite.allow & !permission,
+                deny: permission_overwrite.deny | permission,
+                kind: permission_overwrite.kind,
+            })
+            .await?;
+    }
+
+    // save the original overwrites
+    let updated: Document = LockedChannel {
+        overwrites: Some(permission_overwrites),
+        ..Default::default()
+    }
+    .into();
+
+    database
+        .update::<LockedChannel>(
+            "locked",
+            query,
+            UpdateModifications::Document(doc! { "$set": updated}),
+            Some(UpdateOptions::builder().upsert(true).build()),
+        )
+        .await?;
+
+    respond_moderation(
+        &ctx,
+        &ModerationKind::Lock(channel.name.clone(), None),
+        configuration,
+    )
+    .await
+}
+
+/// Unlock a channel.
+#[poise::command(slash_command)]
+pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
+    let data = &ctx.data().read().await;
+    let configuration = &data.configuration;
+    let database = &data.database;
+    let discord = &ctx.discord();
+    let cache = &discord.cache;
+    let http = &discord.http;
+
+    let channel_id = ctx.channel_id().0;
+
+    let delete_result = database
+        .find_and_delete::<LockedChannel>(
+            "locked",
+            LockedChannel {
+                channel_id: Some(channel_id.to_string()),
+                ..Default::default()
+            }
+            .into(),
+            None,
+        )
+        .await;
+
+    let channel = cache.guild_channel(channel_id).unwrap();
+    let mut error = None;
+    if let Ok(Some(locked_channel)) = delete_result {
+        for overwrite in &locked_channel.overwrites.unwrap() {
+            channel.create_permission(http, overwrite).await?;
+        }
+    } else {
+        error = Some(Error::from("Channel already unlocked"))
+    }
+
+    respond_moderation(
+        &ctx,
+        &ModerationKind::Unlock(channel.name.clone(), error), // TODO: handle error
+        configuration,
+    )
+    .await
+}
 
 /// Unmute a member.
 #[poise::command(slash_command)]
@@ -30,21 +166,20 @@ pub async fn unmute(
         pending_unmute.abort();
     }
 
+    let queue = queue_unmute_member(
+        &ctx.discord().http,
+        &data.database,
+        &member,
+        configuration.general.mute.role,
+        0,
+    )
+    .await
+    .unwrap();
+
     respond_moderation(
         &ctx,
-        &ModerationKind::Unmute(
-            queue_unmute_member(
-                &ctx.discord().http,
-                &data.database,
-                &member,
-                configuration.general.mute.role,
-                0,
-            )
-            .await
-            .unwrap(),
-        ),
-        &member.user,
-        &configuration,
+        &ModerationKind::Unmute(member.user, queue),
+        configuration,
     )
     .await
 }
@@ -175,9 +310,13 @@ pub async fn mute(
 
     respond_moderation(
         &ctx,
-        &ModerationKind::Mute(reason, format!("<t:{}:F>", unmute_time.timestamp()), result),
-        &member.user,
-        &configuration,
+        &ModerationKind::Mute(
+            member.user,
+            reason,
+            format!("<t:{}:F>", unmute_time.timestamp()),
+            result,
+        ),
+        configuration,
     )
     .await
 }
@@ -207,9 +346,7 @@ pub async fn purge(
     let too_old_timestamp = Utc::now().timestamp() - MAX_BULK_DELETE_AGO_SECS;
 
     let current_user = ctx.discord().http.get_current_user().await?;
-    let image = current_user
-        .avatar_url()
-        .unwrap_or_else(|| current_user.default_avatar_url());
+    let image = current_user.face();
 
     let handle = ctx
         .send(|f| {
@@ -314,22 +451,16 @@ pub async fn unban(ctx: Context<'_>, #[description = "User"] user: User) -> Resu
 async fn handle_ban(ctx: &Context<'_>, kind: &BanKind) -> Result<(), Error> {
     let data = ctx.data().read().await;
 
-    let ban_result = ban_moderation(&ctx, &kind).await;
+    let ban_result = ban_moderation(ctx, kind).await;
 
-    let moderated_user;
     respond_moderation(
-        &ctx,
+        ctx,
         &match kind {
             BanKind::Ban(user, _, reason) => {
-                moderated_user = user;
-                ModerationKind::Ban(reason.clone(), ban_result)
+                ModerationKind::Ban(user.clone(), reason.clone(), ban_result)
             },
-            BanKind::Unban(user) => {
-                moderated_user = user;
-                ModerationKind::Unban(ban_result)
-            },
+            BanKind::Unban(user) => ModerationKind::Unban(user.clone(), ban_result),
         },
-        &moderated_user,
         &data.configuration,
     )
     .await

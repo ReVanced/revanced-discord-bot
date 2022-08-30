@@ -50,6 +50,8 @@ async fn main() {
         moderation::purge(),
         moderation::ban(),
         moderation::unban(),
+        moderation::lock(),
+        moderation::unlock(),
         misc::reply(),
     ];
     poise::set_qualified_names(&mut commands);
