@@ -30,6 +30,5 @@ serde_regex = "1.1"
 reqwest = { version = "0.11" }
 chrono = "0.4"
 dirs = "4.0"
-tesseract = "0.12"
 tracing = { version = "0.1", features = ["max_level_debug", "release_max_level_info"] }
 tracing-subscriber = "0.3"

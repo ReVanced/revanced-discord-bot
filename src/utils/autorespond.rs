@@ -1,32 +1,11 @@
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use poise::serenity_prelude::Attachment;
 use regex::Regex;
-use tracing::debug;
 
 use super::*;
 use crate::utils::bot::get_data_lock;
-use crate::utils::ocr;
 
 pub fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
-}
-
-async fn attachments_contains(attachments: &[Attachment], regex: &[Regex]) -> bool {
-    for attachment in attachments {
-        debug!("Checking attachment {}", &attachment.url);
-
-        if !&attachment.content_type.as_ref().unwrap().contains("image") {
-            continue;
-        }
-
-        if contains_match(
-            regex,
-            &ocr::get_text_from_image_url(&attachment.url).await.unwrap(),
-        ) {
-            return true;
-        }
-    }
-    false
 }
 
 pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Message) {
@@ -59,30 +38,14 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
         }
 
         let message = &new_message.content;
-        let contains_attachments = !new_message.attachments.is_empty();
 
         // check if the message does not match any of the excludes
-        if contains_match(&excludes.match_field.text, message) {
-            continue;
-        }
-
-        if contains_attachments
-            && !excludes.match_field.ocr.is_empty()
-            && attachments_contains(&new_message.attachments, &excludes.match_field.ocr).await
-        {
+        if contains_match(&excludes.match_field, message) {
             continue;
         }
 
         // check if the message does match any of the includes
-        if !(contains_match(&response.includes.match_field.text, message)
-            || (contains_attachments
-                && !response.includes.match_field.ocr.is_empty()
-                && attachments_contains(
-                    &new_message.attachments,
-                    &response.includes.match_field.ocr,
-                )
-                .await))
-        {
+        if !(contains_match(&response.includes.match_field, message)) {
             continue;
         }
 

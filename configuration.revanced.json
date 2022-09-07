@@ -24,14 +24,11 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 953965039105232906],
-				"match": {
-					"ocr": [],
-					"text": ["(?i)(((vanced|download|install|get|manager).*){2,})"]
-				}
+				"match": ["(?i)(((vanced|download|install|get|manager).*){2,})"]
 			},
 			"excludes": {
 				"roles": [934329947164667954],
-				"match": { "ocr": [], "text": ["(?i)music", "(?i)eta", "(?i)error"] }
+				"match": ["(?i)music", "(?i)eta", "(?i)error"]
 			},
 			"condition": {
 				"user": {
@@ -71,14 +68,11 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 953965039105232906],
-				"match": {
-					"ocr": [],
-					"text": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
-				}
+				"match": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
 			},
 			"excludes": {
 				"roles": [934329947164667954],
-				"match": { "ocr": [], "text": ["(?i)download", "(?i)get"] }
+				"match": ["(?i)download", "(?i)get"]
 			},
 			"condition": {
 				"user": {
@@ -118,16 +112,13 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 953965039105232906],
-				"match": {
-					"ocr": [],
-					"text": [
-						"(?i)(((vanced|when|where|release|out|progress|update|manager|eta).*){2,})"
-					]
-				}
+				"match": [
+					"(?i)(((vanced|when|where|release|out|progress|update|manager|eta).*){2,})"
+				]
 			},
 			"excludes": {
 				"roles": [934329947164667954],
-				"match": { "ocr": [], "text": ["(?i)error", "(?i)problem"] }
+				"match": ["(?i)error", "(?i)problem"]
 			},
 			"condition": {
 				"user": {

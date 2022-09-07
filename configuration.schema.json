@@ -142,17 +142,8 @@
 			"minItems": 1
 		},
 		"match": {
-			"type": "object",
-			"properties": {
-				"text": {
-					"$ref": "#/$defs/regex",
-					"description": "A list of regex strings."
-				},
-				"ocr": {
-					"$ref": "#/$defs/regex",
-					"description": "A list of regex strings to ocr."
-				}
-			}
+			"$ref": "#/$defs/regex",
+			"description": "A list of regex strings."
 		},
 		"regex": {
 			"type": "array",
