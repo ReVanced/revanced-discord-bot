@@ -24,7 +24,7 @@ pub async fn cure(
 
     let mut cured_name = DECANCER
         .cure(&name)
-        .replace(|c: char| !(c == ' ' || c.is_ascii_alphanumeric()), "");
+        .replace(|c: char| !(c == ' ' || c == '-' || c == '_' || c.is_ascii_alphanumeric()), "");
 
     if cured_name.is_empty() {
         cured_name = "ReVanced user".to_string();
