@@ -1,3 +1,20 @@
+# [1.11.0](https://github.com/revanced/revanced-discord-bot/compare/v1.10.0...v1.11.0) (2022-09-07)
+
+
+### Features
+
+* `unban` command ([b7d333c](https://github.com/revanced/revanced-discord-bot/commit/b7d333c86cae3794744935ea6a09cfc8b45d9039))
+* handle mute when rejoining the server ([042fc8c](https://github.com/revanced/revanced-discord-bot/commit/042fc8c4666fd96baf85dca8df6385e7b2f37cc3))
+* lock & unlock commands ([abdc092](https://github.com/revanced/revanced-discord-bot/commit/abdc0922eb0f4d647c151bddf51552c39b9524b3))
+* media and logging channels and unban command ([4ab4c7e](https://github.com/revanced/revanced-discord-bot/commit/4ab4c7e00ca8a00b725cb8ee69079e04edd2b454))
+* remove `ocr` ([c600c51](https://github.com/revanced/revanced-discord-bot/commit/c600c510a7130e0156c7e4db4a716607bfe93819))
+* work in progress `ocr` auto responder ([23bc1aa](https://github.com/revanced/revanced-discord-bot/commit/23bc1aa30671e55aca97165f25cb31d19126aeb2))
+
+
+### Performance Improvements
+
+* clone `Arc` of `data.database` ([3ad345b](https://github.com/revanced/revanced-discord-bot/commit/3ad345b009da9711a87d14b6a349c36ee2366869))
+
 # [1.10.0](https://github.com/revanced/revanced-discord-bot/compare/v1.9.0...v1.10.0) (2022-08-27)
 
 
