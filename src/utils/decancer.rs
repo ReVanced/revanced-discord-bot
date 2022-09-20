@@ -10,6 +10,11 @@ pub async fn cure(
     old_if_available: &Option<serenity::Member>,
     member: &serenity::Member,
 ) {
+    if member.user.bot {
+        trace!("Skipping decancer for bot {}.", member.user.tag());
+        return;
+    }
+
     let name = member.display_name().to_string();
 
     if let Some(old) = old_if_available {
@@ -22,9 +27,10 @@ pub async fn cure(
         }
     }
 
-    let mut cured_name = DECANCER
-        .cure(&name)
-        .replace(|c: char| !(c == ' ' || c == '-' || c == '_' || c.is_ascii_alphanumeric()), "");
+    let mut cured_name = DECANCER.cure(&name).replace(
+        |c: char| !(c == ' ' || c == '-' || c == '_' || c.is_ascii_alphanumeric()),
+        "",
+    );
 
     if cured_name.is_empty() {
         cured_name = "ReVanced user".to_string();
