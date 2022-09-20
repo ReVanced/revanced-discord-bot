@@ -41,7 +41,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release
+          args: --release --target=x86_64-unknown-linux-musl
 
       - name: cargo clippy
         uses: actions-rs/cargo@v1
@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: revanced-discord-bot
-          path: target/release/revanced-discord-bot
+          path: target/x86_64-unknown-linux-musl/release/revanced-discord-bot
 
       - name: Setup semantic-release
         if: github.event_name != 'pull_request'
