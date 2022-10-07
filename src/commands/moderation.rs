@@ -9,6 +9,7 @@ use poise::serenity_prelude::{
     RoleId,
     User,
 };
+use tracing::log::error;
 use tracing::{debug, trace};
 
 use crate::db::model::{LockedChannel, Muted};
@@ -72,21 +73,9 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         })
         .collect();
 
-    // lock the channel by and creating the new permission overwrite
-    for permission_overwrite in &permission_overwrites {
-        let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
-        channel
-            .create_permission(http, &PermissionOverwrite {
-                allow: permission_overwrite.allow & !permission,
-                deny: permission_overwrite.deny | permission,
-                kind: permission_overwrite.kind,
-            })
-            .await?;
-    }
-
     // save the original overwrites
     let updated: Document = LockedChannel {
-        overwrites: Some(permission_overwrites),
+        overwrites: Some(permission_overwrites.clone()),
         ..Default::default()
     }
     .into();
@@ -99,6 +88,22 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
             Some(UpdateOptions::builder().upsert(true).build()),
         )
         .await?;
+
+    // lock the channel by and creating the new permission overwrite
+    for permission_overwrite in &permission_overwrites {
+        let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
+
+        if let Err(err) = channel
+            .create_permission(http, &PermissionOverwrite {
+                allow: permission_overwrite.allow & !permission,
+                deny: permission_overwrite.deny | permission,
+                kind: permission_overwrite.kind,
+            })
+            .await
+        {
+            error!("Failed to create the new permission: {:?}", err);
+        }
+    }
 
     respond_moderation(
         &ctx,
