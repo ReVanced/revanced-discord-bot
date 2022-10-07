@@ -6,7 +6,7 @@
 			"take": [996121272897519687, 965267139902705744, 995126555867086938]
 		},
 		"media_channels": [954148665646260314],
-		"logging_channel": 952987428786941952
+		"logging_channel": 1027892160797872179
 	},
 	"administrators": {
 		"roles": [955220417969262612],
@@ -23,16 +23,19 @@
 	"message_responses": [
 		{
 			"includes": {
-				"channels": [952946952348270626, 953965039105232906],
-				"match": ["(?i)(((vanced|download|install|get|manager).*){2,})"]
+				"channels": [952946952348270626, 954147049832603748],
+				"match": ["(?i)(((where|how|download|install|get|manager).*){2,})"]
 			},
 			"excludes": {
-				"roles": [934329947164667954],
-				"match": ["(?i)music", "(?i)eta", "(?i)error"]
+				"roles": [
+					965267139902705744, 955220417969262612, 952987191401926697,
+					1027874293192863765
+				],
+				"match": ["(?i)patch", "(?i)error"]
 			},
 			"condition": {
 				"user": {
-					"server_age": 5
+					"server_age": 120
 				}
 			},
 			"response": {
@@ -43,7 +46,7 @@
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
-							"value": "You can download prebuild packages to build ReVanced. For now, please follow the documentation in <#953993848374325269> `III`.",
+							"value": "Please refer to <#953993848374325269> `III`.",
 							"inline": false
 						}
 					],
@@ -67,73 +70,30 @@
 		},
 		{
 			"includes": {
-				"channels": [952946952348270626, 953965039105232906],
-				"match": ["(?i)(((help|how|install|fix|vanced|manager).*){3,})"]
+				"channels": [952946952348270626, 954147049832603748],
+				"match": ["(?i)(((error|open|patch).*){2,})"]
 			},
 			"excludes": {
-				"roles": [934329947164667954],
-				"match": ["(?i)download", "(?i)get"]
+				"roles": [
+					965267139902705744, 955220417969262612, 952987191401926697,
+					1027874293192863765
+				],
+				"match": []
 			},
 			"condition": {
 				"user": {
-					"server_age": 5
+					"server_age": 120
 				}
 			},
 			"response": {
 				"embed": {
-					"title": "Do you have a problem or need help ❓",
+					"title": "Where or how to get ReVanced ❓",
 					"description": "You have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
 					"color": 14908858,
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
-							"value": "Please make sure to read the second half of <#953993848374325269> `XV`, if you have enough knowledge and ask your question in <#985666124068814888>, otherwise the first half applies.",
-							"inline": false
-						}
-					],
-					"footer": {
-						"text": "",
-						"icon_url": ""
-					},
-					"image": {
-						"url": ""
-					},
-					"thumbnail": {
-						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
-					},
-					"author": {
-						"name": "",
-						"icon_url": "",
-						"url": ""
-					}
-				}
-			}
-		},
-		{
-			"includes": {
-				"channels": [952946952348270626, 953965039105232906],
-				"match": [
-					"(?i)(((vanced|when|where|release|out|progress|update|manager|eta).*){2,})"
-				]
-			},
-			"excludes": {
-				"roles": [934329947164667954],
-				"match": ["(?i)error", "(?i)problem"]
-			},
-			"condition": {
-				"user": {
-					"server_age": 5
-				}
-			},
-			"response": {
-				"embed": {
-					"title": "When will ReVanced release ❓",
-					"description": "You have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
-					"fields": [
-						{
-							"name": "🔸 Regarding your question",
-							"value": "ReVanced has already been released and is under active development. Please check <#953993848374325269> `XII`.",
+							"value": "Please make sure to read the second half of <#953993848374325269> XV if you have enough knowledge, otherwise, the first half applies.",
 							"inline": false
 						}
 					],
