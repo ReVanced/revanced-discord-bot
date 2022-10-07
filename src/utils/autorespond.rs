@@ -1,5 +1,6 @@
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use regex::Regex;
+use tracing::log::error;
 
 use super::*;
 use crate::utils::bot::get_data_lock;
@@ -15,6 +16,7 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
 
     let data_lock = get_data_lock(ctx).await;
     let responses = &data_lock.read().await.configuration.message_responses;
+    let message = &new_message.content;
 
     for response in responses {
         // check if the message was sent in a channel that is included in the responder
@@ -27,17 +29,16 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
             continue;
         }
 
-        let excludes = &response.excludes;
         // check if the message was sent by a user that is not excluded from the responder
-        if excludes
-            .roles
-            .iter()
-            .any(|&role_id| role_id == new_message.author.id.0)
-        {
+        let excludes = &response.excludes;
+        let member_roles = &new_message.member.as_ref().unwrap().roles;
+        if excludes.roles.iter().any(|&role_id| {
+            member_roles
+                .iter()
+                .any(|&member_role| role_id == member_role.0)
+        }) {
             continue;
         }
-
-        let message = &new_message.content;
 
         // check if the message does not match any of the excludes
         if contains_match(&excludes.match_field, message) {
@@ -69,7 +70,7 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
                 return;
             }
 
-            new_message
+            if let Err(err) = new_message
                 .channel_id
                 .send_message(&ctx.http, |m| {
                     m.reference_message(new_message);
@@ -95,7 +96,13 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
                     }
                 })
                 .await
-                .expect("Could not reply to message author.");
+            {
+                error!(
+                    "Failed to reply to the message from {}. Error: {:?}",
+                    new_message.author.tag(),
+                    err
+                );
+            }
         }
     }
 }
