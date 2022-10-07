@@ -4,7 +4,7 @@ use std::sync::Arc;
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{ChannelId, Http, User};
 use tokio::task::JoinHandle;
-use tracing::{debug, error, trace};
+use tracing::{debug, error};
 
 use super::bot::get_data_lock;
 use super::*;
@@ -43,23 +43,28 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Me
         )
         .await
     {
-        if cursor.advance().await.is_ok() {
-            trace!("Muted member {} rejoined the server", new_member.user.tag());
-            if new_member
-                .add_role(&ctx.http, RoleId(data.configuration.general.mute.role))
-                .await
-                .is_ok()
-            {
-                debug!(
-                    "Muted member {} was successfully muted",
-                    new_member.user.tag()
-                );
-            } else {
-                error!(
-                    "Failed to mute member {} after rejoining the server",
-                    new_member.user.tag()
-                );
+        
+        if let Ok(found) = cursor.advance().await {
+            if found {
+                debug!("Muted member {} rejoined the server", new_member.user.tag());
+                if new_member
+                    .add_role(&ctx.http, RoleId(data.configuration.general.mute.role))
+                    .await
+                    .is_ok()
+                {
+                    debug!(
+                        "Muted member {} was successfully muted",
+                        new_member.user.tag()
+                    );
+                } else {
+                    error!(
+                        "Failed to mute member {} after rejoining the server",
+                        new_member.user.tag()
+                    );
+                }
             }
+        } else {
+            error!("Failed to advance the cursor");
         }
     } else {
         error!("Failed to query database for muted users");
