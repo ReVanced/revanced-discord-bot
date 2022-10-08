@@ -1,3 +1,31 @@
+# [1.11.0](https://github.com/revanced/revanced-discord-bot/compare/v1.10.0...v1.11.0) (2022-10-08)
+
+
+### Bug Fixes
+
+* check member role for excluded roles ([6279a79](https://github.com/revanced/revanced-discord-bot/commit/6279a791325d5c7b5e59cb79337b1cec2455a630))
+* exclude dash and underscore for decancer ([8af95f0](https://github.com/revanced/revanced-discord-bot/commit/8af95f03bccde54089d4c44c107822b6edc0e8b4))
+* **moderation:** only mute on rejoin if previously muted ([6e9f20d](https://github.com/revanced/revanced-discord-bot/commit/6e9f20df050fd9d6e64e82d1fb509de44ec9f0d7))
+* **moderation:** save overwrites before modifying them ([2f67c59](https://github.com/revanced/revanced-discord-bot/commit/2f67c59bb3536f0edc8ed2b400e10bfd9213959a))
+
+
+### Features
+
+* `unban` command ([b7d333c](https://github.com/revanced/revanced-discord-bot/commit/b7d333c86cae3794744935ea6a09cfc8b45d9039))
+* allow `-` and `_` in usernames ([2767888](https://github.com/revanced/revanced-discord-bot/commit/276788872cbcb16d561fd62d10d65566debfd56a))
+* do not cure bots ([97c064c](https://github.com/revanced/revanced-discord-bot/commit/97c064ce7f1acdd758c9dee185ed2f845e426809))
+* handle mute when rejoining the server ([042fc8c](https://github.com/revanced/revanced-discord-bot/commit/042fc8c4666fd96baf85dca8df6385e7b2f37cc3))
+* lock & unlock commands ([abdc092](https://github.com/revanced/revanced-discord-bot/commit/abdc0922eb0f4d647c151bddf51552c39b9524b3))
+* media and logging channels and unban command ([4ab4c7e](https://github.com/revanced/revanced-discord-bot/commit/4ab4c7e00ca8a00b725cb8ee69079e04edd2b454))
+* new configuration for ReVanced ([d1d99b5](https://github.com/revanced/revanced-discord-bot/commit/d1d99b505c0599414a35b5270bada913c0e14d0b))
+* remove `ocr` ([c600c51](https://github.com/revanced/revanced-discord-bot/commit/c600c510a7130e0156c7e4db4a716607bfe93819))
+* work in progress `ocr` auto responder ([23bc1aa](https://github.com/revanced/revanced-discord-bot/commit/23bc1aa30671e55aca97165f25cb31d19126aeb2))
+
+
+### Performance Improvements
+
+* clone `Arc` of `data.database` ([3ad345b](https://github.com/revanced/revanced-discord-bot/commit/3ad345b009da9711a87d14b6a349c36ee2366869))
+
 # [1.11.0](https://github.com/revanced/revanced-discord-bot/compare/v1.10.0...v1.11.0) (2022-09-08)
 
 
