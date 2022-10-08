@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+  revanced-discord.bot:
+    container_name: revanced-discord-bot
+    image: ubuntu:latest
+    environment:
+      - DISCORD_AUTHORIZATION_TOKEN=YOUR_DISCORD_AUTHORIZATION_TOKEN
+      - MONGODB_URI=YOUR_MONGODB_URI
+    restart: unless-stopped
