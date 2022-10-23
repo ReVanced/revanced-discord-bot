@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/revanced/revanced-discord-bot/compare/v1.11.0...v1.11.1) (2022-10-23)
+
+
+### Bug Fixes
+
+* **media-channel:** check if message contains attachment ([fd8ca42](https://github.com/revanced/revanced-discord-bot/commit/fd8ca4215d9f3eac964e5b7202f7140632ed1e13))
+
 # [1.11.0](https://github.com/revanced/revanced-discord-bot/compare/v1.10.0...v1.11.0) (2022-10-08)
 
 
