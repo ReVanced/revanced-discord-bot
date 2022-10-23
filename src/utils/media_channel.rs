@@ -24,6 +24,7 @@ pub async fn handle_media_channel(
         .users
         .contains(&new_message.author.id.0)
         && is_media_channel
+        && !new_message.attachments.is_empty()
     {
         if let Err(why) = new_message.delete(&ctx.http).await {
             error!("Error deleting message: {:?}", why);
