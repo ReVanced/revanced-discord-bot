@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/revanced/revanced-discord-bot/compare/v1.11.1...v1.11.2) (2022-10-24)
+
+
+### Bug Fixes
+
+* **media-channel:** change order of condition check ([fdf1dca](https://github.com/revanced/revanced-discord-bot/commit/fdf1dca2a12a6c65fa1abfa92656c780cba52287))
+
 ## [1.11.1](https://github.com/revanced/revanced-discord-bot/compare/v1.11.0...v1.11.1) (2022-10-23)
 
 
