@@ -118,7 +118,7 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((sponsor|sponser|does|not|work).*){3,})"]
+				"match": ["(?i)(((sponsor|sponser|does|is|not|work).*){3,})"]
 			},
 			"excludes": {
 				"roles": [
