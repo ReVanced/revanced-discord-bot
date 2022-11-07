@@ -1,3 +1,18 @@
+# [1.12.0](https://github.com/revanced/revanced-discord-bot/compare/v1.11.2...v1.12.0) (2022-11-07)
+
+
+### Bug Fixes
+
+* **media-channel:** correctly check for admin status ([b0ce5ae](https://github.com/revanced/revanced-discord-bot/commit/b0ce5ae370ea62ce95e304e88bdbb46bd4f32630))
+* reduce false matches [skip ci] ([4f2250c](https://github.com/revanced/revanced-discord-bot/commit/4f2250c71f4df3f20ee7d909a64bf72a57653a18))
+
+
+### Features
+
+* improve matching success [skip ci] ([8efe307](https://github.com/revanced/revanced-discord-bot/commit/8efe307020c9423ddd83951d60fd6ad69933b93d))
+* improve matching success [skip ci] ([3a18a40](https://github.com/revanced/revanced-discord-bot/commit/3a18a40362841956b2143c05c184522a25b621fa))
+* response to common sponsorblock question [skip ci] ([710a546](https://github.com/revanced/revanced-discord-bot/commit/710a5462df4bf549b3003597ffb80f2afd8b908f))
+
 ## [1.11.2](https://github.com/revanced/revanced-discord-bot/compare/v1.11.1...v1.11.2) (2022-10-24)
 
 
