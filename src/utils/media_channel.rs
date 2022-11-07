@@ -19,13 +19,12 @@ pub async fn handle_media_channel(
         .iter()
         .any(|&channel| channel == current_channel);
 
-    if is_media_channel
-        && (new_message.attachments.is_empty()
-            || !configuration
-                .administrators
-                .users
-                .contains(&new_message.author.id.0))
-    {
+    let is_admin = configuration
+        .administrators
+        .users
+        .contains(&new_message.author.id.0);
+
+    if is_media_channel && new_message.attachments.is_empty() && !is_admin {
         if let Err(why) = new_message.delete(&ctx.http).await {
             error!("Error deleting message: {:?}", why);
         }
