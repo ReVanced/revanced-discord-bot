@@ -63,7 +63,6 @@
 				}
 			},
 			"description": "Introduce new threads with a message.",
-			"minItems": 1,
 			"uniqueItems": true
 		},
 		"message_responses": {
@@ -138,8 +137,7 @@
 			"items": {
 				"type": "integer"
 			},
-			"uniqueItems": true,
-			"minItems": 1
+			"uniqueItems": true
 		},
 		"match": {
 			"$ref": "#/$defs/regex",
