@@ -161,6 +161,53 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": {
+				"channels": [952946952348270626, 954147049832603748],
+				"match": ["(?i)(((revanced|io).*){2,})"]
+			},
+			"excludes": {
+				"roles": [
+					965267139902705744, 955220417969262612, 952987191401926697,
+					1027874293192863765
+				],
+				"match": []
+			},
+			"condition": {
+				"user": {
+					"server_age": 365
+				}
+			},
+			"response": {
+				"embed": {
+					"title": "What are the official links of ReVanced❓",
+					"description": "A list of official links can be found in <#954066838856273960>.",
+					"color": 14908858,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "ReVanced is always available at [revanced.app](https://revanced.app).",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "",
+						"icon_url": ""
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			}
 		}
 	]
 }
