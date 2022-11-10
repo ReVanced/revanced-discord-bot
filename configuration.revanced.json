@@ -165,7 +165,7 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((vanced|\.io).*){2,})"]
+				"match": ["(?i)(((vanced|\\.io).*){2,})"]
 			},
 			"excludes": {
 				"roles": [
