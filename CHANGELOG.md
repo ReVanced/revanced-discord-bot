@@ -1,3 +1,18 @@
+# [1.13.0](https://github.com/revanced/revanced-discord-bot/compare/v1.12.0...v1.13.0) (2022-11-11)
+
+
+### Bug Fixes
+
+* invalid escape in json value [skip ci] ([488b660](https://github.com/revanced/revanced-discord-bot/commit/488b66032c9225f5e89c26072509446548c1bc82))
+* reduce amount of false positives [skip ci] ([6b65929](https://github.com/revanced/revanced-discord-bot/commit/6b65929d29207c176eff80de28f51088f3233b13))
+* reduce false positives [skip ci] ([c68b8c0](https://github.com/revanced/revanced-discord-bot/commit/c68b8c02c1700a009193ddf869cd372821f5aeb0))
+
+
+### Features
+
+* **mute:** add translator role to `take` list ([#33](https://github.com/revanced/revanced-discord-bot/issues/33)) ([7807db2](https://github.com/revanced/revanced-discord-bot/commit/7807db2c41da490f9842130756294d42adc88e1e))
+* response for official links ([2b00d80](https://github.com/revanced/revanced-discord-bot/commit/2b00d8012c87f845b692168dc83eb55e54118156))
+
 # [1.12.0](https://github.com/revanced/revanced-discord-bot/compare/v1.11.2...v1.12.0) (2022-11-07)
 
 
