@@ -11,6 +11,7 @@ pub struct Configuration {
     pub general: General,
     pub administrators: Administrators,
     pub thread_introductions: Vec<Introduction>,
+    pub role_embed: Vec<RoleInfo>,
     pub message_responses: Vec<MessageResponse>,
 }
 
@@ -99,6 +100,13 @@ pub struct MessageResponse {
 pub struct Response {
     pub message: Option<String>,
     pub embed: Option<Embed>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RoleInfo {
+    pub id: u64,
+    pub button: bool,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize)]

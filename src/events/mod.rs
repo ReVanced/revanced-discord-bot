@@ -9,6 +9,7 @@ mod guild_member_update;
 mod message_create;
 mod ready;
 mod thread_create;
+mod interaction;
 
 pub struct Handler<T> {
     options: poise::FrameworkOptions<T, Error>,
@@ -62,6 +63,9 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
     }
 
     async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
+        let data = self.data.read().await;
+        interaction::interaction(&ctx, &interaction, &data).await;
+
         self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate {
             interaction,
         })

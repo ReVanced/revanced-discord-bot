@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 
-use commands::{configuration, misc, moderation};
+use commands::{configuration, misc, moderation, utils as util_cmds};
 use db::database::Database;
 use events::Handler;
 use poise::serenity_prelude::{self as serenity, RwLock, UserId};
@@ -53,6 +53,7 @@ async fn main() {
         moderation::lock(),
         moderation::unlock(),
         misc::reply(),
+        util_cmds::role_embed(),
     ];
     poise::set_qualified_names(&mut commands);
 
