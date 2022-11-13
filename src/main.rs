@@ -30,6 +30,7 @@ pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
+    api_server: String,
 }
 
 #[tokio::main]
@@ -53,6 +54,7 @@ async fn main() {
         moderation::lock(),
         moderation::unlock(),
         misc::reply(),
+        misc::poll(),
     ];
     poise::set_qualified_names(&mut commands);
 
@@ -79,6 +81,7 @@ async fn main() {
             .unwrap(),
         ),
         pending_unmutes: HashMap::new(),
+        api_server: env::var("API_SERVER").expect("API_SERVER environment variable not set"),
     }));
 
     let handler = Arc::new(Handler::new(
