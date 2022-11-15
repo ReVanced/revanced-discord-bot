@@ -53,7 +53,6 @@ async fn main() {
         moderation::lock(),
         moderation::unlock(),
         misc::reply(),
-        util_cmds::role_embed(),
     ];
     poise::set_qualified_names(&mut commands);
 

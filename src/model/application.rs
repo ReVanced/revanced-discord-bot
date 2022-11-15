@@ -102,7 +102,7 @@ pub struct Response {
     pub embed: Option<Embed>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct RoleInfo {
     pub id: u64,
     pub button: bool,
