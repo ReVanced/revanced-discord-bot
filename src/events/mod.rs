@@ -50,7 +50,7 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         *self.bot_id.write().await = Some(ready.user.id);
 
         ready::load_muted_members(&ctx, &ready).await;
-        let _ = ready::role_embed(&ctx).await;
+        let _ = ready::role_embed_ready(ctx).await;
     }
 
     async fn message(&self, ctx: serenity::Context, new_message: serenity::Message) {

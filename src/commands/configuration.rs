@@ -1,6 +1,7 @@
 use tracing::debug;
 
 use crate::utils::bot::load_configuration;
+use crate::utils::role_embed::update_role_embed;
 use crate::{Context, Error};
 
 /// Reload the Discord bot.
@@ -22,6 +23,11 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
         })
     })
     .await?;
+
+    let data = ctx.data().read().await;
+    // Update the role embed.
+    // TODO: still won't fully work with role embeds :despair:
+    update_role_embed(ctx.discord(), &data).await?;
 
     Ok(())
 }
