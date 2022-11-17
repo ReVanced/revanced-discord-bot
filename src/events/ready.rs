@@ -86,9 +86,7 @@ pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Er
                 continue;
             }
 
-            let role_id = if let Ok(id) = interaction.data.custom_id.parse() {
-                id
-            } else {
+            let Ok(role_id) = interaction.data.custom_id.parse() else {
                 continue;
             };
 
@@ -103,6 +101,9 @@ pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Er
                 // sussy custom id
                 continue;
             }
+
+            // Anything that wants a write lock on `data` will break unless we do this because the lock won't be dropped until the next loop iteration.
+            drop(data);
 
             if let Err(err) = handle_role(&ctx, &*interaction, role_id).await {
                 error!(

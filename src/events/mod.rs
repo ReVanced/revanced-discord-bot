@@ -63,8 +63,6 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
     }
 
     async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
-        let data = self.data.read().await;
-
         self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate {
             interaction,
         })
