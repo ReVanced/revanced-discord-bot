@@ -11,8 +11,11 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     let configuration = load_configuration();
     // Use the embed color from the updated configuration
     let embed_color = configuration.general.embed_color;
+    // Lock user data
+    debug!("Locking...");
+    let mut data = ctx.data().write().await;
     // Also save the new configuration to the user data
-    ctx.data().write().await.configuration = configuration;
+    data.configuration = configuration;
 
     debug!("{} reloaded the configuration.", ctx.author().name);
 
@@ -24,10 +27,8 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     })
     .await?;
 
-    let data = ctx.data().read().await;
     // Update the role embed.
-    // TODO: still won't fully work with role embeds :despair:
-    update_role_embed(ctx.discord(), &data).await?;
+    update_role_embed(ctx.discord(), &mut *data).await?;
 
     Ok(())
 }

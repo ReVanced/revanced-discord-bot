@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 
-use commands::{configuration, misc, moderation, utils as util_cmds};
+use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::Handler;
-use poise::serenity_prelude::{self as serenity, RwLock, UserId};
+use poise::serenity_prelude::{self as serenity, RwLock, MessageId, UserId};
 use tokio::task::JoinHandle;
 use tracing::{error, trace};
 use utils::bot::load_configuration;
@@ -30,6 +30,7 @@ pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
+    role_embed_msg_id: Option<MessageId>,
 }
 
 #[tokio::main]
@@ -79,6 +80,7 @@ async fn main() {
             .unwrap(),
         ),
         pending_unmutes: HashMap::new(),
+        role_embed_msg_id: None,
     }));
 
     let handler = Arc::new(Handler::new(

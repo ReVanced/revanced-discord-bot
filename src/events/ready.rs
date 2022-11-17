@@ -1,6 +1,6 @@
 use crate::model::application::RoleInfo;
-use crate::utils::role_embed::{update_role_embed, get_role_name_from_id};
-use crate::serenity::{RoleId, model::application::component::ComponentType};
+use crate::serenity::{model::application::component::ComponentType, RoleId};
+use crate::utils::role_embed::{get_role_name_from_id, update_role_embed};
 use chrono::Utc;
 use tracing::trace;
 
@@ -66,65 +66,64 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
 /// Creates/updates the role embed and starts collecting interactions.
 pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Error> {
     let data = get_data_lock(&ctx).await;
-    let data = &*data.read().await;
+    let data = &mut *data.write().await;
 
-    let mut stream = update_role_embed(&ctx, data)
-        .await?
-        .await_component_interactions(&ctx.shard)
-        // Filters away all invalid interactions (except those that don't exist in the configs):
-        // Might not be necessary but why not.
-        .filter(move |interaction| {
-            if interaction.data.component_type != ComponentType::Button {
-                return false;
-            }
-
-            // Should be a RoleId (u64)
-            interaction.data.custom_id.parse::<u64>().is_ok()
-        })
-        .build();
+    update_role_embed(&ctx, data).await?;
 
     tokio::task::spawn(async move {
+        let mut stream = serenity::ComponentInteractionCollectorBuilder::new(&ctx).build();
+
         while let Some(interaction) = stream.next().await {
-            // Get config data again incase we reloaded it.
+            // Get config data again (might have been reloaded).
             let data = get_data_lock(&ctx).await;
             let data = &*data.read().await;
 
-            if let Err(err) = handle_role(
-                &ctx,
-                &*interaction,
-                interaction.data.custom_id.parse().unwrap(),
-                &data.configuration.role_embed,
-            )
-            .await
+            // `ComponentInteractionCollectorBuilder.filter()` does indeed exist, but tokio will explode if we try to lock the data using blocking calls inside a synchronous function called from an async context.
+            // The other filtering functions cannot take configuration updates into account.
+
+            if Some(interaction.message.id) != data.role_embed_msg_id {
+                // don't care + didn't ask
+                continue;
+            }
+
+            let role_id = if let Ok(id) = interaction.data.custom_id.parse() {
+                id
+            } else {
+                continue;
+            };
+
+            // Not sure if this check is actually necessary...
+            if data
+                .configuration
+                .role_embed
+                .iter()
+                .find(|entry| entry.id == role_id)
+                .is_none()
             {
+                // sussy custom id
+                continue;
+            }
+
+            if let Err(err) = handle_role(&ctx, &*interaction, role_id).await {
                 error!(
-                    "Could not give/take role to/from user {}: {}",
+                    "Could not update the roles of user with id {}: {}",
                     interaction.user.id, err
                 );
             }
         }
-        warn!("Role Embed interactions collector stopped!");
+
+        warn!("The role embed interactions collector stopped!");
     });
 
     Ok(())
 }
 
+/// DO NOT GIVE THIS UNTRUSTED DATA!
 async fn handle_role(
     ctx: &serenity::Context,
     interaction: &serenity::MessageComponentInteraction,
     role_id: u64,
-    role_embed_config: &[RoleInfo],
 ) -> Result<(), Error> {
-    // Not sure if this check is actually necessary...
-    if role_embed_config
-        .iter()
-        .find(|entry| entry.id == role_id)
-        .is_none()
-    {
-        // sussy custom id
-        return Ok(());
-    }
-
     let mut member = interaction.member.as_ref().unwrap().clone();
     let has_role = member.roles.contains(&RoleId(role_id));
     if has_role {

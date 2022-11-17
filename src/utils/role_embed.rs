@@ -12,8 +12,8 @@ pub fn get_role_name_from_id(ctx: &serenity::Context, id: u64, include_icon: boo
 /// Creates or updates the role embed.
 pub async fn update_role_embed(
     ctx: &serenity::Context,
-    data: &crate::Data,
-) -> Result<serenity::Message, serenity::Error> {
+    data: &mut crate::Data,
+) -> Result<(), serenity::Error> {
     let color = data.configuration.general.embed_color;
     let thumbnail = ctx.http.get_current_user().await?.face();
     let role_config = &data.configuration.role_embed;
@@ -56,5 +56,7 @@ pub async fn update_role_embed(
         })
         .await?;
 
-    Ok(message)
+    data.role_embed_msg_id = Some(message.id);
+
+    Ok(())
 }
