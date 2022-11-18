@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use bson::Document;
-use poise::serenity_prelude::{PermissionOverwrite};
+use poise::serenity_prelude::{PermissionOverwrite, ChannelId, MessageId};
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
 
@@ -23,6 +23,13 @@ pub struct LockedChannel {
     pub overwrites: Option<Vec<PermissionOverwrite>>,
 }
 
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct SavedRoleEmbed {
+    pub channel_id: Option<u64>,
+    pub message_id: Option<u64>,
+}
+
 impl From<Muted> for Document {
     fn from(muted: Muted) -> Self {
         to_document(&muted)
@@ -32,6 +39,12 @@ impl From<Muted> for Document {
 impl From<LockedChannel> for Document {
     fn from(locked: LockedChannel) -> Self {
         to_document(&locked)
+    }
+}
+
+impl From<SavedRoleEmbed> for Document {
+    fn from(saved_role_embed: SavedRoleEmbed) -> Self {
+        to_document(&saved_role_embed)
     }
 }
 
