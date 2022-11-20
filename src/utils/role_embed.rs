@@ -41,9 +41,8 @@ pub async fn update_role_embed(
 ) -> Result<(), serenity::Error> {
     let color = data.configuration.general.embed_color;
     let thumbnail = ctx.http.get_current_user().await?.face();
-    // TODO: get this from config instead
-    let channel_id = ChannelId(1040532157061398550);
-    let role_config = &data.configuration.role_embed;
+    let role_embed = &data.configuration.role_embed;
+    let channel_id = ChannelId(role_embed.channel_id);
 
     let query: Document = SavedRoleEmbed {
         channel_id: Some(channel_id.0),
@@ -89,7 +88,7 @@ pub async fn update_role_embed(
                     .color(color)
                     .thumbnail(thumbnail)
                     .description("Click the respective button to toggle the role.")
-                    .fields(role_config.iter().map(|role| {
+                    .fields(role_embed.roles.iter().map(|role| {
                         (
                             get_role_name_from_id(ctx, role.id, true),
                             role.description.as_str(),
@@ -99,7 +98,7 @@ pub async fn update_role_embed(
             })
             .components(|c| {
                 c.create_action_row(|r| {
-                    for role in role_config {
+                    for role in &role_embed.roles {
                         if !role.button {
                             continue;
                         }
