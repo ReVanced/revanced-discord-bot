@@ -12,7 +12,7 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     // Use the embed color from the updated configuration
     let embed_color = configuration.general.embed_color;
     // Lock user data
-    debug!("Locking...");
+    debug!("Locking data...");
     let mut data = ctx.data().write().await;
     // Also save the new configuration to the user data
     data.configuration = configuration;
