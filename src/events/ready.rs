@@ -1,5 +1,4 @@
-use crate::model::application::RoleInfo;
-use crate::serenity::{model::application::component::ComponentType, RoleId};
+use crate::serenity::RoleId;
 use crate::utils::role_embed::{get_role_name_from_id, update_role_embed};
 use chrono::Utc;
 use tracing::trace;
@@ -90,12 +89,10 @@ pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Er
             };
 
             // Not sure if this check is actually necessary...
-            if data
+            if !data
                 .configuration
                 .role_embed
-                .iter()
-                .find(|entry| entry.id == role_id)
-                .is_none()
+                .iter().any(|entry| entry.id == role_id)
             {
                 // sussy custom id
                 continue;
@@ -104,7 +101,7 @@ pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Er
             // Anything that wants a write lock on `data` will break unless we do this because the lock won't be dropped until the next loop iteration.
             drop(data);
 
-            if let Err(err) = handle_role(&ctx, &*interaction, role_id).await {
+            if let Err(err) = handle_role(&ctx, &interaction, role_id).await {
                 error!(
                     "Could not update the roles of user with id {}: {}",
                     interaction.user.id, err

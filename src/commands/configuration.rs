@@ -28,7 +28,7 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     .await?;
 
     // Update the role embed.
-    update_role_embed(ctx.discord(), &mut *data).await?;
+    update_role_embed(ctx.discord(), &mut data).await?;
 
     Ok(())
 }
