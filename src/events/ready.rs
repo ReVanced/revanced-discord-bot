@@ -75,7 +75,7 @@ pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Er
         while let Some(interaction) = stream.next().await {
             // Get config data again (might have been reloaded).
             let data = get_data_lock(&ctx).await;
-            let data = &*data.read().await;
+            let data = data.read().await;
 
             // `ComponentInteractionCollectorBuilder.filter()` does indeed exist, but tokio will explode if we try to lock the data using blocking calls inside a synchronous function called from an async context.
             // The other filtering functions cannot take configuration updates into account.
