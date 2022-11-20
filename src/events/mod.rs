@@ -4,6 +4,8 @@ use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, Use
 
 use crate::{Data, Error};
 
+use tracing::error;
+
 mod guild_member_addition;
 mod guild_member_update;
 mod message_create;
@@ -50,7 +52,9 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         *self.bot_id.write().await = Some(ready.user.id);
 
         ready::load_muted_members(&ctx, &ready).await;
-        let _ = ready::role_embed_ready(ctx).await;
+        if let Err(err) = ready::prepare_role_embed(ctx).await {
+            error!("Could not prepare role embed: {}", err);
+        }
     }
 
     async fn message(&self, ctx: serenity::Context, new_message: serenity::Message) {

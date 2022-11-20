@@ -62,7 +62,7 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
 }
 
 /// Creates/updates the role embed and starts collecting interactions.
-pub async fn role_embed_ready(ctx: serenity::Context) -> Result<(), serenity::Error> {
+pub async fn prepare_role_embed(ctx: serenity::Context) -> Result<(), serenity::Error> {
     let data = get_data_lock(&ctx).await;
     let data = &mut *data.write().await;
 
