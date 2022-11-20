@@ -11,8 +11,7 @@ use crate::utils::moderation::queue_unmute_member;
 
 use tracing::log::{error, warn};
 
-// TODO: uhh...
-use poise::futures_util::StreamExt;
+use futures_util::StreamExt;
 
 pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
     let data = get_data_lock(ctx).await;
