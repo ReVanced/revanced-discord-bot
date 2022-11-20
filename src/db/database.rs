@@ -9,7 +9,8 @@ use mongodb::options::{
     InsertOneOptions,
     ResolverConfig,
     UpdateModifications,
-    UpdateOptions, FindOneOptions,
+    UpdateOptions,
+    FindOneOptions,
 };
 use mongodb::results::{DeleteResult, InsertOneResult, UpdateResult};
 use mongodb::{Client, Collection, Cursor};
