@@ -237,7 +237,7 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Lock(channel, author, error) => match error {
                 Some(err) => f
-                    .title(format!("Failed to lock {} ", channel))
+                    .title(format!("Failed to lock {} ", channel.name()))
                     .field("Exception", err.to_string(), false)
                     .field(
                         "Action",
@@ -269,11 +269,11 @@ pub async fn respond_moderation<'a>(
                         false,
                     ),
                 None => f
-                    .title(format!("Unlocked {}", channel))
+                    .title(format!("Unlocked {}", channel.name()))
                     .description("Restored original permission overwrites.")
                     .field(
                         "Action",
-                        format!("{} was unlocked by {}", channel, author.mention()),
+                        format!("{} was unlocked by {}", channel.mention(), author.mention()),
                         false,
                     ),
             },
