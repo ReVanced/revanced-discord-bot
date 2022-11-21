@@ -443,6 +443,11 @@ pub async fn purge(
                     .field("Action by", author.mention(), true)
                     .color(embed_color)
                     .thumbnail(image)
+                    .footer(|f| {
+                            f.text("ReVanced");
+                            f.icon_url(current_user.face()) // ran into a "use of moved value" when using the image variable here, HELP!
+                        }
+                    )
                     .clone(),
             )
         })

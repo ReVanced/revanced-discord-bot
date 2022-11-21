@@ -313,6 +313,10 @@ pub async fn respond_moderation<'a>(
                     ),
                     true,
                 )
+                .footer(|f| {
+                    f.text("ReVanced");
+                    f.icon_url(current_user.face())
+                })
             })
         })
         .await?;
