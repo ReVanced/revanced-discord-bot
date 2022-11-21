@@ -150,9 +150,9 @@ pub async fn respond_moderation<'a>(
                     None => f
                         .title(format!("Muted {}", user.tag()))
                         .field(
-                           "Action",
-                           format!("{} was muted by {}", user.mention(), author.mention()),
-                        false,
+                            "Action",
+                            format!("{} was muted by {}", user.mention(), author.mention()),
+                            false,
                         ),
                 }
                 .field("Reason", reason, true)
@@ -229,8 +229,8 @@ pub async fn respond_moderation<'a>(
                     None => f
                         .title(format!("Unbanned {}", user.tag()))
                         .field(
-                           "Action by",
-                           format!("{} was unbanned by {}", user.mention(), author.mention()),
+                            "Action",
+                            format!("{} was unbanned by {}", user.mention(), author.mention()),
                             false,
                         ),
                 }
