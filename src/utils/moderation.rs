@@ -286,7 +286,10 @@ pub async fn respond_moderation<'a>(
             current_user.face()
         };
 
-        result.thumbnail(&user);
+        result.thumbnail(&user).footer(|f| {
+            f.text("ReVanced");
+            f.icon_url(current_user.face())
+        });
     };
 
     let reply = ctx
@@ -313,10 +316,6 @@ pub async fn respond_moderation<'a>(
                     ),
                     true,
                 )
-                .footer(|f| {
-                    f.text("ReVanced");
-                    f.icon_url(current_user.face())
-                })
             })
         })
         .await?;
