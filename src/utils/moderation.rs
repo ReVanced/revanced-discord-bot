@@ -241,7 +241,7 @@ pub async fn respond_moderation<'a>(
                     .field("Exception", err.to_string(), false)
                     .field(
                         "Action",
-                        format!("{} was locked by {}", channel.mention(), author.mention()),
+                        format!("{} was locked by {} but failed", channel.mention(), author.mention()),
                         false,
                     ),
                 None => f
