@@ -12,14 +12,7 @@
 		"roles": [955220417969262612],
 		"users": [737323631117598811]
 	},
-	"thread_introductions": [
-		{
-			"channels": [985666124068814888],
-			"response": {
-				"message": "Hi. Please wait for someone to help you with your problem.\r\nUnderstand that this channel is only meant to help you.\r\nIf you encounter a bug, please report it on the respective GitHub repository instead.\r\n\r\nThank you!"
-			}
-		}
-	],
+	"thread_introductions": [],
 	"message_responses": [
 		{
 			"includes": {
