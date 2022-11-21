@@ -17,53 +17,6 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((where|how|download|install|get|manager).*){2,})"]
-			},
-			"excludes": {
-				"roles": [
-					965267139902705744, 955220417969262612, 952987191401926697,
-					1027874293192863765
-				],
-				"match": ["(?i)patch", "(?i)error"]
-			},
-			"condition": {
-				"user": {
-					"server_age": 120
-				}
-			},
-			"response": {
-				"embed": {
-					"title": "Where or how to get ReVanced ❓",
-					"description": "You have asked a question that might have been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
-					"fields": [
-						{
-							"name": "🔸 Regarding your question",
-							"value": "Please refer to <#953993848374325269> `III`.",
-							"inline": false
-						}
-					],
-					"footer": {
-						"text": "",
-						"icon_url": ""
-					},
-					"image": {
-						"url": ""
-					},
-					"thumbnail": {
-						"url": "https://cdn.discordapp.com/icons/952946952348270622/d011f1dc1d27e9001d243bdedaf7443b.webp?size=512"
-					},
-					"author": {
-						"name": "",
-						"icon_url": "",
-						"url": ""
-					}
-				}
-			}
-		},
-		{
-			"includes": {
-				"channels": [952946952348270626, 954147049832603748],
 				"match": ["(?i)(((error|open|patch).*){2,})"]
 			},
 			"excludes": {
