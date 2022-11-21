@@ -28,7 +28,7 @@
 			},
 			"condition": {
 				"user": {
-					"server_age": 120
+					"server_age": 5
 				}
 			},
 			"response": {
