@@ -439,8 +439,8 @@ pub async fn purge(
             e.set_embed(
                 serenity::CreateEmbed::default()
                     .title("Purge successful")
-                    .field("Deleted messages", deleted_amount.to_string(), true)
-                    .field("Action by", author.mention(), true)
+                    .field("Deleted messages", deleted_amount.to_string(), false)
+                    .field("Action by", author.mention(), false)
                     .color(embed_color)
                     .thumbnail(image)
                     .footer(|f| {

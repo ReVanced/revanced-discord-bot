@@ -152,7 +152,7 @@ pub async fn respond_moderation<'a>(
                         .field(
                            "Action",
                            format!("{} was muted by {}", user.mention(), author.mention()),
-                        true,
+                        false,
                         ),
                 }
                 .field("Reason", reason, true)
@@ -178,7 +178,7 @@ pub async fn respond_moderation<'a>(
                         .field(
                             "Action",
                             format!("{} was unmuted by {}", user.mention(), author.mention()),
-                            true,
+                            false,
                         ),
                 }
             },
@@ -202,7 +202,7 @@ pub async fn respond_moderation<'a>(
                         .field(
                             "Action",
                             format!("{} was banned by {}", user.mention(), author.mention()),
-                            true,
+                            false,
                         ),
                 };
                 if let Some(reason) = reason {
@@ -231,7 +231,7 @@ pub async fn respond_moderation<'a>(
                         .field(
                            "Action by",
                            format!("{} was unbanned by {}", user.mention(), author.mention()),
-                            true,
+                            false,
                         ),
                 }
             },
@@ -242,7 +242,7 @@ pub async fn respond_moderation<'a>(
                     .field(
                         "Action",
                         format!("{} was locked by {}", channel.mention(), author.mention()),
-                        true,
+                        false,
                     ),
                 None => f
                     .title(format!("Locked {}", channel.name()))
@@ -252,7 +252,7 @@ pub async fn respond_moderation<'a>(
                     .field(
                         "Action",
                         format!("{} was locked by {}", channel.mention(), author.mention()),
-                        true,
+                        false,
                     ),
             },
             ModerationKind::Unlock(channel, author, error) => match error {
@@ -274,7 +274,7 @@ pub async fn respond_moderation<'a>(
                     .field(
                         "Action",
                         format!("{} was unlocked by {}", channel, author.mention()),
-                        true,
+                        false,
                     ),
             },
         }
