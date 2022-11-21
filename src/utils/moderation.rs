@@ -147,11 +147,13 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f.title(format!("Muted {}", user.tag())).field(
-                        "Action",
-                        format!("{} was muted by {}", user.mention(), author.mention()),
+                    None => f
+                        .title(format!("Muted {}", user.tag()))
+                        .field(
+                           "Action",
+                           format!("{} was muted by {}", user.mention(), author.mention()),
                         true,
-                    ),
+                        ),
                 }
                 .field("Reason", reason, true)
                 .field("Expires", expires, true)
@@ -171,11 +173,13 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f.title(format!("Unmuted {}", user.tag())).field(
-                        "Action",
-                        format!("{} was unmuted by {}", user.mention(), author.mention()),
-                        true,
-                    ),
+                    None => f
+                        .title(format!("Unmuted {}", user.tag()))
+                        .field(
+                            "Action",
+                            format!("{} was unmuted by {}", user.mention(), author.mention()),
+                            true,
+                        ),
                 }
             },
             ModerationKind::Ban(user, author, reason, error) => {
@@ -193,11 +197,13 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f.title(format!("Banned {}", user.tag())).field(
-                        "Action",
-                        format!("{} was banned by {}", user.mention(), author.mention()),
-                        true,
-                    ),
+                    None => f
+                        .title(format!("Banned {}", user.tag()))
+                        .field(
+                            "Action",
+                            format!("{} was banned by {}", user.mention(), author.mention()),
+                            true,
+                        ),
                 };
                 if let Some(reason) = reason {
                     f.field("Reason", reason, true)
@@ -220,11 +226,13 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f.title(format!("Unbanned {}", user.tag())).field(
-                        "Action by",
-                        format!("{} was unbanned by {}", user.mention(), author.mention()),
-                        true,
-                    ),
+                    None => f
+                        .title(format!("Unbanned {}", user.tag()))
+                        .field(
+                           "Action by",
+                           format!("{} was unbanned by {}", user.mention(), author.mention()),
+                            true,
+                        ),
                 }
             },
             ModerationKind::Lock(channel, author, error) => match error {
