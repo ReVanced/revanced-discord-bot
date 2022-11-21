@@ -2,7 +2,7 @@ use std::cmp;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
-use poise::serenity_prelude::{ChannelId, Http, User};
+use poise::serenity_prelude::{ChannelId, GuildChannel, Http, Mentionable, User};
 use tokio::task::JoinHandle;
 use tracing::{debug, error};
 
@@ -15,12 +15,12 @@ use crate::serenity::SerenityError;
 use crate::{Context, Error};
 
 pub enum ModerationKind {
-    Mute(User, String, String, Option<Error>), // User, Reason, Expires, Error
-    Unmute(User, Option<Error>),               // User, Error
-    Ban(User, Option<String>, Option<SerenityError>), // User, Reason, Error
-    Unban(User, Option<SerenityError>),        // User, Error
-    Lock(String, Option<Error>),               // Channel name, Error
-    Unlock(String, Option<Error>),             // Channel name, Error
+    Mute(User, User, String, String, Option<Error>), // User, Command author, Reason, Expires, Error
+    Unmute(User, User, Option<Error>),               // User, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),        // User, Command author, Error
+    Lock(GuildChannel, User, Option<Error>),         // Channel name, Command author, Error
+    Unlock(GuildChannel, User, Option<Error>),       // Channel name, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -43,7 +43,6 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Me
         )
         .await
     {
-        
         if let Ok(found) = cursor.advance().await {
             if found {
                 debug!("Muted member {} rejoined the server", new_member.user.tag());
@@ -132,77 +131,143 @@ pub async fn respond_moderation<'a>(
         let mut moderated_user: Option<&User> = None;
 
         let result = match moderation {
-            ModerationKind::Mute(user, reason, expires, error) => {
+            ModerationKind::Mute(user, author, reason, expires, error) => {
                 moderated_user = Some(user);
 
                 match error {
-                    Some(err) => f.title(format!("Failed to mute {}", user.tag())).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
+                    Some(err) => f
+                        .title(format!("Failed to mute {}", user.tag()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was muted by {} but failed",
+                                user.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        ),
+                    None => f.title(format!("Muted {}", user.tag())).field(
+                        "Action",
+                        format!("{} was muted by {}", user.mention(), author.mention()),
+                        true,
                     ),
-                    None => f.title(format!("Muted {}", user.tag())),
                 }
-                .field("Reason", reason, false)
-                .field("Expires", expires, false)
+                .field("Reason", reason, true)
+                .field("Expires", expires, true)
             },
-            ModerationKind::Unmute(user, error) => {
+            ModerationKind::Unmute(user, author, error) => {
                 moderated_user = Some(user);
                 match error {
-                    Some(err) => f.title(format!("Failed to unmute {}", user.tag())).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
+                    Some(err) => f
+                        .title(format!("Failed to unmute {}", user.tag()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was unmuted by {} but failed",
+                                user.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        ),
+                    None => f.title(format!("Unmuted {}", user.tag())).field(
+                        "Action",
+                        format!("{} was unmuted by {}", user.mention(), author.mention()),
+                        true,
                     ),
-                    None => f.title(format!("Unmuted {}", user.tag())),
                 }
             },
-            ModerationKind::Ban(user, reason, error) => {
+            ModerationKind::Ban(user, author, reason, error) => {
                 moderated_user = Some(user);
                 let f = match error {
-                    Some(err) => f.title(format!("Failed to ban {}", user.tag())).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
+                    Some(err) => f
+                        .title(format!("Failed to ban {}", user.tag()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was banned by {} but failed",
+                                user.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        ),
+                    None => f.title(format!("Banned {}", user.tag())).field(
+                        "Action",
+                        format!("{} was banned by {}", user.mention(), author.mention()),
+                        true,
                     ),
-                    None => f.title(format!("Banned {}", user.tag())),
                 };
                 if let Some(reason) = reason {
-                    f.field("Reason", reason, false)
+                    f.field("Reason", reason, true)
                 } else {
                     f
                 }
             },
-            ModerationKind::Unban(user, error) => {
+            ModerationKind::Unban(user, author, error) => {
                 moderated_user = Some(user);
                 match error {
-                    Some(err) => f.title(format!("Failed to unban {}", user.tag())).field(
-                        "Exception",
-                        err.to_string(),
-                        false,
+                    Some(err) => f
+                        .title(format!("Failed to unban {}", user.tag()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was unbanned by {} but failed",
+                                user.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        ),
+                    None => f.title(format!("Unbanned {}", user.tag())).field(
+                        "Action by",
+                        format!("{} was unbanned by {}", user.mention(), author.mention()),
+                        true,
                     ),
-                    None => f.title(format!("Unbanned {}", user.tag())),
                 }
             },
-            ModerationKind::Lock(channel, error) => match error {
-                Some(err) => f.title(format!("Failed to lock {} ", channel)).field(
-                    "Exception",
-                    err.to_string(),
-                    false,
-                ),
-                None => f.title(format!("Locked {}", channel)).description(
-                    "Unlocking the channel will restore the original permission overwrites.",
-                ),
+            ModerationKind::Lock(channel, author, error) => match error {
+                Some(err) => f
+                    .title(format!("Failed to lock {} ", channel))
+                    .field("Exception", err.to_string(), false)
+                    .field(
+                        "Action",
+                        format!("{} was locked by {}", channel.mention(), author.mention()),
+                        true,
+                    ),
+                None => f
+                    .title(format!("Locked {}", channel.name()))
+                    .description(
+                        "Unlocking the channel will restore the original permission overwrites.",
+                    )
+                    .field(
+                        "Action",
+                        format!("{} was locked by {}", channel.mention(), author.mention()),
+                        true,
+                    ),
             },
-            ModerationKind::Unlock(channel, error) => match error {
-                Some(err) => f.title(format!("Failed to unlock {}", channel)).field(
-                    "Exception",
-                    err.to_string(),
-                    false,
-                ),
+            ModerationKind::Unlock(channel, author, error) => match error {
+                Some(err) => f
+                    .title(format!("Failed to unlock {}", channel.name()))
+                    .field("Exception", err.to_string(), false)
+                    .field(
+                        "Action",
+                        format!(
+                            "{} was unlocked by {} but failed",
+                            channel.mention(),
+                            author.mention()
+                        ),
+                        false,
+                    ),
                 None => f
                     .title(format!("Unlocked {}", channel))
-                    .description("Restored original permission overwrites."),
+                    .description("Restored original permission overwrites.")
+                    .field(
+                        "Action",
+                        format!("{} was unlocked by {}", channel, author.mention()),
+                        true,
+                    ),
             },
         }
         .color(configuration.general.embed_color);
@@ -238,7 +303,7 @@ pub async fn respond_moderation<'a>(
                         response.channel_id,
                         response.id
                     ),
-                    false,
+                    true,
                 )
             })
         })
