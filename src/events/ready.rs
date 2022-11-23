@@ -115,7 +115,6 @@ pub async fn prepare_role_embed(ctx: serenity::Context) -> Result<(), serenity::
     Ok(())
 }
 
-/// DO NOT GIVE THIS UNTRUSTED DATA!
 async fn handle_role(
     ctx: &serenity::Context,
     interaction: &serenity::MessageComponentInteraction,
