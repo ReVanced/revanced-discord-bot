@@ -95,7 +95,6 @@ pub async fn prepare_role_embed(ctx: serenity::Context) -> Result<(), serenity::
                 .iter()
                 .any(|entry| entry.id == role_id)
             {
-                // sussy custom id
                 continue;
             }
 
