@@ -80,7 +80,6 @@ pub async fn prepare_role_embed(ctx: serenity::Context) -> Result<(), serenity::
             // The other filtering functions cannot take configuration updates into account.
 
             if Some(interaction.message.id) != data.role_embed_msg_id {
-                // don't care + didn't ask
                 continue;
             }
 
