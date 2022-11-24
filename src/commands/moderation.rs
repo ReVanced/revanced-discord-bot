@@ -442,10 +442,10 @@ pub async fn purge(
                     .field("Deleted messages", deleted_amount.to_string(), false)
                     .field("Action by", author.mention(), false)
                     .color(embed_color)
-                    .thumbnail(image)
+                    .thumbnail(image.clone())
                     .footer(|f| {
                             f.text("ReVanced");
-                            f.icon_url(current_user.face()) // ran into a "use of moved value" when using the image variable here, HELP!
+                            f.icon_url(image)
                         }
                     )
                     .clone(),
