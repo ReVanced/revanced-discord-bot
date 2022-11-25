@@ -91,7 +91,9 @@
 								"type": "boolean",
 								"description": "Whether or not there will be a button for this role."
 							}
+						}
 					}
+				}
 			}
 		},
 		"message_responses": {
