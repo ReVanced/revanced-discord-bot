@@ -93,7 +93,7 @@ pub async fn prepare_role_embed(ctx: serenity::Context) -> Result<(), serenity::
                 .role_embed
                 .roles
                 .iter()
-                .any(|entry| entry.id == role_id)
+                .any(|entry| entry.id == role_id && entry.obtainable)
             {
                 continue;
             }

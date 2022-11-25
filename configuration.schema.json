@@ -66,6 +66,34 @@
 			"minItems": 1,
 			"uniqueItems": true
 		},
+		"role_embed": {
+			"type": "object",
+			"properties": {
+				"channel_id": {
+					"type": "integer",
+					"description": "The location of the role embed."
+				},
+				"roles": {
+					"type": "array",
+					"description": "Role information.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer",
+								"description": "ID of the role."
+							},
+							"description": {
+								"type": "string",
+								"description": "Role description."
+							},
+							"obtainable": {
+								"type": "boolean",
+								"description": "Whether or not there will be a button for this role."
+							}
+					}
+			}
+		},
 		"message_responses": {
 			"type": "array",
 			"items": {

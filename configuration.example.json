@@ -40,5 +40,9 @@
 				"message": ""
 			}
 		}
-	]
+	],
+	"role_embed": {
+		"channel_id": 0,
+		"roles": []
+	}
 }

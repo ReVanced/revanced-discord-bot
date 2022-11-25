@@ -99,7 +99,7 @@ pub async fn update_role_embed(
             .components(|c| {
                 c.create_action_row(|r| {
                     for role in &role_embed.roles {
-                        if !role.button {
+                        if !role.obtainable {
                             continue;
                         }
 

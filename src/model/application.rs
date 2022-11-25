@@ -111,7 +111,7 @@ pub struct RoleEmbed {
 #[derive(Serialize, Deserialize)]
 pub struct RoleInfo {
     pub id: u64,
-    pub button: bool,
+    pub obtainable: bool,
     pub description: String,
 }
 
