@@ -442,7 +442,7 @@ pub async fn purge(
                     .field("Deleted messages", deleted_amount.to_string(), false)
                     .field("Action by", author.mention(), false)
                     .color(embed_color)
-                    .thumbnail(image.clone())
+                    .thumbnail(&image)
                     .footer(|f| {
                             f.text("ReVanced");
                             f.icon_url(image)
