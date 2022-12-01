@@ -10,7 +10,7 @@ use poise::serenity_prelude::{
     User,
 };
 use tracing::log::error;
-use tracing::{debug, trace};
+use tracing::{debug, warn, trace};
 
 use crate::db::model::{LockedChannel, Muted};
 use crate::utils::moderation::{
@@ -312,6 +312,12 @@ pub async fn mute(
             mute_duration.num_seconds() as u64,
         ),
     );
+
+    if result.is_none() {
+        if let Err(e) = member.disconnect_from_voice(&ctx.discord().http).await {
+            warn!("Could not disconnect member from voice channel: {}", e);
+        }
+    }
 
     respond_moderation(
         &ctx,
