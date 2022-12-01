@@ -1,3 +1,19 @@
+# [1.14.0](https://github.com/revanced/revanced-discord-bot/compare/v1.13.0...v1.14.0) (2022-12-01)
+
+
+### Bug Fixes
+
+* correct title of auto response [skip ci] ([093f2bf](https://github.com/revanced/revanced-discord-bot/commit/093f2bf643119facb411dfd74c6e40e555cd7614))
+
+
+### Features
+
+* decrease maximum age for auto response [skip ci] ([c2fe25a](https://github.com/revanced/revanced-discord-bot/commit/c2fe25a3a818cdf89d3d8c55477e600bdbc65339))
+* improve responses [skip ci] ([0548876](https://github.com/revanced/revanced-discord-bot/commit/0548876230c89d35088c5eb130aa03f6eca00005))
+* **moderation:** disconnect from voice channel on mute ([#39](https://github.com/revanced/revanced-discord-bot/issues/39)) ([b2aa39b](https://github.com/revanced/revanced-discord-bot/commit/b2aa39b9b68fd8163460e90c89cfd9bad4b2a622))
+* remove now useless auto response [skip ci] ([e607fef](https://github.com/revanced/revanced-discord-bot/commit/e607fef2dc397df89d1a2fe3da9257f758e4ce7d))
+* remove thread introductions [skip ci] ([bca2020](https://github.com/revanced/revanced-discord-bot/commit/bca20209713de707b10d46550c405d693cb25a31))
+
 # [1.13.0](https://github.com/revanced/revanced-discord-bot/compare/v1.12.0...v1.13.0) (2022-11-11)
 
 
