@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/revanced/revanced-discord-bot/compare/v1.14.0...v1.15.0) (2022-12-03)
+
+
+### Features
+
+* **moderation:** improve log embeds ([#37](https://github.com/revanced/revanced-discord-bot/issues/37)) ([78f954b](https://github.com/revanced/revanced-discord-bot/commit/78f954b7e8f07069e10be5f45edec6718930ae86))
+
 # [1.14.0](https://github.com/revanced/revanced-discord-bot/compare/v1.13.0...v1.14.0) (2022-12-01)
 
 
