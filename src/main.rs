@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 
+use api::model::api::Api;
 use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::Handler;
@@ -12,6 +13,7 @@ use utils::bot::load_configuration;
 
 use crate::model::application::Configuration;
 
+mod api;
 mod commands;
 mod db;
 mod events;
@@ -30,6 +32,7 @@ pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
+    api: Api,
 }
 
 #[tokio::main]
@@ -53,6 +56,7 @@ async fn main() {
         moderation::lock(),
         moderation::unlock(),
         misc::reply(),
+        misc::poll(),
     ];
     poise::set_qualified_names(&mut commands);
 
@@ -79,6 +83,13 @@ async fn main() {
             .unwrap(),
         ),
         pending_unmutes: HashMap::new(),
+        api: Api {
+            server: env::var("API_SERVER").expect("API_SERVER environment variable not set"),
+            client_id: env::var("API_CLIENT_ID")
+                .expect("API_CLIENT_ID environment variable not set"),
+            client_secret: env::var("API_CLIENT_SECRET")
+                .expect("API_CLIENT_SECRET environment variable not set"),
+        },
     }));
 
     let handler = Arc::new(Handler::new(

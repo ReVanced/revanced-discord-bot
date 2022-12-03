@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use bson::Document;
-use poise::serenity_prelude::{PermissionOverwrite};
+use poise::serenity_prelude::PermissionOverwrite;
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
 
@@ -21,6 +21,21 @@ pub struct Muted {
 pub struct LockedChannel {
     pub channel_id: Option<String>,
     pub overwrites: Option<Vec<PermissionOverwrite>>,
+}
+
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct Poll {
+    pub author: Option<PollAuthor>,
+    pub image_url: Option<String>,
+    pub votes: Option<u16>,
+}
+
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct PollAuthor {
+    pub name: Option<String>,
+    pub id: Option<u64>,
 }
 
 impl From<Muted> for Document {

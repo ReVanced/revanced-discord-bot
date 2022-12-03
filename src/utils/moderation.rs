@@ -43,7 +43,6 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Me
         )
         .await
     {
-        
         if let Ok(found) = cursor.advance().await {
             if found {
                 debug!("Muted member {} rejoined the server", new_member.user.tag());

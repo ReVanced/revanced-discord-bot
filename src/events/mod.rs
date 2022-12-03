@@ -1,11 +1,13 @@
 use std::sync::Arc;
 
 use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
+use tracing::log::error;
 
 use crate::{Data, Error};
 
 mod guild_member_addition;
 mod guild_member_update;
+mod interaction;
 mod message_create;
 mod ready;
 mod thread_create;
@@ -46,10 +48,21 @@ impl<T: Send + Sync> Handler<T> {
 // Manually dispatch events from serenity to poise
 #[serenity::async_trait]
 impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
-    async fn ready(&self, ctx: serenity::Context, ready: serenity::Ready) {
-        *self.bot_id.write().await = Some(ready.user.id);
+    async fn guild_member_addition(
+        &self,
+        ctx: serenity::Context,
+        mut new_member: serenity::Member,
+    ) {
+        guild_member_addition::guild_member_addition(&ctx, &mut new_member).await;
+    }
 
-        ready::load_muted_members(&ctx, &ready).await;
+    async fn guild_member_update(
+        &self,
+        ctx: serenity::Context,
+        old_if_available: Option<serenity::Member>,
+        new: serenity::Member,
+    ) {
+        guild_member_update::guild_member_update(&ctx, &old_if_available, &new).await;
     }
 
     async fn message(&self, ctx: serenity::Context, new_message: serenity::Message) {
@@ -57,13 +70,6 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
 
         self.dispatch_poise_event(&ctx, &poise::Event::Message {
             new_message,
-        })
-        .await;
-    }
-
-    async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
-        self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate {
-            interaction,
         })
         .await;
     }
@@ -83,20 +89,24 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         .await;
     }
 
+    async fn ready(&self, ctx: serenity::Context, ready: serenity::Ready) {
+        *self.bot_id.write().await = Some(ready.user.id);
+
+        ready::load_muted_members(&ctx, &ready).await;
+    }
+
+    async fn interaction_create(&self, ctx: serenity::Context, interaction: serenity::Interaction) {
+        if let Err(e) = interaction::interaction_create(&ctx, &interaction).await {
+            error!("Failed to handle interaction: {:?}.", e);
+        }
+
+        self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate {
+            interaction,
+        })
+        .await;
+    }
+
     async fn thread_create(&self, ctx: serenity::Context, thread: serenity::GuildChannel) {
         thread_create::thread_create(&ctx, &thread).await;
-    }
-
-    async fn guild_member_addition(&self, ctx: serenity::Context, mut new_member: serenity::Member) {
-        guild_member_addition::guild_member_addition(&ctx, &mut new_member).await;
-    }
-
-    async fn guild_member_update(
-        &self,
-        ctx: serenity::Context,
-        old_if_available: Option<serenity::Member>,
-        new: serenity::Member,
-    ) {
-        guild_member_update::guild_member_update(&ctx, &old_if_available, &new).await;
     }
 }
