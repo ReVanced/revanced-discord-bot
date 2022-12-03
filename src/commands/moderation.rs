@@ -7,7 +7,7 @@ use poise::serenity_prelude::{
     PermissionOverwrite,
     Permissions,
     RoleId,
-    User,
+    User, Mentionable,
 };
 use tracing::log::error;
 use tracing::{debug, warn, trace};
@@ -35,6 +35,8 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
     let channel_id = ctx.channel_id().0;
     let channel = &cache.guild_channel(channel_id).unwrap();
 
+    let author = ctx.author();
+
     let query: Document = LockedChannel {
         channel_id: Some(channel_id.to_string()),
         ..Default::default()
@@ -50,7 +52,8 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
             respond_moderation(
                 &ctx,
                 &ModerationKind::Lock(
-                    channel.name.clone(),
+                    channel.clone(),
+                    author.clone(),
                     Some(Error::from("Channel already locked")),
                 ),
                 configuration,
@@ -107,7 +110,7 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
 
     respond_moderation(
         &ctx,
-        &ModerationKind::Lock(channel.name.clone(), None),
+        &ModerationKind::Lock(channel.clone(), author.clone(), None),
         configuration,
     )
     .await
@@ -138,6 +141,9 @@ pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
         .await;
 
     let channel = cache.guild_channel(channel_id).unwrap();
+
+    let author = ctx.author();
+    
     let mut error = None;
     if let Ok(Some(locked_channel)) = delete_result {
         for overwrite in &locked_channel.overwrites.unwrap() {
@@ -149,7 +155,7 @@ pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
 
     respond_moderation(
         &ctx,
-        &ModerationKind::Unlock(channel.name.clone(), error), // TODO: handle error
+        &ModerationKind::Unlock(channel.clone(), author.clone(), error), // TODO: handle error
         configuration,
     )
     .await
@@ -171,6 +177,8 @@ pub async fn unmute(
         pending_unmute.abort();
     }
 
+    let author = ctx.author();
+
     let queue = queue_unmute_member(
         &ctx.discord().http,
         &data.database,
@@ -183,7 +191,7 @@ pub async fn unmute(
 
     respond_moderation(
         &ctx,
-        &ModerationKind::Unmute(member.user, queue),
+        &ModerationKind::Unmute(member.user, author.clone(), queue),
         configuration,
     )
     .await
@@ -236,6 +244,8 @@ pub async fn mute(
     let mute_role_id = mute.role;
     let take = &mute.take;
     let is_currently_muted = member.roles.iter().any(|r| r.0 == mute_role_id);
+
+    let author = ctx.author();
 
     let result =
         if let Err(add_role_result) = member.add_role(&ctx.discord().http, mute_role_id).await {
@@ -323,6 +333,7 @@ pub async fn mute(
         &ctx,
         &ModerationKind::Mute(
             member.user,
+            author.clone(),
             reason,
             format!("<t:{}:F>", unmute_time.timestamp()),
             result,
@@ -358,6 +369,8 @@ pub async fn purge(
 
     let current_user = ctx.discord().http.get_current_user().await?;
     let image = current_user.face();
+
+    let author = ctx.author();
 
     let handle = ctx
         .send(|f| {
@@ -433,8 +446,14 @@ pub async fn purge(
                 serenity::CreateEmbed::default()
                     .title("Purge successful")
                     .field("Deleted messages", deleted_amount.to_string(), false)
+                    .field("Action by", author.mention(), false)
                     .color(embed_color)
-                    .thumbnail(image)
+                    .thumbnail(&image)
+                    .footer(|f| {
+                            f.text("ReVanced");
+                            f.icon_url(image)
+                        }
+                    )
                     .clone(),
             )
         })
@@ -464,13 +483,15 @@ async fn handle_ban(ctx: &Context<'_>, kind: &BanKind) -> Result<(), Error> {
 
     let ban_result = ban_moderation(ctx, kind).await;
 
+    let author = ctx.author();
+
     respond_moderation(
         ctx,
         &match kind {
             BanKind::Ban(user, _, reason) => {
-                ModerationKind::Ban(user.clone(), reason.clone(), ban_result)
+                ModerationKind::Ban(user.clone(), author.clone(), reason.clone(), ban_result)
             },
-            BanKind::Unban(user) => ModerationKind::Unban(user.clone(), ban_result),
+            BanKind::Unban(user) => ModerationKind::Unban(user.clone(), author.clone(), ban_result),
         },
         &data.configuration,
     )
