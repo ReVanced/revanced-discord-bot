@@ -1,5 +1,6 @@
 use serde::Deserialize;
+
 #[derive(Deserialize)]
-pub struct Authentication<'a> {
-    pub token: &'a str,
+pub struct Authentication {
+    pub access_token: String,
 }

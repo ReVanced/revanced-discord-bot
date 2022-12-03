@@ -1,29 +1,28 @@
-use std::borrow::Cow;
+use reqwest::{Body, Method, Request};
+use serde::{Deserialize, Serialize};
 
-use reqwest::Method;
-
-pub enum RouteInfo {
-    Authenticate,
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum Endpoint<'a> {
+    Authenticate {
+        id: &'a str,
+        secret: &'a str,
+        discord_id_hash: &'a str,
+    },
 }
 
-pub enum Route {
-    Authenticate,
+macro_rules! route {
+    ($self:ident, $server:ident, $endpoint:literal, $method:ident) => {{
+        let mut req = Request::new(Method::$method, $server.join($endpoint).unwrap());
+        *req.body_mut() = Some(Body::from(serde_json::to_vec($self).unwrap()));
+        req
+    }};
 }
 
-impl RouteInfo {
-    pub fn deconstruct(&self) -> (Method, Route, Cow<'_, str>) {
-        match *self {
-            RouteInfo::Authenticate => (
-                Method::POST,
-                Route::Authenticate,
-                Cow::from(Route::authenticate()),
-            ),
+impl Endpoint<'_> {
+    pub fn to_request(&self, server: &reqwest::Url) -> Request {
+        match self {
+            Self::Authenticate { .. } => route!(self, server, "/auth/", POST),
         }
-    }
-}
-
-impl Route {
-    pub fn authenticate() -> &'static str {
-        "/auth"
     }
 }

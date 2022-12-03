@@ -1,68 +1,62 @@
-use poise::serenity_prelude::JsonMap;
 use reqwest::header::HeaderMap;
 use reqwest::Client;
 use serde::de::DeserializeOwned;
-use serde_json::to_vec;
 
-use super::model::api::Api;
 use super::model::auth::Authentication;
 
-pub struct ApiClient<'a> {
+use super::routing::Endpoint;
+
+pub struct Api {
     pub client: Client,
-    api: &'a Api,
+    pub server: reqwest::Url,
+    pub client_id: String,
+    pub client_secret: String,
 }
 
-struct Request<'a> {
+struct RequestInfo<'a> {
     headers: Option<HeaderMap>,
-    body: Option<&'a [u8]>,
-    route: super::routing::RouteInfo,
+    route: Endpoint<'a>,
 }
 
-impl ApiClient<'_> {
-    pub fn new(api: &Api) -> Self {
+impl Api {
+    pub fn new(server: reqwest::Url, client_id: String, client_secret: String) -> Self {
         let client = Client::builder()
             .build()
             .expect("Cannot build reqwest::Client");
 
-        ApiClient {
+        Api {
             client,
-            api,
+            server,
+            client_id,
+            client_secret,
         }
     }
 
-    async fn fire<T: DeserializeOwned>(&self, request: &Request<'_>) -> Result<T, reqwest::Error> {
+    async fn fire<T: DeserializeOwned>(&self, request_info: &RequestInfo<'_>) -> Result<T, reqwest::Error> {
         let client = &self.client;
+        let mut req = request_info.route.to_request(&self.server);
 
-        Ok(client
-            .execute(client.request(request.route, url).build()?)
-            .await?
-            .json::<T>()
-            .await
-            .map_err(From::from)
-            .unwrap())
+        if let Some(headers) = &request_info.headers {
+            *req.headers_mut() = headers.clone();
+        }
+
+        client.execute(req).await?.json::<T>().await
     }
 
     pub async fn authenticate(
         &self,
         discord_id_hash: &str,
     ) -> Result<Authentication, reqwest::Error> {
-        let api = &self.api;
-
-        let body = &JsonMap::new();
-        for (k, v) in [
-            ("id", api.client_id),
-            ("secret", api.client_secret),
-            ("discord_id_hash", discord_id_hash.to_string()),
-        ] {
-            body.insert(k.to_string(), v)
-        }
-
-        Ok(self
-            .fire(&Request {
+        let route = Endpoint::Authenticate {
+            id: &self.client_id,
+            secret: &self.client_secret,
+            discord_id_hash,
+        };
+        self
+            .fire(&RequestInfo {
                 headers: None,
-                body: Some(&to_vec(body).unwrap()),
-                route: RouteInfo::Authenticate,
+                route,
             })
-            .await?)
+            .await
     }
 }
