@@ -40,8 +40,10 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
                     member.user.id.0,
                     queue_unmute_member(
                         &ctx.http,
+                        &ctx.cache,
                         &data.database,
-                        &member,
+                        member.guild_id,
+                        member.user.id,
                         mute_role_id,
                         amount_left as u64, // i64 as u64 is handled properly here
                     ),

@@ -2,15 +2,17 @@ use std::cmp;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
-use poise::serenity_prelude::{ChannelId, GuildChannel, Http, Mentionable, User};
+use poise::serenity_prelude::{
+    Cache, ChannelId, GuildChannel, GuildId, Http, Mentionable, User, UserId,
+};
 use tokio::task::JoinHandle;
-use tracing::{debug, error};
+use tracing::{debug, error, warn};
 
 use super::bot::get_data_lock;
 use super::*;
 use crate::db::database::Database;
 use crate::db::model::Muted;
-use crate::model::application::Configuration;
+use crate::model::application::{Configuration, Mute};
 use crate::serenity::SerenityError;
 use crate::{Context, Error};
 
@@ -72,23 +74,24 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Me
 
 pub fn queue_unmute_member(
     http: &Arc<Http>,
+    cache: &Arc<Cache>,
     database: &Arc<Database>,
-    member: &Member,
+    guild_id: GuildId,
+    user_id: UserId,
     mute_role_id: u64,
     mute_duration: u64,
 ) -> JoinHandle<Option<Error>> {
+    let cache = cache.clone();
     let http = http.clone();
     let database = database.clone();
-    let mut member = member.clone();
 
     tokio::spawn(async move {
         tokio::time::sleep(std::time::Duration::from_secs(mute_duration)).await;
-
         let delete_result = database
             .find_and_delete::<Muted>(
                 "muted",
                 Muted {
-                    user_id: Some(member.user.id.0.to_string()),
+                    user_id: Some(user_id.0.to_string()),
                     ..Default::default()
                 }
                 .into(),
@@ -106,6 +109,8 @@ pub fn queue_unmute_member(
                 .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
                 .collect::<Vec<_>>();
 
+            // Update roles if they didn't leave the guild.
+            let mut member = cache.member(guild_id, user_id)?;
             if let Err(add_role_result) = member.add_roles(&http, &taken_roles).await {
                 Some(Error::from(add_role_result))
             } else if let Err(remove_result) = member.remove_role(http, mute_role_id).await {
@@ -362,4 +367,38 @@ pub async fn ban_moderation(ctx: &Context<'_>, kind: &BanKind) -> Option<Serenit
             }
         },
     }
+}
+
+pub async fn mute_moderation(
+    ctx: &Context<'_>,
+    member: &mut Member,
+    config: &Mute,
+) -> Result<(bool, Vec<serenity::RoleId>), SerenityError> {
+    let mute_role_id = config.role;
+    let take = &config.take;
+
+    let is_currently_muted = member.roles.iter().any(|r| r.0 == mute_role_id);
+
+    member.add_role(&ctx.discord().http, mute_role_id).await?;
+
+    // accumulate all roles to take from the member
+    let removed_roles = member
+        .roles
+        .iter()
+        .filter(|r| take.contains(&r.0))
+        .copied()
+        .collect::<Vec<_>>();
+    // take them from the member.
+    member
+        .remove_roles(
+            &ctx.discord().http,
+            &take.iter().map(|&r| RoleId::from(r)).collect::<Vec<_>>(),
+        )
+        .await?;
+
+    if let Err(e) = member.disconnect_from_voice(&ctx.discord().http).await {
+        warn!("Could not disconnect member from voice channel: {}", e);
+    }
+
+    Ok((is_currently_muted, removed_roles))
 }

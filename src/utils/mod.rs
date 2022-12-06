@@ -4,6 +4,7 @@ pub mod autorespond;
 pub mod bot;
 pub mod decancer;
 pub mod embed;
+pub mod macros;
 pub mod media_channel;
 pub mod moderation;
 pub mod poll;
