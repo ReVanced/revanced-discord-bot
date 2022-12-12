@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 
-use api::model::api::Api;
+use api::client::Api;
 use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::Handler;
@@ -83,13 +83,14 @@ async fn main() {
             .unwrap(),
         ),
         pending_unmutes: HashMap::new(),
-        api: Api {
-            server: env::var("API_SERVER").expect("API_SERVER environment variable not set"),
-            client_id: env::var("API_CLIENT_ID")
-                .expect("API_CLIENT_ID environment variable not set"),
-            client_secret: env::var("API_CLIENT_SECRET")
-                .expect("API_CLIENT_SECRET environment variable not set"),
-        },
+        api: Api::new(
+            reqwest::Url::parse(
+                &env::var("API_SERVER").expect("API_SERVER environment variable not set"),
+            )
+            .expect("Invalid API_SERVER"),
+            env::var("API_CLIENT_ID").expect("API_CLIENT_ID environment variable not set"),
+            env::var("API_CLIENT_SECRET").expect("API_CLIENT_SECRET environment variable not set"),
+        ),
     }));
 
     let handler = Arc::new(Handler::new(

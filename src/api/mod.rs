@@ -1,3 +1,3 @@
 pub mod client;
-mod model;
+pub mod model;
 mod routing;
