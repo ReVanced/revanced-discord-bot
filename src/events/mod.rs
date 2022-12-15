@@ -11,6 +11,7 @@ mod interaction;
 mod message_create;
 mod ready;
 mod thread_create;
+mod thread_update;
 
 pub struct Handler<T> {
     options: poise::FrameworkOptions<T, Error>,
@@ -108,5 +109,9 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
 
     async fn thread_create(&self, ctx: serenity::Context, thread: serenity::GuildChannel) {
         thread_create::thread_create(&ctx, &thread).await;
+    }
+
+    async fn thread_update(&self, ctx: serenity::Context, thread: serenity::GuildChannel) {
+        thread_update::thread_update(&ctx, &thread).await;
     }
 }
