@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/revanced/revanced-discord-bot/compare/v1.15.0...v1.16.0) (2022-12-15)
+
+
+### Features
+
+* **utils:** `poll` command ([#40](https://github.com/revanced/revanced-discord-bot/issues/40)) ([3be6b46](https://github.com/revanced/revanced-discord-bot/commit/3be6b4693c1917f4e4f0432125de5f0cf7b58451))
+
 # [1.15.0](https://github.com/revanced/revanced-discord-bot/compare/v1.14.0...v1.15.0) (2022-12-03)
 
 
