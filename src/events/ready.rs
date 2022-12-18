@@ -30,22 +30,24 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
         let current: Muted = cursor.deserialize_current().unwrap();
         let guild_id = current.guild_id.unwrap().parse::<u64>().unwrap();
         let member_id = current.user_id.unwrap().parse::<u64>().unwrap();
+        let Some(expires) = current.expires else { continue };
 
         if let Ok(guild) = http_ref.get_guild(guild_id).await {
             if let Ok(member) = guild.member(http_ref, member_id).await {
-                let amount_left =
-                    std::cmp::max(current.expires.unwrap() as i64 - Utc::now().timestamp(), 0);
+                let amount_left = std::cmp::max(expires as i64 - Utc::now().timestamp(), 0);
 
-                data.pending_unmutes.insert(
-                    member.user.id.0,
-                    queue_unmute_member(
-                        &ctx.http,
-                        &data.database,
-                        &member,
-                        mute_role_id,
-                        amount_left as u64, // i64 as u64 is handled properly here
-                    ),
-                );
+                if current.expires.is_some() {
+                    data.pending_unmutes.insert(
+                        member.user.id.0,
+                        queue_unmute_member(
+                            &ctx.http,
+                            &data.database,
+                            &member,
+                            mute_role_id,
+                            amount_left as u64, // i64 as u64 is handled properly here
+                        ),
+                    );
+                }
             } else {
                 trace!("Failed to find member {} in guild {}", member_id, guild_id);
             }
