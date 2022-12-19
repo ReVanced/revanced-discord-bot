@@ -299,24 +299,22 @@ pub async fn mute(
                     .await
                 {
                     Some(database_update_result)
+                } else if unmute_time.is_none() {
+                    data.database
+                        .update::<Muted>(
+                            "muted",
+                            Muted {
+                                user_id: Some(member.user.id.0.to_string()),
+                                ..Default::default()
+                            }
+                            .into(),
+                            UpdateModifications::Document(doc! { "$unset": { "expires": "" } }),
+                            None,
+                        )
+                        .await
+                        .err()
                 } else {
-                    if unmute_time.is_none() {
-                        data.database
-                            .update::<Muted>(
-                                "muted",
-                                Muted {
-                                    user_id: Some(member.user.id.0.to_string()),
-                                    ..Default::default()
-                                }
-                                .into(),
-                                UpdateModifications::Document(doc! { "$unset": { "expires": "" } }),
-                                None,
-                            )
-                            .await
-                            .err()
-                    } else {
-                        None
-                    }
+                    None
                 }
             }
         };
