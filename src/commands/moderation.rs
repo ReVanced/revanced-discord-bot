@@ -2,23 +2,14 @@ use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity,
-    Member,
-    PermissionOverwrite,
-    Permissions,
-    RoleId,
-    User, Mentionable,
+    self as serenity, Member, Mentionable, PermissionOverwrite, Permissions, RoleId, User,
 };
 use tracing::log::error;
-use tracing::{debug, warn, trace};
+use tracing::{debug, trace, warn};
 
 use crate::db::model::{LockedChannel, Muted};
 use crate::utils::moderation::{
-    ban_moderation,
-    queue_unmute_member,
-    respond_moderation,
-    BanKind,
-    ModerationKind,
+    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
 };
 use crate::{Context, Error};
 
@@ -97,11 +88,14 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
 
         if let Err(err) = channel
-            .create_permission(http, &PermissionOverwrite {
-                allow: permission_overwrite.allow & !permission,
-                deny: permission_overwrite.deny | permission,
-                kind: permission_overwrite.kind,
-            })
+            .create_permission(
+                http,
+                &PermissionOverwrite {
+                    allow: permission_overwrite.allow & !permission,
+                    deny: permission_overwrite.deny | permission,
+                    kind: permission_overwrite.kind,
+                },
+            )
             .await
         {
             error!("Failed to create the new permission: {:?}", err);
@@ -143,7 +137,7 @@ pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
     let channel = cache.guild_channel(channel_id).unwrap();
 
     let author = ctx.author();
-    
+
     let mut error = None;
     if let Ok(Some(locked_channel)) = delete_result {
         for overwrite in &locked_channel.overwrites.unwrap() {
@@ -236,7 +230,11 @@ pub async fn mute(
             .unwrap();
     }
 
-    let unmute_time = now + mute_duration;
+    let unmute_time = if !mute_duration.is_zero() {
+        Some((now + mute_duration).timestamp() as u64)
+    } else {
+        None
+    };
 
     let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
@@ -272,7 +270,7 @@ pub async fn mute(
                 // Roles which were removed from the user
                 let updated: Document = Muted {
                     guild_id: Some(member.guild_id.0.to_string()),
-                    expires: Some(unmute_time.timestamp() as u64),
+                    expires: unmute_time,
                     reason: Some(reason.clone()),
                     taken_roles: if is_currently_muted {
                         // Prevent the bot from overriding the "take" field.
@@ -301,6 +299,20 @@ pub async fn mute(
                     .await
                 {
                     Some(database_update_result)
+                } else if unmute_time.is_none() {
+                    data.database
+                        .update::<Muted>(
+                            "muted",
+                            Muted {
+                                user_id: Some(member.user.id.0.to_string()),
+                                ..Default::default()
+                            }
+                            .into(),
+                            UpdateModifications::Document(doc! { "$unset": { "expires": "" } }),
+                            None,
+                        )
+                        .await
+                        .err()
                 } else {
                     None
                 }
@@ -312,16 +324,18 @@ pub async fn mute(
         pending_unmute.abort();
     }
 
-    data.pending_unmutes.insert(
-        member.user.id.0,
-        queue_unmute_member(
-            &ctx.discord().http,
-            &data.database,
-            &member,
-            mute_role_id,
-            mute_duration.num_seconds() as u64,
-        ),
-    );
+    if let Some(mute_duration) = unmute_time {
+        data.pending_unmutes.insert(
+            member.user.id.0,
+            queue_unmute_member(
+                &ctx.discord().http,
+                &data.database,
+                &member,
+                mute_role_id,
+                mute_duration,
+            ),
+        );
+    }
 
     if result.is_none() {
         if let Err(e) = member.disconnect_from_voice(&ctx.discord().http).await {
@@ -329,15 +343,11 @@ pub async fn mute(
         }
     }
 
+    let duration = unmute_time.map(|time| format!("<t:{}:F>", time));
+
     respond_moderation(
         &ctx,
-        &ModerationKind::Mute(
-            member.user,
-            author.clone(),
-            reason,
-            format!("<t:{}:F>", unmute_time.timestamp()),
-            result,
-        ),
+        &ModerationKind::Mute(member.user, author.clone(), reason, duration, result),
         configuration,
     )
     .await
@@ -450,10 +460,9 @@ pub async fn purge(
                     .color(embed_color)
                     .thumbnail(&image)
                     .footer(|f| {
-                            f.text("ReVanced");
-                            f.icon_url(image)
-                        }
-                    )
+                        f.text("ReVanced");
+                        f.icon_url(image)
+                    })
                     .clone(),
             )
         })

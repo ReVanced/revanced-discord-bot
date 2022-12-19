@@ -15,12 +15,12 @@ use crate::serenity::SerenityError;
 use crate::{Context, Error};
 
 pub enum ModerationKind {
-    Mute(User, User, String, String, Option<Error>), // User, Command author, Reason, Expires, Error
-    Unmute(User, User, Option<Error>),               // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),        // User, Command author, Error
-    Lock(GuildChannel, User, Option<Error>),         // Channel name, Command author, Error
-    Unlock(GuildChannel, User, Option<Error>),       // Channel name, Command author, Error
+    Mute(User, User, String, Option<String>, Option<Error>), // User, Command author, Reason, Expires, Error
+    Unmute(User, User, Option<Error>),                       // User, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
+    Lock(GuildChannel, User, Option<Error>),                 // Channel name, Command author, Error
+    Unlock(GuildChannel, User, Option<Error>),               // Channel name, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -134,7 +134,7 @@ pub async fn respond_moderation<'a>(
             ModerationKind::Mute(user, author, reason, expires, error) => {
                 moderated_user = Some(user);
 
-                match error {
+                let embed = match error {
                     Some(err) => f
                         .title(format!("Failed to mute {}", user.tag()))
                         .field("Exception", err.to_string(), false)
@@ -147,16 +147,19 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f
-                        .title(format!("Muted {}", user.tag()))
-                        .field(
-                            "Action",
-                            format!("{} was muted by {}", user.mention(), author.mention()),
-                            false,
-                        ),
+                    None => f.title(format!("Muted {}", user.tag())).field(
+                        "Action",
+                        format!("{} was muted by {}", user.mention(), author.mention()),
+                        false,
+                    ),
                 }
-                .field("Reason", reason, true)
-                .field("Expires", expires, true)
+                .field("Reason", reason, true);
+
+                // add expiration date to embed if mute has a duration
+                if let Some(expire) = expires {
+                    embed.field("Expires", expire, true);
+                }
+                embed
             },
             ModerationKind::Unmute(user, author, error) => {
                 moderated_user = Some(user);
@@ -173,13 +176,11 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f
-                        .title(format!("Unmuted {}", user.tag()))
-                        .field(
-                            "Action",
-                            format!("{} was unmuted by {}", user.mention(), author.mention()),
-                            false,
-                        ),
+                    None => f.title(format!("Unmuted {}", user.tag())).field(
+                        "Action",
+                        format!("{} was unmuted by {}", user.mention(), author.mention()),
+                        false,
+                    ),
                 }
             },
             ModerationKind::Ban(user, author, reason, error) => {
@@ -197,13 +198,11 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f
-                        .title(format!("Banned {}", user.tag()))
-                        .field(
-                            "Action",
-                            format!("{} was banned by {}", user.mention(), author.mention()),
-                            false,
-                        ),
+                    None => f.title(format!("Banned {}", user.tag())).field(
+                        "Action",
+                        format!("{} was banned by {}", user.mention(), author.mention()),
+                        false,
+                    ),
                 };
                 if let Some(reason) = reason {
                     f.field("Reason", reason, true)
@@ -226,13 +225,11 @@ pub async fn respond_moderation<'a>(
                             ),
                             false,
                         ),
-                    None => f
-                        .title(format!("Unbanned {}", user.tag()))
-                        .field(
-                            "Action",
-                            format!("{} was unbanned by {}", user.mention(), author.mention()),
-                            false,
-                        ),
+                    None => f.title(format!("Unbanned {}", user.tag())).field(
+                        "Action",
+                        format!("{} was unbanned by {}", user.mention(), author.mention()),
+                        false,
+                    ),
                 }
             },
             ModerationKind::Lock(channel, author, error) => match error {
@@ -241,7 +238,11 @@ pub async fn respond_moderation<'a>(
                     .field("Exception", err.to_string(), false)
                     .field(
                         "Action",
-                        format!("{} was locked by {} but failed", channel.mention(), author.mention()),
+                        format!(
+                            "{} was locked by {} but failed",
+                            channel.mention(),
+                            author.mention()
+                        ),
                         false,
                     ),
                 None => f

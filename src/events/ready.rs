@@ -28,13 +28,13 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
 
     while cursor.advance().await.unwrap() {
         let current: Muted = cursor.deserialize_current().unwrap();
+        let Some(expires) = current.expires else { continue };
         let guild_id = current.guild_id.unwrap().parse::<u64>().unwrap();
         let member_id = current.user_id.unwrap().parse::<u64>().unwrap();
 
         if let Ok(guild) = http_ref.get_guild(guild_id).await {
             if let Ok(member) = guild.member(http_ref, member_id).await {
-                let amount_left =
-                    std::cmp::max(current.expires.unwrap() as i64 - Utc::now().timestamp(), 0);
+                let amount_left = std::cmp::max(expires as i64 - Utc::now().timestamp(), 0);
 
                 data.pending_unmutes.insert(
                     member.user.id.0,
