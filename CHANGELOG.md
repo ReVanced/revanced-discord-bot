@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/revanced/revanced-discord-bot/compare/v1.16.0...v1.17.0) (2022-12-19)
+
+
+### Features
+
+* permanently mute when no duration is specified ([#44](https://github.com/revanced/revanced-discord-bot/issues/44)) ([573d907](https://github.com/revanced/revanced-discord-bot/commit/573d907c1dc10f4d1d0ce6bf2f514d0e382828cc))
+
 # [1.16.0](https://github.com/revanced/revanced-discord-bot/compare/v1.15.0...v1.16.0) (2022-12-15)
 
 
