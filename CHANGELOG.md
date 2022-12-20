@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/revanced/revanced-discord-bot/compare/v1.17.0...v1.17.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* **moderation:** use correct mute duration ([#46](https://github.com/revanced/revanced-discord-bot/issues/46)) ([a8cedfc](https://github.com/revanced/revanced-discord-bot/commit/a8cedfc1c04c458c4eb8626c9476041c85688c7c))
+
 # [1.17.0](https://github.com/revanced/revanced-discord-bot/compare/v1.16.0...v1.17.0) (2022-12-19)
 
 
