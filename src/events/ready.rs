@@ -39,9 +39,8 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
                 data.pending_unmutes.insert(
                     member.user.id.0,
                     queue_unmute_member(
-                        &ctx.http,
-                        &ctx.cache,
-                        &data.database,
+                        ctx.clone(),
+                        data.database.clone(),
                         member.guild_id,
                         member.user.id,
                         mute_role_id,

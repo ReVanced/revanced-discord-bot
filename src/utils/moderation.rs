@@ -2,9 +2,7 @@ use std::cmp;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
-use poise::serenity_prelude::{
-    Cache, ChannelId, GuildChannel, GuildId, Http, Mentionable, User, UserId,
-};
+use poise::serenity_prelude::{ChannelId, GuildChannel, GuildId, Mentionable, User, UserId};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, warn};
 
@@ -73,21 +71,16 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Me
 }
 
 pub fn queue_unmute_member(
-    http: &Arc<Http>,
-    cache: &Arc<Cache>,
-    database: &Arc<Database>,
+    ctx: serenity::Context,
+    database: Arc<Database>,
     guild_id: GuildId,
     user_id: UserId,
     mute_role_id: u64,
     mute_duration: u64,
-) -> JoinHandle<Option<Error>> {
-    let cache = cache.clone();
-    let http = http.clone();
-    let database = database.clone();
-
+) -> JoinHandle<Result<(), Error>> {
     tokio::spawn(async move {
         tokio::time::sleep(std::time::Duration::from_secs(mute_duration)).await;
-        let delete_result = database
+        let db_result = database
             .find_and_delete::<Muted>(
                 "muted",
                 Muted {
@@ -97,30 +90,24 @@ pub fn queue_unmute_member(
                 .into(),
                 None,
             )
-            .await;
+            .await?
+            .ok_or("User was not muted.")?;
 
-        if let Err(database_remove_result) = delete_result {
-            Some(database_remove_result)
-        } else if let Some(find_result) = delete_result.unwrap() {
-            let taken_roles = find_result
-                .taken_roles
-                .unwrap()
-                .into_iter()
-                .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
-                .collect::<Vec<_>>();
+        let taken_roles = db_result
+            .taken_roles
+            .unwrap()
+            .into_iter()
+            .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
+            .collect::<Vec<_>>();
 
-            // Update roles if they didn't leave the guild.
-            let mut member = cache.member(guild_id, user_id)?;
-            if let Err(add_role_result) = member.add_roles(&http, &taken_roles).await {
-                Some(Error::from(add_role_result))
-            } else if let Err(remove_result) = member.remove_role(http, mute_role_id).await {
-                Some(Error::from(remove_result))
-            } else {
-                None
-            }
-        } else {
-            None
+        let http = &ctx.http;
+
+        // Update roles if they didn't leave the guild.
+        if let Some(mut member) = ctx.cache.member(guild_id, user_id) {
+            member.add_roles(http, &taken_roles).await?;
+            member.remove_role(http, mute_role_id).await?;
         }
+        Ok(())
     })
 }
 

@@ -31,7 +31,7 @@ impl serenity::TypeMapKey for Data {
 pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
-    pending_unmutes: HashMap<u64, JoinHandle<Option<Error>>>,
+    pending_unmutes: HashMap<u64, JoinHandle<Result<(), Error>>>,
     api: Api,
 }
 
