@@ -230,12 +230,6 @@ pub async fn mute(
             .unwrap();
     }
 
-    let unmute_time = if !mute_duration.is_zero() {
-        Some((now + mute_duration).timestamp() as u64)
-    } else {
-        None
-    };
-
     let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
     let mute = &configuration.general.mute;
@@ -244,6 +238,27 @@ pub async fn mute(
     let is_currently_muted = member.roles.iter().any(|r| r.0 == mute_role_id);
 
     let author = ctx.author();
+
+    if let Some(pending_unmute) = data.pending_unmutes.get(&member.user.id.0) {
+        trace!("Cancelling pending unmute for {}", member.user.id.0);
+        pending_unmute.abort();
+    }
+
+    let unmute_time = if !mute_duration.is_zero() {
+        data.pending_unmutes.insert(
+            member.user.id.0,
+            queue_unmute_member(
+                &ctx.discord().http,
+                &data.database,
+                &member,
+                mute_role_id,
+                mute_duration.num_seconds() as u64,
+            ),
+        );
+        Some((now + mute_duration).timestamp() as u64)
+    } else {
+        None
+    };
 
     let result =
         if let Err(add_role_result) = member.add_role(&ctx.discord().http, mute_role_id).await {
@@ -318,24 +333,6 @@ pub async fn mute(
                 }
             }
         };
-
-    if let Some(pending_unmute) = data.pending_unmutes.get(&member.user.id.0) {
-        trace!("Cancelling pending unmute for {}", member.user.id.0);
-        pending_unmute.abort();
-    }
-
-    if let Some(mute_duration) = unmute_time {
-        data.pending_unmutes.insert(
-            member.user.id.0,
-            queue_unmute_member(
-                &ctx.discord().http,
-                &data.database,
-                &member,
-                mute_role_id,
-                mute_duration,
-            ),
-        );
-    }
 
     if result.is_none() {
         if let Err(e) = member.disconnect_from_voice(&ctx.discord().http).await {
