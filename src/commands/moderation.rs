@@ -176,16 +176,16 @@ pub async fn unmute(
     let author = ctx.author();
 
     let queue = queue_unmute_member(
-        &ctx.discord().http,
-        &ctx.discord().cache,
-        &data.database,
+        ctx.discord().clone(),
+        data.database.clone(),
         ctx.guild_id().unwrap(),
         id,
         configuration.general.mute.role,
         0,
     )
     .await
-    .unwrap();
+    .unwrap()
+    .err();
 
     respond_moderation(
         &ctx,
@@ -243,6 +243,9 @@ pub async fn mute(
     let mute = &configuration.general.mute;
     let guild_id = ctx.guild_id().unwrap();
 
+    let discord = ctx.discord();
+    let cache = &discord.cache;
+
     if let Some(pending_unmute) = data.pending_unmutes.get(&id.0) {
         trace!("Cancelling pending unmute for {}", id.0);
         pending_unmute.abort();
@@ -252,9 +255,8 @@ pub async fn mute(
         data.pending_unmutes.insert(
             id.0,
             queue_unmute_member(
-                &ctx.discord().http,
-                &ctx.discord().cache,
-                &data.database,
+                discord.clone(),
+                data.database.clone(),
                 guild_id,
                 id,
                 mute.role,
@@ -274,7 +276,7 @@ pub async fn mute(
     };
 
     let result = async {
-        if let Some(mut member) = ctx.discord().cache.member(guild_id, id) {
+        if let Some(mut member) = cache.member(guild_id, id) {
             let (is_currently_muted, removed_roles) =
                 crate::utils::moderation::mute_moderation(&ctx, &mut member, mute).await?;
             // Prevent the bot from overriding the "take" field.
