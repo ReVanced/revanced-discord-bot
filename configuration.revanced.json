@@ -17,7 +17,7 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((error|open|patch).*){2,})"]
+				"match": ["(?i)(((error|open|patch).*){2,})", "abort"]
 			},
 			"excludes": {
 				"roles": [
