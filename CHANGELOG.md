@@ -1,3 +1,15 @@
+# [1.18.0](https://github.com/revanced/revanced-discord-bot/compare/v1.17.1...v1.18.0) (2023-01-03)
+
+
+### Bug Fixes
+
+* **moderation:** UserId instead of Member parameter ([5fcad81](https://github.com/revanced/revanced-discord-bot/commit/5fcad81483286a9ed664a82705e50743ddeea19d))
+
+
+### Features
+
+* adjust match for response [skip ci] ([5e7939a](https://github.com/revanced/revanced-discord-bot/commit/5e7939a512aa79b6d295ecb9cc34a7c72b1c4eef))
+
 ## [1.17.1](https://github.com/revanced/revanced-discord-bot/compare/v1.17.0...v1.17.1) (2022-12-20)
 
 
