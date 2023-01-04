@@ -93,18 +93,21 @@ pub fn queue_unmute_member(
             .await?
             .ok_or("User was not muted.")?;
 
-        let taken_roles = db_result
-            .taken_roles
-            .unwrap()
-            .into_iter()
-            .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
-            .collect::<Vec<_>>();
-
-        let http = &ctx.http;
-
         // Update roles if they didn't leave the guild.
         if let Some(mut member) = ctx.cache.member(guild_id, user_id) {
-            member.add_roles(http, &taken_roles).await?;
+            let http = &ctx.http;
+
+            if let Some(taken_roles) = db_result.taken_roles {
+                member
+                    .add_roles(
+                        http,
+                        &taken_roles
+                            .into_iter()
+                            .map(|r| RoleId::from(r.parse::<u64>().unwrap()))
+                            .collect::<Vec<_>>(),
+                    )
+                    .await?;
+            }
             member.remove_role(http, mute_role_id).await?;
         }
         Ok(())
