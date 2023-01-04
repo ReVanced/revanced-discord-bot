@@ -1,3 +1,11 @@
+## [1.19.1](https://github.com/revanced/revanced-discord-bot/compare/v1.19.0...v1.19.1) (2023-01-04)
+
+
+### Bug Fixes
+
+* **moderation:** don't fail when taken_roles is empty ([bf0c34e](https://github.com/revanced/revanced-discord-bot/commit/bf0c34e1676c9a49b1705ec25c994a3ea47b4b31))
+* **moderation:** properly schedule unmutes ([503e095](https://github.com/revanced/revanced-discord-bot/commit/503e095bd0dd3d9a780a8ff9fdf19d0935e24ddf))
+
 # [1.19.0](https://github.com/revanced/revanced-discord-bot/compare/v1.18.0...v1.19.0) (2023-01-04)
 
 
