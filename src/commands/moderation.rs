@@ -246,23 +246,7 @@ pub async fn mute(
     let discord = ctx.discord();
     let cache = &discord.cache;
 
-    if let Some(pending_unmute) = data.pending_unmutes.get(&id.0) {
-        trace!("Cancelling pending unmute for {}", id.0);
-        pending_unmute.abort();
-    }
-
     let unmute_time = if !mute_duration.is_zero() {
-        data.pending_unmutes.insert(
-            id.0,
-            queue_unmute_member(
-                discord.clone(),
-                data.database.clone(),
-                guild_id,
-                id,
-                mute.role,
-                mute_duration.num_seconds() as u64,
-            ),
-        );
         Some((now + mute_duration).timestamp() as u64)
     } else {
         None
@@ -303,6 +287,11 @@ pub async fn mute(
             )
             .await?;
 
+        if let Some(pending_unmute) = data.pending_unmutes.get(&id.0) {
+            trace!("Cancelling pending unmute for {}", id.0);
+            pending_unmute.abort();
+        }
+
         if unmute_time.is_none() {
             data.database
                 .update::<Muted>(
@@ -312,6 +301,18 @@ pub async fn mute(
                     None,
                 )
                 .await?;
+        } else {
+            data.pending_unmutes.insert(
+                id.0,
+                queue_unmute_member(
+                    discord.clone(),
+                    data.database.clone(),
+                    guild_id,
+                    id,
+                    mute.role,
+                    mute_duration.num_seconds() as u64,
+                ),
+            );
         }
         Ok(())
     }
