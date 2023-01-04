@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/revanced/revanced-discord-bot/compare/v1.18.0...v1.19.0) (2023-01-04)
+
+
+### Features
+
+* **poll api:** hash discord user id ([#48](https://github.com/revanced/revanced-discord-bot/issues/48)) ([99c476d](https://github.com/revanced/revanced-discord-bot/commit/99c476df9afbb9ca6bb776ea3f0cc4af5455507c))
+
 # [1.18.0](https://github.com/revanced/revanced-discord-bot/compare/v1.17.1...v1.18.0) (2023-01-03)
 
 
