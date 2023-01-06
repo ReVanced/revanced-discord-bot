@@ -1,3 +1,15 @@
+# [1.20.0](https://github.com/revanced/revanced-discord-bot/compare/v1.19.1...v1.20.0) (2023-01-06)
+
+
+### Bug Fixes
+
+* correctly find `slice_end` ([7e2db94](https://github.com/revanced/revanced-discord-bot/commit/7e2db945a0988209e3a48082693360ba27e27655))
+
+
+### Features
+
+* **misc:** embed code links ([6cc775a](https://github.com/revanced/revanced-discord-bot/commit/6cc775a2e404196e265467b02f1976f56debe233))
+
 ## [1.19.1](https://github.com/revanced/revanced-discord-bot/compare/v1.19.0...v1.19.1) (2023-01-04)
 
 
