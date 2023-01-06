@@ -21,7 +21,7 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
 
                 if let Some(end) = new_slice
                     .find(' ')
-                    .or_else(|| new_slice.find('\n'))
+                    .or(Some(new_slice.len()))
                     .map(|slice_end| start + slice_end)
                 {
                     debug!("HTTP url end: {}", end);
@@ -72,7 +72,7 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
             for code_preview in code_previews {
                 message = message.add_embed(|e| {
                     let mut e = e
-                        .title("Code preview")
+                        .title("Source code")
                         .url(code_preview.code.original_code_url)
                         .color(configuration.general.embed_color)
                         .field(
