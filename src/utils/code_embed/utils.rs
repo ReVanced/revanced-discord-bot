@@ -1,12 +1,11 @@
-use chrono::Utc;
 use reqwest::Url;
-use tracing::{debug, error};
+use tracing::{debug, error, trace};
 
 use super::*;
 use crate::utils::bot::get_data_lock;
 use crate::utils::code_embed::url_parser::{CodePreview, CodeUrlParser, GitHubCodeUrl};
 
-pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Message) {
+pub async fn code_preview(ctx: &serenity::Context, new_message: &serenity::Message) {
     let data_lock = get_data_lock(ctx).await;
     let configuration = &data_lock.read().await.configuration;
 
@@ -55,8 +54,12 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
         };
 
         match code_url.parse().await {
-            Err(e) => error!("Failed to parse url: {} ({:?})", url, e),
-            Ok(code_preview) => code_previews.push(code_preview),
+            Err(e) => trace!("Failed to parse url: {} ({:?})", url, e),
+            Ok(code_preview) => {
+                if code_preview.preview.is_some() {
+                    code_previews.push(code_preview)
+                }
+            },
         }
     }
 
@@ -66,53 +69,23 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
 
     if let Err(err) = new_message
         .channel_id
-        .send_message(&ctx.http, |m| {
-            let mut message = m;
+        .send_message(&ctx.http, |message| {
+            let mut message = message.reference_message(new_message);
+            let icon_url = &new_message.guild(&ctx.cache).unwrap().icon_url();
 
             for code_preview in code_previews {
-                message = message.add_embed(|e| {
-                    let mut e = e
-                        .title("Source code")
-                        .url(code_preview.code.original_code_url)
-                        .color(configuration.general.embed_color)
-                        .field(
-                            "Raw link",
-                            format!("[Click here]({})", code_preview.code.raw_code_url),
-                            true,
-                        )
-                        .field("Branch/Sha", code_preview.code.branch_or_sha, true);
-
-                    if let Some(preview) = code_preview.preview {
-                        e = e.field("Preview", preview, false)
+                message = message.add_embed(|embed| {
+                    if let Some(url) = icon_url {
+                        embed.footer(|f| f.text("ReVanced").icon_url(url))
+                    } else {
+                        embed
                     }
-
-                    let guild = &new_message.guild(&ctx.cache).unwrap();
-                    if let Some(url) = &guild.icon_url() {
-                        e = e.footer(|f| {
-                            f.icon_url(url).text(format!(
-                                "{} • {}",
-                                guild.name,
-                                Utc::today().format("%Y/%m/%d")
-                            ))
-                        })
-                    }
-
-                    e.field(
-                        format!("Original message by {}", new_message.author.tag()),
-                        new_message.content.clone(),
-                        false,
-                    )
+                    .color(configuration.general.embed_color)
+                    .description(code_preview.preview.unwrap())
                 });
             }
 
-            message.content(
-                new_message
-                    .mentions
-                    .iter()
-                    .map(|m| format!("<@{}>", m.id))
-                    .collect::<Vec<_>>()
-                    .join(" "),
-            )
+            message
         })
         .await
     {
@@ -121,9 +94,10 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
             new_message.author.tag(),
             err
         );
+        return;
     }
 
-    if let Err(err) = new_message.delete(&ctx.http).await {
-        error!("Failed to delete the message. Error: {:?}", err);
+    if let Err(err) = new_message.clone().suppress_embeds(&ctx.http).await {
+        error!("Failed to remove embeds. Error: {:?}", err);
     }
 }

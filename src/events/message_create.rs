@@ -1,6 +1,6 @@
 use super::*;
 use crate::utils::autorespond::auto_respond;
-use crate::utils::code_embed::utils::handle_code_url;
+use crate::utils::code_embed::utils::code_preview;
 use crate::utils::media_channel::handle_media_channel;
 
 pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Message) {
@@ -12,5 +12,5 @@ pub async fn message_create(ctx: &serenity::Context, new_message: &serenity::Mes
 
     auto_respond(ctx, new_message).await;
 
-    handle_code_url(ctx, new_message).await;
+    code_preview(ctx, new_message).await;
 }
