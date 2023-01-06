@@ -1,7 +1,6 @@
 use chrono::Utc;
-use poise::serenity_prelude::{ButtonStyle, ReactionType};
 use reqwest::Url;
-use tracing::{debug, error, trace};
+use tracing::{debug, error};
 
 use super::*;
 use crate::utils::bot::get_data_lock;
@@ -21,9 +20,9 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
                 let new_slice = &slice[start..];
 
                 if let Some(end) = new_slice
-                    .find(" ")
-                    .or(new_slice.find("\n"))
-                    .and_then(|slice_end| Some(start + slice_end))
+                    .find(' ')
+                    .or_else(|| new_slice.find('\n'))
+                    .map(|slice_end| start + slice_end)
                 {
                     debug!("HTTP url end: {}", end);
 
@@ -124,5 +123,7 @@ pub async fn handle_code_url(ctx: &serenity::Context, new_message: &serenity::Me
         );
     }
 
-    new_message.delete(&ctx.http).await;
+    if let Err(err) = new_message.delete(&ctx.http).await {
+        error!("Failed to delete the message. Error: {:?}", err);
+    }
 }

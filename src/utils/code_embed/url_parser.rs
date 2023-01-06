@@ -48,12 +48,9 @@ impl CodeUrlParser for GitHubCodeUrl {
     }
 
     fn parse_code_url(&self) -> Result<CodeUrl, ParserError> {
-        let mut segments = self
-            .url
-            .path_segments()
-            .ok_or(ParserError::ConversionError(
-                "Failed to convert path segments".to_string(),
-            ))?;
+        let mut segments = self.url.path_segments().ok_or_else(|| {
+            ParserError::ConversionError("Failed to convert path segments".to_string())
+        })?;
 
         // parse the segments
 
@@ -64,7 +61,7 @@ impl CodeUrlParser for GitHubCodeUrl {
 
         let mut path = String::new();
         while let Ok(segment) = parse_segment!(segments, "path") {
-            if segment == "" {
+            if segment.is_empty() {
                 continue;
             }
             path.push('/');
@@ -98,7 +95,7 @@ impl CodeUrlParser for GitHubCodeUrl {
             }
 
             let start = numbers.remove(0);
-            let end = numbers.pop().unwrap_or_else(|| start);
+            let end = numbers.pop().unwrap_or(start);
             code_url.relevant_lines = Some((start, end));
         }
 
@@ -130,7 +127,7 @@ impl CodeUrlParser for GitHubCodeUrl {
             .await
             .map_err(|_| ParserError::FailedToGetCode("Can't parse body".to_string()))?;
 
-        let preview = if let Some((start, end)) = code_url.relevant_lines.clone() {
+        let preview = if let Some((start, end)) = code_url.relevant_lines {
             let lines = code.lines().collect::<Vec<_>>();
             let start = start - 1;
             let end = end - 1;
