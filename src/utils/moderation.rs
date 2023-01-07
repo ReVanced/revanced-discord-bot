@@ -12,6 +12,7 @@ use crate::db::database::Database;
 use crate::db::model::Muted;
 use crate::model::application::{Configuration, Mute};
 use crate::serenity::SerenityError;
+use crate::utils::bot::get_member;
 use crate::{Context, Error};
 
 pub enum ModerationKind {
@@ -94,7 +95,7 @@ pub fn queue_unmute_member(
             .ok_or("User was not muted.")?;
 
         // Update roles if they didn't leave the guild.
-        if let Some(mut member) = ctx.cache.member(guild_id, user_id) {
+        if let Some(mut member) = get_member(&ctx, guild_id, user_id).await? {
             let http = &ctx.http;
 
             if let Some(taken_roles) = db_result.taken_roles {
