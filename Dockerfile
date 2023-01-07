@@ -1,7 +1,7 @@
 # Name the first stage so it can be reused later
 FROM rust:latest AS builder
-WORKDIR /app
-COPY . /app
+WORKDIR /app/revanced-discord-bot
+COPY . .
 RUN apt-get update && apt-get upgrade -y
 RUN cargo build --release
 
@@ -13,4 +13,4 @@ ENV DISCORD_AUTHORIZATION_TOKEN $DISCORD_AUTHORIZATION_TOKEN
 ARG MONGODB_URI
 ENV MONGODB_URI $MONGODB_URI
 COPY --from=builder /app/revanced-discord-bot/target/release/revanced-discord-bot /
-CMD ["./revanced-discord-bot"]
+CMD ["/revanced-discord-bot"]
