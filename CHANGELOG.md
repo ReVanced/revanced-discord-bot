@@ -1,3 +1,17 @@
+# [1.21.0](https://github.com/revanced/revanced-discord-bot/compare/v1.20.0...v1.21.0) (2023-01-07)
+
+
+### Bug Fixes
+
+* **moderation:** properly convert UserId to Member ([#50](https://github.com/revanced/revanced-discord-bot/issues/50)) ([05ff0a2](https://github.com/revanced/revanced-discord-bot/commit/05ff0a27d2f4003bfe143fd1ca9bce15227cae37))
+* **workflow:** disable npm cache ([3c0a583](https://github.com/revanced/revanced-discord-bot/commit/3c0a58359d0a77c94da53f877d220fbfcd0e4fc6))
+* **workflow:** use latest version of Node.JS ([2fb3afd](https://github.com/revanced/revanced-discord-bot/commit/2fb3afd6e232f1e3fc93df866893f3a3383aad22))
+
+
+### Features
+
+* simplify code block embeds ([8376eb9](https://github.com/revanced/revanced-discord-bot/commit/8376eb9b4ebeef7cba2ed8adfe41c14f0b58f56b))
+
 # [1.20.0](https://github.com/revanced/revanced-discord-bot/compare/v1.19.1...v1.20.0) (2023-01-06)
 
 
