@@ -1,7 +1,8 @@
 use poise::serenity_prelude::{ButtonStyle, ReactionType, Timestamp};
 
+use reqwest::StatusCode;
 use sha3::{Digest, Sha3_256};
-use tracing::log::{error, info, trace};
+use tracing::log::{error, trace};
 
 use super::bot::get_data_lock;
 use super::*;
@@ -22,28 +23,32 @@ pub async fn handle_poll(
     let member = component.member.as_ref().unwrap();
 
     let eligible = member.joined_at.unwrap() <= min_join_date;
-    let auth_token = if eligible {
+    let result = if eligible {
         let mut hasher = Sha3_256::new();
         hasher.update(&member.user.id.to_string());
-        let result = data
+        match data
             .api
             // We cannot use the entire hash because Discord rejects URLs with more than 512 characters.
             .authenticate(&hex::encode(hasher.finalize())[..2^5])
             .await
-            .map(|auth| auth.access_token);
-
-        if let Err(ref e) = result {
-            error!("API Request error: {}", e)
+        {
+            Ok(auth) => Ok(auth.access_token),
+            Err(err) => match err.status() {
+                Some(StatusCode::PRECONDITION_FAILED) => Err("You can only vote once."),
+                _ => {
+                    error!("API Request error: {:?}", err);
+                    Err("API Request failed. Please try again later.")
+                },
+            },
         }
-        result.ok()
     } else {
-        None
+        Err("You are not eligible to vote on this poll.")
     };
 
     component
         .create_interaction_response(&ctx.http, |r| {
             r.interaction_response_data(|m| {
-                if let Some(token) = auth_token.as_deref() {
+                if let Ok(token) = result.as_deref() {
                     let url = format!("https://revanced.app/polling#{}", token);
                     m.components(|c| {
                         c.create_action_row(|r| {
@@ -60,16 +65,11 @@ pub async fn handle_poll(
                 }
                 .ephemeral(true)
                 .embed(|e| {
-                    if auth_token.is_some() {
-                        e.title("Cast your vote")
-                            .description("You can now vote on the poll.")
-                    } else if !eligible {
-                        info!("Member {} failed to vote.", member.display_name());
-                        e.title("You can not vote")
-                            .description("You are not eligible to vote on this poll.")
-                    } else {
-                        e.title("Error")
-                            .description("An error has occured. Please try again later.")
+                    match result {
+                        Ok(_) => e
+                            .title("Cast your vote")
+                            .description("You can now vote on the poll."),
+                        Err(msg) => e.title("Error").description(msg),
                     }
                     .color(data.configuration.general.embed_color)
                     .thumbnail(member.user.face())
