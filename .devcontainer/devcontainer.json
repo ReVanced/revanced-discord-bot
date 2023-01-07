@@ -1,0 +1,32 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/rust
+{
+	"name": "Rust",
+	"image": "mcr.microsoft.com/devcontainers/rust:0-1-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/rust:1": {},
+		"ghcr.io/devcontainers/features/sshd:1": {},
+		"ghcr.io/dhoeric/features/act:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"1yib.rust-bundle",
+				"rust-lang.rust-analyzer",
+				"dustypomerleau.rust-syntax",
+				"serayuzgur.crates",
+				"github.copilot",
+				"github.vscode-pull-request-github",
+				"cschleiden.vscode-github-actions",
+				"ms-azuretools.vscode-docker",
+				"formulahendry.docker-explorer",
+				"jeff-hykin.better-dockerfile-syntax",
+				"redhat.vscode-yaml"
+			]
+		}
+	},
+	"remoteUser": "vscode"
+}
