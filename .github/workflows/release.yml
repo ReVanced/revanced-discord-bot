@@ -19,6 +19,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "latest"
+          cache: 'npm'
+
       - name: Setup Rust toolchain
         id: rust-toolchain
         uses: actions-rs/toolchain@v1
