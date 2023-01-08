@@ -36,7 +36,7 @@ jobs:
       - name: Set up cache
         uses: Swatinem/rust-cache@v2
         with:
-           cache-on-failure: "true"
+          cache-on-failure: "true"
 
       - name: cargo build
         uses: actions-rs/cargo@v1
