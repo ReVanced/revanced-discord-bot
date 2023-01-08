@@ -78,19 +78,10 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v3
-
-      - name: Setup QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v2
-
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
 
       - name: Setup Rust toolchain
         id: rust
@@ -100,16 +91,24 @@ jobs:
         id: rust-cache
         uses: Swatinem/rust-cache@v2
 
+      - name: Build
+        id: rust_build
+        run: cargo build --release --target=${{ matrix.arch[0] }}
+
+      - name: Setup QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v2
+
+      - name: Setup Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Login to DockerHub
         id: login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build
-        id: rust_build
-        run: cargo build --release --target=${{ matrix.arch[0] }}
 
       - name: Build Image and Push
         id: docker_build
