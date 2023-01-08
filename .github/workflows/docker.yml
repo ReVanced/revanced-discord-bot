@@ -13,10 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          [
-            [x86_64-unknown-linux-gnu, linux/amd64],
-            [aarch64-unknown-linux-gnu, linux/arm64/v8],
+        arch: [
+            # [use-cross, target, platform]
+            [false, x86_64-unknown-linux-gnu, linux/amd64],
+            [true, aarch64-unknown-linux-gnu, linux/arm64/v8],
           ]
     runs-on: ubuntu-latest
     steps:
@@ -26,10 +26,11 @@ jobs:
 
       - name: Setup Rust toolchain
         id: rust
-        run: |
-          rustup toolchain install stable --profile minimal
-          rustup default stable
-          rustup target add ${{ matrix.arch[0] }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.arch[1] }}
+          override: true
 
       - name: Setup Rust Cache
         id: rust-cache
@@ -37,7 +38,11 @@ jobs:
 
       - name: Build
         id: rust_build
-        run: cargo build --release --target=${{ matrix.arch[0] }}
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.arch[0] }}
+          command: build
+          args: --release --target ${{ matrix.arch[1] }}
 
       - name: Setup QEMU
         id: qemu
@@ -60,7 +65,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: ${{ matrix.arch[1] }}
+          platforms: ${{ matrix.arch[2] }}
           cache-to: type=gha,mode=max,ignore-error=true
           cache-from: type=gha
           push: true
