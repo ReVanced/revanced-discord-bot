@@ -85,7 +85,10 @@ jobs:
 
       - name: Setup Rust toolchain
         id: rust
-        run: rustup toolchain install stable --profile minimal
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add ${{ matrix.arch[0] }}
 
       - name: Setup Rust Cache
         id: rust-cache
