@@ -40,7 +40,7 @@ impl Api {
             *req.headers_mut() = headers.clone();
         }
 
-        client.execute(req).await?.json::<T>().await
+        client.execute(req).await?.error_for_status()?.json::<T>().await
     }
 
     pub async fn authenticate(
