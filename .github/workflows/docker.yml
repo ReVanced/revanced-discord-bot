@@ -14,9 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         arch: [
-            # [use-cross, target, platform]
-            [false, x86_64-unknown-linux-gnu, linux/amd64],
-            [true, aarch64-unknown-linux-gnu, linux/arm64/v8],
+            # [use-cross, target, platform, tag]
+            [false, x86_64-unknown-linux-gnu, linux/amd64, latest],
+            [true, aarch64-unknown-linux-gnu, linux/arm64/v8, latest-arm64],
           ]
     runs-on: ubuntu-latest
     steps:
@@ -69,4 +69,4 @@ jobs:
           cache-to: type=gha,mode=max,ignore-error=true
           cache-from: type=gha
           push: true
-          tags: revanced/revanced-discord-bot:latest
+          tags: 'revanced/revanced-discord-bot:${{ matrix.arch[3] }}'
