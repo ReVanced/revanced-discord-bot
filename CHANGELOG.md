@@ -1,3 +1,10 @@
+## [1.22.1](https://github.com/revanced/revanced-discord-bot/compare/v1.22.0...v1.22.1) (2023-01-09)
+
+
+### Bug Fixes
+
+* **ci:** move Dockerfile to ubuntu:latest ([8619368](https://github.com/revanced/revanced-discord-bot/commit/86193688cfeaa44bc8013d61dc9cb802900b272f))
+
 # [1.22.0](https://github.com/revanced/revanced-discord-bot/compare/v1.21.0...v1.22.0) (2023-01-09)
 
 
