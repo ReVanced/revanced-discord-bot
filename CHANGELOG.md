@@ -1,3 +1,12 @@
+# [1.22.0](https://github.com/revanced/revanced-discord-bot/compare/v1.21.0...v1.22.0) (2023-01-09)
+
+
+### Features
+
+* docker compose file ([#56](https://github.com/revanced/revanced-discord-bot/issues/56)) ([694ca4b](https://github.com/revanced/revanced-discord-bot/commit/694ca4b58c7c0234b1ec0af4c2c0e7435649a91f))
+* **dockerfile:** rename config file ([#57](https://github.com/revanced/revanced-discord-bot/issues/57)) ([5327956](https://github.com/revanced/revanced-discord-bot/commit/53279569da26615b0e2f25280a802fc30bfd26b7))
+* **poll api:** improve error handling ([#52](https://github.com/revanced/revanced-discord-bot/issues/52)) ([5229cd6](https://github.com/revanced/revanced-discord-bot/commit/5229cd6654f3e6d1c682891d247ac8b05e058580))
+
 # [1.21.0](https://github.com/revanced/revanced-discord-bot/compare/v1.20.0...v1.21.0) (2023-01-07)
 
 
