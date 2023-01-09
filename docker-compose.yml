@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  revanced-discord.bot:
+    container_name: revanced-discord-bot
+    image: revanced/revanced-discord-bot:latest
+    environment:
+      - DISCORD_AUTHORIZATION_TOKEN=$DISCORD_AUTHORIZATION_TOKEN
+      - MONGODB_URI=$MONGODB_URI
+      - API_SERVER=$API_SERVER
+      - API_CLIENT_ID=$API_CLIENT_ID
+      - API_CLIENT_SECRET=$API_CLIENT_SECRET
+    restart: unless-stopped
