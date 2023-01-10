@@ -16,7 +16,7 @@ pub async fn handle_keep_thread_alive(ctx: &serenity::Context, thread: &serenity
         ..Default::default()
     }
     .into();
-    if let Ok(Some(_)) = database.find_one::<KeepAliveThread>("keep_alive", query.clone(), None)
+    if let Ok(Some(_)) = database.find_one::<KeepAliveThread>("keep_alive", query, None)
         .await
     {
         if let Err(why) = thread.edit_thread(&ctx, |t| t.archived(false)).await {
