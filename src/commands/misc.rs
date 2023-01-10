@@ -158,6 +158,7 @@ pub async fn keep_thread_alive(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+#[poise::command(slash_command)]
 pub async fn kill_thread(ctx: Context<'_>) -> Result<(), Error> {
     let data = &ctx.data().read().await;
     let database = &data.database;
