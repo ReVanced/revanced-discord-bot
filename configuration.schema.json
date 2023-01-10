@@ -27,10 +27,6 @@
 					"$ref": "#/$defs/channels",
 					"description": "A list of channel ids where only media is allowed."
 				},
-				"auto_unarchive_threads": {
-					"$ref": "#/$defs/threads",
-					"description": "A list of channel ids where threads should be automatically unarchived."
-				},
 				"logging_channel": {
 					"type": "integer",
 					"description": "The id of the channel to send logs to."
@@ -134,9 +130,6 @@
 			"$ref": "#/$defs/ids"
 		},
 		"channels": {
-			"$ref": "#/$defs/ids"
-		},
-		"threads": {
 			"$ref": "#/$defs/ids"
 		},
 		"ids": {

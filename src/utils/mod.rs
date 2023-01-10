@@ -7,3 +7,4 @@ pub mod embed;
 pub mod media_channel;
 pub mod moderation;
 pub mod poll;
+pub mod keep_thread_alive;
