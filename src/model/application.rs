@@ -67,7 +67,7 @@ pub struct General {
     pub embed_color: i32,
     pub mute: Mute,
     pub media_channels: Vec<u64>,
-    pub logging_channel: u64
+    pub logging_channel: u64,
 }
 
 #[derive(Default, Serialize, Deserialize)]
