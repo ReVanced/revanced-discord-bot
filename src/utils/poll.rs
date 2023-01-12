@@ -1,7 +1,7 @@
 use poise::serenity_prelude::{ButtonStyle, ReactionType, Timestamp};
 
+use base64::Engine;
 use reqwest::StatusCode;
-use sha3::{Digest, Sha3_256};
 use tracing::log::{error, trace};
 
 use super::bot::get_data_lock;
@@ -24,12 +24,11 @@ pub async fn handle_poll(
 
     let eligible = member.joined_at.unwrap() <= min_join_date;
     let result = if eligible {
-        let mut hasher = Sha3_256::new();
-        hasher.update(&member.user.id.to_string());
         match data
             .api
-            // We cannot use the entire hash because Discord rejects URLs with more than 512 characters.
-            .authenticate(&hex::encode(hasher.finalize())[..2^5])
+            .authenticate(&base64::engine::general_purpose::STANDARD_NO_PAD.encode(
+                hmac_sha256::HMAC::mac(member.user.id.to_string(), &data.poll_secret),
+            ))
             .await
         {
             Ok(auth) => Ok(auth.access_token),

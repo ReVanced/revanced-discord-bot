@@ -32,6 +32,7 @@ pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Result<(), Error>>>,
+    poll_secret: String,
     api: Api,
 }
 
@@ -83,6 +84,7 @@ async fn main() {
             .unwrap(),
         ),
         pending_unmutes: HashMap::new(),
+        poll_secret: env::var("POLL_SECRET").expect("POLL_SECRET environment variable not set"),
         api: Api::new(
             reqwest::Url::parse(
                 &env::var("API_SERVER").expect("API_SERVER environment variable not set"),
