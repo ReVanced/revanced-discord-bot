@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/revanced/revanced-discord-bot/compare/v1.22.1...v1.23.0) (2023-01-12)
+
+
+### Features
+
+* **poll api:** use hmac and base64 ([d7dc351](https://github.com/revanced/revanced-discord-bot/commit/d7dc351605459b0a34d55159891743d8800b985b))
+
 ## [1.22.1](https://github.com/revanced/revanced-discord-bot/compare/v1.22.0...v1.22.1) (2023-01-09)
 
 
