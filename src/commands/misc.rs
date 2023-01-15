@@ -111,15 +111,14 @@ pub async fn keep_thread_alive(ctx: Context<'_>) -> Result<(), Error> {
 
     let query: Document = KeepAliveThread {
         thread_id: Some(channel_id.to_string()),
-        ..Default::default()
     }
     .into();
 
-    let (title, description, ephemeral) = if !channel.thread_metadata.is_some() {
+    let (title, description, ephemeral) = if channel.thread_metadata.is_none() {
         ("Error", "Channel is not a thread.", true)
-    } else if let Some(_) = database
+    } else if (database
         .find_one::<KeepAliveThread>("keep_alive", query.clone(), None)
-        .await?
+        .await?).is_some()
     {
         ("Error", "Thread is already kept alive", true)
     } else {
@@ -173,14 +172,13 @@ pub async fn kill_thread(ctx: Context<'_>) -> Result<(), Error> {
 
     let author = ctx.author();
 
-    let (title, description, ephemeral) = if !channel.thread_metadata.is_some() {
+    let (title, description, ephemeral) = if channel.thread_metadata.is_none() {
         ("Error", "Channel is not a thread.", true)
     } else if database
         .delete(
             "keep_alive",
             KeepAliveThread {
                 thread_id: Some(channel_id.to_string()),
-                ..Default::default()
             }
             .into(),
             None,

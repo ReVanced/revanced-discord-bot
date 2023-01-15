@@ -16,12 +16,11 @@ pub async fn handle_keep_thread_alive(
 
     let query: Document = KeepAliveThread {
         thread_id: Some(thread.id.to_string()),
-        ..Default::default()
     }
     .into();
-    if let Some(_) = database
+    if (database
         .find_one::<KeepAliveThread>("keep_alive", query, None)
-        .await?
+        .await?).is_some()
     {
         thread.edit_thread(&ctx, |t| t.archived(false)).await?;
     }
