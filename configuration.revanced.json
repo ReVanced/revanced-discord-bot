@@ -158,7 +158,7 @@
                 {
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["((video|buffer|play|work|time|infinite|endless).*){2,})"]
+				"match": ["(?i)(((video|buffer|play|work|time|infinite|endless).*){2,})"]
 			},
 			"excludes": {
 				"roles": [
