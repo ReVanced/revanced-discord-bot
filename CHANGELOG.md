@@ -1,3 +1,10 @@
+# [1.24.0](https://github.com/revanced/revanced-discord-bot/compare/v1.23.0...v1.24.0) (2023-01-18)
+
+
+### Features
+
+* add new response for video playback issues ([d48b012](https://github.com/revanced/revanced-discord-bot/commit/d48b0127a41811931e45045c03d18c7ce474e149))
+
 # [1.23.0](https://github.com/revanced/revanced-discord-bot/compare/v1.22.1...v1.23.0) (2023-01-12)
 
 
