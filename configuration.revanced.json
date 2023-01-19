@@ -17,7 +17,7 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((error|open|patch).*){2,})", "abort"]
+				"match": ["(?i)(((error|open|patch).*){2,})", "abort", "crash"]
 			},
 			"excludes": {
 				"roles": [
@@ -157,7 +157,7 @@
 		},
                 {
 			"includes": {
-				"channels": [952946952348270626, 954147049832603748],
+				"channels": [1019635439272992868, 952946952348270626, 954147049832603748],
 				"match": ["(?i)(((video|buffer|play|work|time|infinite|endless|load).*){2,})"]
 			},
 			"excludes": {
