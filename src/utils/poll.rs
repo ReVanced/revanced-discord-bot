@@ -48,7 +48,7 @@ pub async fn handle_poll(
         .create_interaction_response(&ctx.http, |r| {
             r.interaction_response_data(|m| {
                 if let Ok(token) = result.as_deref() {
-                    let url = format!("https://revanced.app/polling#{}", token);
+                    let url = format!("https://revanced.app/poll#{}", token);
                     m.components(|c| {
                         c.create_action_row(|r| {
                             r.create_button(|b| {
