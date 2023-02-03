@@ -42,7 +42,7 @@ pub async fn reply(
         channel.say(http, &message).await?;
     }
 
-    send_ephermal(&ctx, &format!("Response: {}", message)).await?;
+    send_ephermal(&ctx, &format!("Response: {message}")).await?;
     Ok(())
 }
 
@@ -82,7 +82,7 @@ pub async fn poll(
                 r.create_button(|b| {
                     b.label("Vote")
                         .emoji(ReactionType::Unicode("🗳️".to_string()))
-                        .custom_id(format!("poll:{}:{}", id, age))
+                        .custom_id(format!("poll:{id}:{age}"))
                 })
             })
         })

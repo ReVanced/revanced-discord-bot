@@ -69,8 +69,7 @@ impl CodeUrlParser for GitHubCodeUrl {
         }
 
         let raw_url = format!(
-            "https://raw.githubusercontent.com/{}/{}/{}{}",
-            user, repo, branch_or_sha, path
+            "https://raw.githubusercontent.com/{user}/{repo}/{branch_or_sha}{path}"
         );
 
         let mut code_url = CodeUrl {
@@ -133,7 +132,7 @@ impl CodeUrlParser for GitHubCodeUrl {
             let end = end - 1;
 
             if start > end || start >= lines.len() || end >= lines.len() {
-                return Err(ParserError::InvalidFragment(format!("{}-{}", start, end)));
+                return Err(ParserError::InvalidFragment(format!("{start}-{end}")));
             }
 
             let mut code_block = String::new();
@@ -177,19 +176,19 @@ impl fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ParserError::Error(e) => {
-                write!(f, "Error: {}", e)
+                write!(f, "Error: {e}")
             },
             ParserError::WrongParserError(expected, got) => {
-                write!(f, "Expected parser {}, got {}", expected, got)
+                write!(f, "Expected parser {expected}, got {got}")
             },
             ParserError::ConversionError(conversion_error) => {
-                write!(f, "Conversion error: {}", conversion_error)
+                write!(f, "Conversion error: {conversion_error}")
             },
             ParserError::InvalidFragment(fragment) => {
-                write!(f, "Invalid fragment: {}", fragment)
+                write!(f, "Invalid fragment: {fragment}")
             },
             ParserError::FailedToGetCode(error) => {
-                write!(f, "Failed to get code: {}", error)
+                write!(f, "Failed to get code: {error}")
             },
         }
     }

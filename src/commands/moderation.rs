@@ -318,7 +318,7 @@ pub async fn mute(
     }
     .await;
 
-    let duration = unmute_time.map(|time| format!("<t:{}:F>", time));
+    let duration = unmute_time.map(|time| format!("<t:{time}:F>"));
 
     respond_moderation(
         &ctx,
