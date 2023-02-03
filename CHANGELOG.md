@@ -1,3 +1,17 @@
+# [1.25.0](https://github.com/revanced/revanced-discord-bot/compare/v1.24.0...v1.25.0) (2023-02-03)
+
+
+### Bug Fixes
+
+* correct match regex [skip ci] ([f276ec1](https://github.com/revanced/revanced-discord-bot/commit/f276ec1b473f83148eb86d0c731ee95e06755e9e))
+
+
+### Features
+
+* improve match for response [skip ci] ([82694c0](https://github.com/revanced/revanced-discord-bot/commit/82694c0a9de79201a538298f1509f90bbe37d306))
+* improve success rate for responses [skip ci] ([df7a64f](https://github.com/revanced/revanced-discord-bot/commit/df7a64f6e093acfd938e0d02bd900399ac7968a4))
+* increase age on server [skip ci] ([2ec7bd9](https://github.com/revanced/revanced-discord-bot/commit/2ec7bd93e35d213fdca5a88a7fa0768434218637))
+
 # [1.24.0](https://github.com/revanced/revanced-discord-bot/compare/v1.23.0...v1.24.0) (2023-01-18)
 
 
