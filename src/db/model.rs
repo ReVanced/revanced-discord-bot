@@ -25,6 +25,12 @@ pub struct LockedChannel {
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Default)]
+pub struct KeepAliveThread {
+    pub thread_id: Option<String>
+}
+
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Poll {
     pub author: Option<PollAuthor>,
     pub image_url: Option<String>,
@@ -47,6 +53,12 @@ impl From<Muted> for Document {
 impl From<LockedChannel> for Document {
     fn from(locked: LockedChannel) -> Self {
         to_document(&locked)
+    }
+}
+
+impl From<KeepAliveThread> for Document {
+    fn from(keep_alive_thread: KeepAliveThread) -> Self {
+        to_document(&keep_alive_thread)
     }
 }
 
