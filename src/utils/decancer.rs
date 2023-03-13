@@ -32,7 +32,7 @@ pub async fn cure(
         "",
     );
 
-    if cured_name.is_empty() {
+    if cured_name.is_empty() || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic()) {
         cured_name = "ReVanced user".to_string();
     }
 
