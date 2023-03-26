@@ -1,7 +1,7 @@
-use chrono::Utc;
-use poise::serenity_prelude::{self as serenity, MessageId, ReactionType};
+use poise::serenity_prelude::{self as serenity, MessageId, ParseValue, ReactionType};
 use poise::ReplyHandle;
 
+use crate::utils::message::clone_message;
 use crate::{Context, Error};
 
 /// Make the Discord bot sentient.
@@ -50,43 +50,47 @@ pub async fn reply(
 #[poise::command(slash_command)]
 pub async fn poll(
     ctx: Context<'_>,
-    #[description = "The id of the poll"] id: u64,
-    #[description = "The poll message"] message: String,
-    #[description = "The poll title"] title: String,
+    #[description = "The id of the poll"] id: u64, /* This is currently unused in the API, leaving as a placeholder in case it is required. */
+    #[description = "The link to a message to clone"] message_link: String,
     #[description = "The minumum server age in days to allow members to poll"] age: u16,
 ) -> Result<(), Error> {
-    let data = ctx.data().read().await;
-    let configuration = &data.configuration;
-    let embed_color = configuration.general.embed_color;
+    let get_id =
+        |segments: &mut std::str::Split<char>| segments.next_back().unwrap().parse::<u64>();
+
+    let url = reqwest::Url::parse(&message_link)?;
+    let mut segments = url.path_segments().ok_or("Invalid Discord message link")?;
+
+    if segments.clone().count() != 4 {
+        return Err("Invalid Discord message link".into());
+    }
+
+    let message_id = get_id(&mut segments)?;
+    let channel_id = get_id(&mut segments)?;
+
+    let message = ctx
+        .discord()
+        .http
+        .get_message(channel_id, message_id)
+        .await?;
 
     ctx.send(|m| {
-        m.embed(|e| {
-            let guild = &ctx.guild().unwrap();
-            if let Some(url) = guild.icon_url() {
-                e.thumbnail(url.clone()).footer(|f| {
-                    f.icon_url(url).text(format!(
-                        "{} • {}",
-                        guild.name,
-                        Utc::today().format("%Y/%m/%d")
-                    ))
-                })
-            } else {
-                e
-            }
-            .title(title)
-            .description(message)
-            .color(embed_color)
-        })
-        .components(|c| {
-            c.create_action_row(|r| {
-                r.create_button(|b| {
-                    b.label("Vote")
-                        .emoji(ReactionType::Unicode("🗳️".to_string()))
-                        .custom_id(format!("poll:{id}:{age}"))
+        clone_message(&message, m)
+            .components(|c| {
+                c.create_action_row(|r| {
+                    r.create_button(|b| {
+                        b.label("Vote")
+                            .emoji(ReactionType::Unicode("🗳️".to_string()))
+                            .custom_id(format!("poll:{id}:{age}"))
+                    })
                 })
             })
-        })
+            .allowed_mentions(|am| {
+                am.parse(ParseValue::Users)
+                    .parse(ParseValue::Roles)
+                    .parse(ParseValue::Everyone)
+            })
     })
     .await?;
+
     Ok(())
 }
