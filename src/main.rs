@@ -152,7 +152,7 @@ async fn main() {
                     Ok(true)
                 })
             }),
-            listener: |_ctx, event, _framework, _data| {
+            event_handler: |_ctx, event, _framework, _data| {
                 Box::pin(async move {
                     tracing::trace!("{:?}", event.name());
                     Ok(())

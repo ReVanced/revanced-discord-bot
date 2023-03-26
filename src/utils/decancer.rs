@@ -1,9 +1,8 @@
-use ::decancer::Decancer;
+extern crate decancer;
+
 use tracing::{error, info, trace};
 
 use super::*;
-
-const DECANCER: Decancer = Decancer::new();
 
 pub async fn cure(
     ctx: &serenity::Context,
@@ -27,7 +26,7 @@ pub async fn cure(
         }
     }
 
-    let mut cured_name = DECANCER.cure(&name).replace(
+    let mut cured_name = decancer::cure(&name).replace(
         |c: char| !(c == ' ' || c == '-' || c == '_' || c.is_ascii_alphanumeric()),
         "",
     );

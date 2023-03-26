@@ -18,7 +18,7 @@ pub async fn reply(
         ctx.send(|f| f.ephemeral(true).content(content)).await
     }
 
-    let http = &ctx.discord().http;
+    let http = &ctx.serenity_context().http;
     let channel = &ctx.channel_id();
 
     if let Some(reply_message) = reply_message {
@@ -68,7 +68,7 @@ pub async fn poll(
     let channel_id = get_id(&mut segments)?;
 
     let message = ctx
-        .discord()
+        .serenity_context()
         .http
         .get_message(channel_id, message_id)
         .await?;

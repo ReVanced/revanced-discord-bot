@@ -62,8 +62,10 @@ pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Messa
                 .unwrap()
                 .unix_timestamp();
 
-            let must_joined_at =
-                DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(joined_at, 0), Utc);
+            let must_joined_at = DateTime::<Utc>::from_utc(
+                NaiveDateTime::from_timestamp_opt(joined_at, 0).unwrap(),
+                Utc,
+            );
             let but_joined_at = Utc::now() - Duration::days(min_age);
 
             if must_joined_at <= but_joined_at {

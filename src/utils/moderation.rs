@@ -16,12 +16,12 @@ use crate::utils::bot::get_member;
 use crate::{Context, Error};
 
 pub enum ModerationKind {
-    Mute(User, User, String, Option<String>, Option<Error>), // User, Command author, Reason, Expires, Error
+    Mute(User, User, String, Option<String>, Option<Error>), /* User, Command author, Reason, Expires, Error */
     Unmute(User, User, Option<Error>),                       // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
-    Lock(GuildChannel, User, Option<Error>),                 // Channel name, Command author, Error
-    Unlock(GuildChannel, User, Option<Error>),               // Channel name, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),               // User, Command author, Error
+    Lock(GuildChannel, User, Option<Error>),                // Channel name, Command author, Error
+    Unlock(GuildChannel, User, Option<Error>),              // Channel name, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -121,7 +121,7 @@ pub async fn respond_moderation<'a>(
     moderation: &ModerationKind,
     configuration: &Configuration,
 ) -> Result<(), Error> {
-    let current_user = ctx.discord().http.get_current_user().await?;
+    let current_user = ctx.serenity_context().http.get_current_user().await?;
 
     let create_embed = |f: &mut serenity::CreateEmbed| {
         let mut moderated_user: Option<&User> = None;
@@ -300,7 +300,7 @@ pub async fn respond_moderation<'a>(
 
     let response = reply.message().await?;
     ChannelId(configuration.general.logging_channel)
-        .send_message(&ctx.discord().http, |reply| {
+        .send_message(&ctx.serenity_context().http, |reply| {
             reply.embed(|embed| {
                 create_embed(embed);
                 embed.field(
@@ -322,7 +322,8 @@ pub async fn respond_moderation<'a>(
 
 pub async fn ban_moderation(ctx: &Context<'_>, kind: &BanKind) -> Option<SerenityError> {
     let guild_id = ctx.guild_id().unwrap().0;
-    let http = &ctx.discord().http;
+
+    let http = &ctx.serenity_context().http;
 
     match kind {
         BanKind::Ban(user, dmd, reason) => {
@@ -370,7 +371,9 @@ pub async fn mute_moderation(
 
     let is_currently_muted = member.roles.iter().any(|r| r.0 == mute_role_id);
 
-    member.add_role(&ctx.discord().http, mute_role_id).await?;
+    member
+        .add_role(&ctx.serenity_context().http, mute_role_id)
+        .await?;
 
     // accumulate all roles to take from the member
     let removed_roles = member
@@ -382,12 +385,15 @@ pub async fn mute_moderation(
     // take them from the member.
     member
         .remove_roles(
-            &ctx.discord().http,
+            &ctx.serenity_context().http,
             &take.iter().map(|&r| RoleId::from(r)).collect::<Vec<_>>(),
         )
         .await?;
 
-    if let Err(e) = member.disconnect_from_voice(&ctx.discord().http).await {
+    if let Err(e) = member
+        .disconnect_from_voice(&ctx.serenity_context().http)
+        .await
+    {
         warn!("Could not disconnect member from voice channel: {}", e);
     }
 

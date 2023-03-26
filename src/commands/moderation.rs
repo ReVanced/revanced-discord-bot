@@ -2,7 +2,11 @@ use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity, Mentionable, PermissionOverwrite, Permissions, UserId,
+    self as serenity,
+    Mentionable,
+    PermissionOverwrite,
+    Permissions,
+    UserId,
 };
 use tracing::{debug, error, trace};
 
@@ -10,7 +14,11 @@ use crate::db::model::{LockedChannel, Muted};
 use crate::utils::bot::get_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
-    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
+    ban_moderation,
+    queue_unmute_member,
+    respond_moderation,
+    BanKind,
+    ModerationKind,
 };
 use crate::{Context, Error};
 
@@ -20,7 +28,7 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
     let data = &ctx.data().read().await;
     let configuration = &data.configuration;
     let database = &data.database;
-    let discord = &ctx.discord();
+    let discord = &ctx.serenity_context();
     let cache = &discord.cache;
     let http = &discord.http;
 
@@ -89,14 +97,11 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
 
         if let Err(err) = channel
-            .create_permission(
-                http,
-                &PermissionOverwrite {
-                    allow: permission_overwrite.allow & !permission,
-                    deny: permission_overwrite.deny | permission,
-                    kind: permission_overwrite.kind,
-                },
-            )
+            .create_permission(http, &PermissionOverwrite {
+                allow: permission_overwrite.allow & !permission,
+                deny: permission_overwrite.deny | permission,
+                kind: permission_overwrite.kind,
+            })
             .await
         {
             error!("Failed to create the new permission: {:?}", err);
@@ -117,7 +122,7 @@ pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
     let data = &ctx.data().read().await;
     let configuration = &data.configuration;
     let database = &data.database;
-    let discord = &ctx.discord();
+    let discord = &ctx.serenity_context();
     let cache = &discord.cache;
     let http = &discord.http;
 
@@ -177,7 +182,7 @@ pub async fn unmute(
     let author = ctx.author();
 
     let queue = queue_unmute_member(
-        ctx.discord().clone(),
+        ctx.serenity_context().clone(),
         data.database.clone(),
         ctx.guild_id().unwrap(),
         id,
@@ -244,7 +249,7 @@ pub async fn mute(
     let mute = &configuration.general.mute;
     let guild_id = ctx.guild_id().unwrap();
 
-    let discord = ctx.discord();
+    let discord = ctx.serenity_context();
 
     let unmute_time = if !mute_duration.is_zero() {
         Some((now + mute_duration).timestamp() as u64)
@@ -357,7 +362,7 @@ pub async fn purge(
     let channel = ctx.channel_id();
     let too_old_timestamp = Utc::now().timestamp() - MAX_BULK_DELETE_AGO_SECS;
 
-    let current_user = ctx.discord().http.get_current_user().await?;
+    let current_user = ctx.serenity_context().http.get_current_user().await?;
     let image = current_user.face();
 
     let author = ctx.author();
@@ -383,7 +388,7 @@ pub async fn purge(
     loop {
         // Filter out messages that are too old
         let mut messages = channel
-            .messages(&ctx.discord(), |m| {
+            .messages(&ctx.serenity_context(), |m| {
                 m.limit(count_to_delete as u64).before(response.id)
             })
             .await?
@@ -419,7 +424,9 @@ pub async fn purge(
         let purge_count = messages.len();
         if purge_count > 0 {
             deleted_amount += purge_count;
-            channel.delete_messages(&ctx.discord(), &messages).await?;
+            channel
+                .delete_messages(&ctx.serenity_context(), &messages)
+                .await?;
         } else {
             empty_pages += 1;
         }
@@ -431,7 +438,7 @@ pub async fn purge(
 
     response
         .to_mut()
-        .edit(&ctx.discord(), |e| {
+        .edit(&ctx.serenity_context(), |e| {
             e.set_embed(
                 serenity::CreateEmbed::default()
                     .title("Purge successful")
