@@ -1,6 +1,5 @@
-use poise::serenity_prelude::{ButtonStyle, ReactionType, Timestamp};
-
 use base64::Engine;
+use poise::serenity_prelude::{ButtonStyle, ReactionType, Timestamp};
 use reqwest::StatusCode;
 use tracing::log::{error, trace};
 
@@ -44,6 +43,14 @@ pub async fn handle_poll(
         Err("You are not eligible to vote on this poll.")
     };
 
+    let icon_url = component
+        .guild_id
+        .unwrap()
+        .to_guild_cached(&ctx.cache)
+        .unwrap()
+        .icon_url()
+        .unwrap();
+
     component
         .create_interaction_response(&ctx.http, |r| {
             r.interaction_response_data(|m| {
@@ -71,7 +78,11 @@ pub async fn handle_poll(
                         Err(msg) => e.title("Error").description(msg),
                     }
                     .color(data.configuration.general.embed_color)
-                    .thumbnail(member.user.face())
+                    .thumbnail(&icon_url)
+                    .footer(|f| {
+                        f.text("ReVanced");
+                        f.icon_url(&icon_url)
+                    })
                 })
             })
         })
