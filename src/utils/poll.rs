@@ -40,7 +40,7 @@ pub async fn handle_poll(
             },
         }
     } else {
-        Err("You are not eligible to vote on this poll.")
+        Err("You are not eligible to vote on this poll because you joined this server too recently.")
     };
 
     let icon_url = component
