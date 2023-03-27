@@ -1,3 +1,20 @@
+# [1.26.0](https://github.com/revanced/revanced-discord-bot/compare/v1.25.0...v1.26.0) (2023-03-27)
+
+
+### Bug Fixes
+
+* use correct substitute name if necessary ([b9fa498](https://github.com/revanced/revanced-discord-bot/commit/b9fa498950d7ecb6057b7e63b2fb03fb0847bd9f))
+
+
+### Features
+
+* clone message to create a poll ([14a1052](https://github.com/revanced/revanced-discord-bot/commit/14a1052cd86ae941143491829de235ac6fd5ea46))
+* cure names that don't start with an alphabetic character ([ccc3834](https://github.com/revanced/revanced-discord-bot/commit/ccc38342102a3cec0d9ab0189c031563c5a01cc5))
+* improve matching regex [skip ci] ([431441b](https://github.com/revanced/revanced-discord-bot/commit/431441b52f5cc0b1f56884fccc6f42e5e3211b66))
+* improve matching regex [skip ci] ([c6710b4](https://github.com/revanced/revanced-discord-bot/commit/c6710b4ecd67dab44adb1b9ad1a0202f03d9aacc))
+* update ReVanced configuration [skip ci] ([d195aa9](https://github.com/revanced/revanced-discord-bot/commit/d195aa938a58351c39800b420abdceff328986c6))
+* use better matching regex [skip ci] ([6f5c6aa](https://github.com/revanced/revanced-discord-bot/commit/6f5c6aaee4dc651200b391ebae78d722853f7c1f))
+
 # [1.25.0](https://github.com/revanced/revanced-discord-bot/compare/v1.24.0...v1.25.0) (2023-02-03)
 
 
