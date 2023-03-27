@@ -51,8 +51,9 @@ pub async fn reply(
 pub async fn poll(
     ctx: Context<'_>,
     #[description = "The id of the poll"] id: u64, /* This is currently unused in the API, leaving as a placeholder in case it is required. */
-    #[description = "The link to a message to clone"] message_link: String,
+    #[description = "A link to a message to clone"] message_link: String,
     #[description = "The minumum server age in days to allow members to poll"] age: u16,
+    #[description = "Enable pings"] ping: bool,
 ) -> Result<(), Error> {
     let get_id =
         |segments: &mut std::str::Split<char>| segments.next_back().unwrap().parse::<u64>();
@@ -74,21 +75,25 @@ pub async fn poll(
         .await?;
 
     ctx.send(|m| {
-        clone_message(&message, m)
-            .components(|c| {
-                c.create_action_row(|r| {
-                    r.create_button(|b| {
-                        b.label("Vote")
-                            .emoji(ReactionType::Unicode("🗳️".to_string()))
-                            .custom_id(format!("poll:{id}:{age}"))
-                    })
+        let mut clone = clone_message(&message, m).components(|c| {
+            c.create_action_row(|r| {
+                r.create_button(|b| {
+                    b.label("Vote")
+                        .emoji(ReactionType::Unicode("🗳️".to_string()))
+                        .custom_id(format!("poll:{id}:{age}"))
                 })
             })
-            .allowed_mentions(|am| {
+        });
+
+        if ping {
+            clone = clone.allowed_mentions(|am| {
                 am.parse(ParseValue::Users)
                     .parse(ParseValue::Roles)
                     .parse(ParseValue::Everyone)
-            })
+            });
+        }
+
+        clone
     })
     .await?;
 
