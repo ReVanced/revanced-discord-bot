@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/revanced/revanced-discord-bot/compare/v1.26.0...v1.27.0) (2023-03-27)
+
+
+### Features
+
+* add thumbnail and footer to interaction response embed ([8fad7e7](https://github.com/revanced/revanced-discord-bot/commit/8fad7e71b6f9756018212a5bfcb21977d062b441))
+
 # [1.26.0](https://github.com/revanced/revanced-discord-bot/compare/v1.25.0...v1.26.0) (2023-03-27)
 
 
