@@ -1,3 +1,11 @@
+# [1.28.0](https://github.com/revanced/revanced-discord-bot/compare/v1.27.0...v1.28.0) (2023-03-27)
+
+
+### Features
+
+* add option to enable or disable pings when polling ([3e86a2c](https://github.com/revanced/revanced-discord-bot/commit/3e86a2cdb7034a6cd02f5754a0e5b3de3e70f878))
+* remove unused response [skip ci] ([0793b1c](https://github.com/revanced/revanced-discord-bot/commit/0793b1c6d1966c01c644fa363ca566650aaaf262))
+
 # [1.27.0](https://github.com/revanced/revanced-discord-bot/compare/v1.26.0...v1.27.0) (2023-03-27)
 
 
