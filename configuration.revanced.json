@@ -106,53 +106,6 @@
 					}
 				}
 			}
-		},
-        {
-			"includes": {
-				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|endless|\\sload).*){2,})", "(?i)(((no|history).*){2,})"]
-			},
-			"excludes": {
-				"roles": [
-					965267139902705744, 955220417969262612, 952987191401926697,
-					1027874293192863765
-				],
-				"match": []
-			},
-			"condition": {
-				"user": {
-					"server_age": 730
-				}
-			},
-			"response": {
-				"embed": {
-					"title": "Why do videos fail to play❓",
-					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
-					"fields": [
-						{
-							"name": "🔸 Regarding your question",
-							"value": "Please refer to <#953993848374325269> `26`.",
-							"inline": false
-						}
-					],
-					"footer": {
-						"text": "ReVanced",
-						"icon_url": "https://cdn.discordapp.com/icons/952946952348270622/74f615d7c299d1be78d982dd0a64d2d7.webp?size=32"
-					},
-					"image": {
-						"url": ""
-					},
-					"thumbnail": {
-						"url": "https://cdn.discordapp.com/icons/952946952348270622/74f615d7c299d1be78d982dd0a64d2d7.webp?size=128"
-					},
-					"author": {
-						"name": "",
-						"icon_url": "https://cdn.discordapp.com/icons/952946952348270622/74f615d7c299d1be78d982dd0a64d2d7.webp?size=32",
-						"url": ""
-					}
-				}
-			}
 		}
 	]
 }
