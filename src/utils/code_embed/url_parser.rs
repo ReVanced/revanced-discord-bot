@@ -68,9 +68,8 @@ impl CodeUrlParser for GitHubCodeUrl {
             path.push_str(segment);
         }
 
-        let raw_url = format!(
-            "https://raw.githubusercontent.com/{user}/{repo}/{branch_or_sha}{path}"
-        );
+        let raw_url =
+            format!("https://raw.githubusercontent.com/{user}/{repo}/{branch_or_sha}{path}");
 
         let mut code_url = CodeUrl {
             raw_code_url: raw_url,
@@ -135,19 +134,7 @@ impl CodeUrlParser for GitHubCodeUrl {
                 return Err(ParserError::InvalidFragment(format!("{start}-{end}")));
             }
 
-            let mut code_block = String::new();
-
-            code_block.push_str("```");
-
-            if let Some(language) = code_url.language.clone() {
-                code_block.push_str(&language);
-                code_block.push('\n');
-            }
-
-            code_block.push_str(&lines[start..=end].join("\n"));
-            code_block.push_str("```");
-
-            Some(code_block)
+            Some(lines[start..=end].join("\n"))
         } else {
             None
         };

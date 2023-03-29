@@ -2,13 +2,9 @@ use reqwest::Url;
 use tracing::{debug, error, trace};
 
 use super::*;
-use crate::utils::bot::get_data_lock;
 use crate::utils::code_embed::url_parser::{CodePreview, CodeUrlParser, GitHubCodeUrl};
 
 pub async fn code_preview(ctx: &serenity::Context, new_message: &serenity::Message) {
-    let data_lock = get_data_lock(ctx).await;
-    let configuration = &data_lock.read().await.configuration;
-
     let mut urls: Vec<Url> = Vec::new();
 
     fn get_all_http_urls(string: &str, out: &mut Vec<Url>) {
@@ -71,18 +67,18 @@ pub async fn code_preview(ctx: &serenity::Context, new_message: &serenity::Messa
         .channel_id
         .send_message(&ctx.http, |message| {
             let mut message = message.reference_message(new_message);
-            let icon_url = &new_message.guild(&ctx.cache).unwrap().icon_url();
 
-            for code_preview in code_previews {
-                message = message.add_embed(|embed| {
-                    if let Some(url) = icon_url {
-                        embed.footer(|f| f.text("ReVanced").icon_url(url))
-                    } else {
-                        embed
-                    }
-                    .color(configuration.general.embed_color)
-                    .description(code_preview.preview.unwrap())
-                });
+            for preview in code_previews.iter() {
+                let language = match preview.code.language.as_ref() {
+                    Some(language) => language,
+                    None => "txt",
+                };
+
+                let name = format!("{}.{}", &preview.code.branch_or_sha, language);
+
+                let content = preview.preview.as_ref().unwrap().as_bytes();
+
+                message = message.add_file((content, name.as_str()));
             }
 
             message
