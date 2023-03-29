@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/revanced/revanced-discord-bot/compare/v1.28.0...v1.29.0) (2023-03-27)
+
+
+### Features
+
+* clarify poll eligibility ([991a90c](https://github.com/revanced/revanced-discord-bot/commit/991a90cfa9609114dacd3e5e27d33bc41780ae26))
+
 # [1.28.0](https://github.com/revanced/revanced-discord-bot/compare/v1.27.0...v1.28.0) (2023-03-27)
 
 
