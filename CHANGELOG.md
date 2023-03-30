@@ -1,3 +1,10 @@
+# [1.30.0](https://github.com/revanced/revanced-discord-bot/compare/v1.29.0...v1.30.0) (2023-03-30)
+
+
+### Features
+
+* send code embeds as files ([f6d9817](https://github.com/revanced/revanced-discord-bot/commit/f6d9817bb1928163ce5213868d812064654ec159))
+
 # [1.29.0](https://github.com/revanced/revanced-discord-bot/compare/v1.28.0...v1.29.0) (2023-03-27)
 
 
