@@ -1,3 +1,12 @@
+## [1.30.1](https://github.com/revanced/revanced-discord-bot/compare/v1.30.0...v1.30.1) (2023-04-07)
+
+
+### Bug Fixes
+
+* add missing option to configuration [skip ci] ([39c4c04](https://github.com/revanced/revanced-discord-bot/commit/39c4c044f74eed46bfa2c9b12ee5cab4d49d7dd1))
+* get rid of negative lookahead ([7c170cb](https://github.com/revanced/revanced-discord-bot/commit/7c170cbfee9b85c98d31acb192539e0cebdffdbe))
+* move configuration into correct place [skip ci] ([be5f7e1](https://github.com/revanced/revanced-discord-bot/commit/be5f7e111ce62da96a6670ce9e1bd6e435c8464c))
+
 # [1.30.0](https://github.com/revanced/revanced-discord-bot/compare/v1.29.0...v1.30.0) (2023-03-30)
 
 
