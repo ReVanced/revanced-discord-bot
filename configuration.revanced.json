@@ -64,7 +64,7 @@
 		{
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["vanced\\s*\\.\\s*(?!app)\\S*"]
+				"match": ["vanced\\.([^a]|a($|[^p]))"]
 			},
 			"excludes": {
 				"roles": [
