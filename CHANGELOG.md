@@ -1,3 +1,10 @@
+# [1.31.0](https://github.com/revanced/revanced-discord-bot/compare/v1.30.1...v1.31.0) (2023-04-10)
+
+
+### Features
+
+* **moderation:** reorder purge parameters ([66c64e2](https://github.com/revanced/revanced-discord-bot/commit/66c64e2950cf8be64d9fe82b458a08bf0638ca95))
+
 ## [1.30.1](https://github.com/revanced/revanced-discord-bot/compare/v1.30.0...v1.30.1) (2023-04-07)
 
 
