@@ -2,11 +2,7 @@ use bson::{doc, Document};
 use chrono::{Duration, Utc};
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity,
-    Mentionable,
-    PermissionOverwrite,
-    Permissions,
-    UserId,
+    self as serenity, Mentionable, PermissionOverwrite, Permissions, UserId,
 };
 use tracing::{debug, error, trace};
 
@@ -14,11 +10,7 @@ use crate::db::model::{LockedChannel, Muted};
 use crate::utils::bot::get_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
-    ban_moderation,
-    queue_unmute_member,
-    respond_moderation,
-    BanKind,
-    ModerationKind,
+    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
 };
 use crate::{Context, Error};
 
@@ -97,11 +89,14 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
 
         if let Err(err) = channel
-            .create_permission(http, &PermissionOverwrite {
-                allow: permission_overwrite.allow & !permission,
-                deny: permission_overwrite.deny | permission,
-                kind: permission_overwrite.kind,
-            })
+            .create_permission(
+                http,
+                &PermissionOverwrite {
+                    allow: permission_overwrite.allow & !permission,
+                    deny: permission_overwrite.deny | permission,
+                    kind: permission_overwrite.kind,
+                },
+            )
             .await
         {
             error!("Failed to create the new permission: {:?}", err);
@@ -338,11 +333,11 @@ pub async fn mute(
 pub async fn purge(
     ctx: Context<'_>,
     #[description = "Member"] user: Option<UserId>,
-    #[description = "Until message"] until: Option<String>,
     #[min = 1]
     #[max = 1000]
     #[description = "Count"]
     count: Option<i64>,
+    #[description = "Until message"] until: Option<String>,
 ) -> Result<(), Error> {
     let user = if let Some(id) = user {
         Some(to_user!(id, ctx))
