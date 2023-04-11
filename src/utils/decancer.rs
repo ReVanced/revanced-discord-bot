@@ -10,7 +10,7 @@ pub async fn cure(
     old_if_available: &Option<serenity::Member>,
     member: &serenity::Member,
 ) {
-    let censor = Standard - "ass" - "fuck" - "shit" + "nigga";
+    let censor = Standard + "nigga";
     if member.user.bot {
         trace!("Skipping decancer for bot {}.", member.user.tag());
         return;
