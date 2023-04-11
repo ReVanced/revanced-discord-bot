@@ -161,6 +161,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 
 [[package]]
+name = "censor"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d41e3b9fdbb9b3edc10dc66a06dc255822f699c432e19403fb966e6d60e0dec4"
+dependencies = [
+ "once_cell",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1351,6 +1360,7 @@ version = "2.5.1"
 dependencies = [
  "base64 0.21.2",
  "bson",
+ "censor",
  "chrono",
  "decancer",
  "dirs",

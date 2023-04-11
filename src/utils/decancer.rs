@@ -1,5 +1,6 @@
 extern crate decancer;
 
+use censor::*;
 use tracing::{error, info, trace};
 
 use super::*;
@@ -9,6 +10,7 @@ pub async fn cure(
     old_if_available: &Option<serenity::Member>,
     member: &serenity::Member,
 ) {
+    let censor = Standard - "ass" - "fuck" - "shit" + "nigga";
     if member.user.bot {
         trace!("Skipping decancer for bot {}.", member.user.tag());
         return;
@@ -31,7 +33,10 @@ pub async fn cure(
         "",
     );
 
-    if cured_name.is_empty() || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic()) {
+    if cured_name.is_empty()
+        || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic())
+        || censor.check(&cured_name)
+    {
         cured_name = "ReVanced member".to_string();
     }
 
