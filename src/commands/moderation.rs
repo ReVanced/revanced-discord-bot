@@ -201,7 +201,7 @@ pub async fn unmute(
 #[poise::command(slash_command)]
 pub async fn mute(
     ctx: Context<'_>,
-    #[description = "The member to mute"] member: User,
+    #[description = "The member to mute"] member: UserId,
     #[description = "The duration of the mute"] duration: String,
     #[description = "The reason of the mute"] reason: String,
 ) -> Result<(), Error> {
