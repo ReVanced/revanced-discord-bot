@@ -1,6 +1,7 @@
 use std::cmp;
 use std::sync::Arc;
 
+use chrono::Duration;
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{ChannelId, GuildChannel, GuildId, Mentionable, User, UserId};
 use tokio::task::JoinHandle;
@@ -18,10 +19,10 @@ use crate::{Context, Error};
 pub enum ModerationKind {
     Mute(User, User, String, Option<String>, Option<Error>), /* User, Command author, Reason, Expires, Error */
     Unmute(User, User, Option<Error>),                       // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),               // User, Command author, Error
-    Lock(GuildChannel, User, Option<Error>),                // Channel name, Command author, Error
-    Unlock(GuildChannel, User, Option<Error>),              // Channel name, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
+    Lock(GuildChannel, User, Option<Error>),                 // Channel name, Command author, Error
+    Unlock(GuildChannel, User, Option<Error>),               // Channel name, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -398,4 +399,9 @@ pub async fn mute_moderation(
     }
 
     Ok((is_currently_muted, removed_roles))
+}
+
+pub fn parse_duration(duration: String) -> Result<Duration, go_parse_duration::Error> {
+    let d = go_parse_duration::parse_duration(&duration)?;
+    Ok(Duration::nanoseconds(d))
 }

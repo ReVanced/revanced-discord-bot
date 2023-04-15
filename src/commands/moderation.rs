@@ -1,5 +1,6 @@
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
+use crate::utils::moderation::parse_duration;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
     self as serenity, Mentionable, PermissionOverwrite, Permissions, UserId,
@@ -197,16 +198,11 @@ pub async fn unmute(
 }
 
 /// Mute a member.
-#[allow(clippy::too_many_arguments)]
 #[poise::command(slash_command)]
 pub async fn mute(
     ctx: Context<'_>,
-    #[description = "The member to mute"] member: UserId,
-    #[description = "Seconds"] seconds: Option<i64>,
-    #[description = "Minutes"] minutes: Option<i64>,
-    #[description = "Hours"] hours: Option<i64>,
-    #[description = "Days"] days: Option<i64>,
-    #[description = "Months"] months: Option<i64>,
+    #[description = "The member to mute"] member: User,
+    #[description = "The duration of the mute"] duration: String,
     #[description = "The reason of the mute"] reason: String,
 ) -> Result<(), Error> {
     let user = to_user!(member, ctx);
@@ -214,28 +210,14 @@ pub async fn mute(
     let now = Utc::now();
     let mut mute_duration = Duration::zero();
 
-    if let Some(seconds) = seconds {
-        mute_duration = mute_duration
-            .checked_add(&Duration::seconds(seconds))
-            .unwrap();
-    }
-    if let Some(minutes) = minutes {
-        mute_duration = mute_duration
-            .checked_add(&Duration::minutes(minutes))
-            .unwrap();
-    }
-    if let Some(hours) = hours {
-        mute_duration = mute_duration.checked_add(&Duration::hours(hours)).unwrap();
-    }
-    if let Some(days) = days {
-        mute_duration = mute_duration.checked_add(&Duration::days(days)).unwrap();
-    }
-    if let Some(months) = months {
-        const DAYS_IN_MONTH: i64 = 30;
-        mute_duration = mute_duration
-            .checked_add(&Duration::days(months * DAYS_IN_MONTH))
-            .unwrap();
-    }
+    match parse_duration(duration) {
+        Ok(duration) => {
+            mute_duration = duration;
+        }
+        Err(err) => {
+            error!("Failed to parse duration: {:?}", err);
+        }
+    }    
 
     let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
