@@ -13,15 +13,15 @@ pub async fn cure(
     let data_lock = get_data_lock(ctx).await;
     let additions = &data_lock.read().await.configuration.general.censor.additions;
     let removals = &data_lock.read().await.configuration.general.censor.removals;
-    
+
     let mut censor = Standard;
 
     for addition in additions {
-        censor = censor + addition;
+        censor += addition;
     }
 
     for removal in removals {
-        censor = censor - removal;
+        censor -= removal;
     }
 
     if member.user.bot {
@@ -46,10 +46,7 @@ pub async fn cure(
         "",
     );
 
-    if cured_name.is_empty()
-        || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic())
-        || censor.check(&cured_name)
-    {
+    if cured_name.is_empty() || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic()) || censor.check(&cured_name) {
         cured_name = "ReVanced member".to_string();
     }
 
