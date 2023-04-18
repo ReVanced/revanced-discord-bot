@@ -1,7 +1,6 @@
 use std::cmp;
 use std::sync::Arc;
 
-use chrono::Duration;
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{ChannelId, GuildChannel, GuildId, Mentionable, User, UserId};
 use tokio::task::JoinHandle;
@@ -401,7 +400,3 @@ pub async fn mute_moderation(
     Ok((is_currently_muted, removed_roles))
 }
 
-pub fn parse_duration(duration: String) -> Result<Duration, go_parse_duration::Error> {
-    let d = go_parse_duration::parse_duration(&duration)?;
-    Ok(Duration::nanoseconds(d))
-}

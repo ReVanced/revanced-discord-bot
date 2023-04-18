@@ -1,6 +1,6 @@
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
-use crate::utils::moderation::parse_duration;
+use crate::utils::parse_duration;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
     self as serenity, Mentionable, PermissionOverwrite, Permissions, UserId,
