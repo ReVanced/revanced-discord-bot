@@ -3,14 +3,27 @@ extern crate decancer;
 use censor::*;
 use tracing::{error, info, trace};
 
-use super::*;
+use super::{*, bot::get_data_lock};
 
 pub async fn cure(
     ctx: &serenity::Context,
     old_if_available: &Option<serenity::Member>,
     member: &serenity::Member,
 ) {
-    let censor = Standard + "nigga";
+    let data_lock = get_data_lock(ctx).await;
+    let additions = &data_lock.read().await.configuration.general.censor.additions;
+    let removals = &data_lock.read().await.configuration.general.censor.removals;
+    
+    let mut censor = Standard;
+
+    for addition in additions {
+        censor = censor + addition;
+    }
+
+    for removal in removals {
+        censor = censor - removal;
+    }
+
     if member.user.bot {
         trace!("Skipping decancer for bot {}.", member.user.tag());
         return;
