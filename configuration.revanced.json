@@ -111,7 +111,7 @@
 		      {	
 			"includes": {	
 				"channels": [952946952348270626, 954147049832603748],	
-				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|endless|\\sload).*){2,})", "(?i)(((no|history).*){2,})"]	
+				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|endless|\\sload).*){2,})", "(?i)(((40|seconds).*){2,})"]	
 			},	
 			"excludes": {	
 				"roles": [	
