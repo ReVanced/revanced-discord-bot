@@ -1,9 +1,12 @@
 use bson::{doc, Document};
 use chrono::{Duration, Utc};
-use crate::utils::parse_duration;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity, Mentionable, PermissionOverwrite, Permissions, UserId,
+    self as serenity,
+    Mentionable,
+    PermissionOverwrite,
+    Permissions,
+    UserId,
 };
 use tracing::{debug, error, trace};
 
@@ -11,8 +14,13 @@ use crate::db::model::{LockedChannel, Muted};
 use crate::utils::bot::get_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
-    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
+    ban_moderation,
+    queue_unmute_member,
+    respond_moderation,
+    BanKind,
+    ModerationKind,
 };
+use crate::utils::parse_duration;
 use crate::{Context, Error};
 
 /// Lock a channel.
@@ -90,14 +98,11 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
 
         if let Err(err) = channel
-            .create_permission(
-                http,
-                &PermissionOverwrite {
-                    allow: permission_overwrite.allow & !permission,
-                    deny: permission_overwrite.deny | permission,
-                    kind: permission_overwrite.kind,
-                },
-            )
+            .create_permission(http, &PermissionOverwrite {
+                allow: permission_overwrite.allow & !permission,
+                deny: permission_overwrite.deny | permission,
+                kind: permission_overwrite.kind,
+            })
             .await
         {
             error!("Failed to create the new permission: {:?}", err);
@@ -208,16 +213,7 @@ pub async fn mute(
     let user = to_user!(member, ctx);
     let id = user.id;
     let now = Utc::now();
-    let mut mute_duration = Duration::zero();
-
-    match parse_duration(duration) {
-        Ok(duration) => {
-            mute_duration = duration;
-        }
-        Err(err) => {
-            error!("Failed to parse duration: {:?}", err);
-        }
-    }    
+    let mute_duration = parse_duration(duration).map_err(|e| Error::from(format!("{:?}", e)))?;
 
     let data = &mut *ctx.data().write().await;
     let configuration = &data.configuration;
