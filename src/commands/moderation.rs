@@ -1,5 +1,5 @@
 use bson::{doc, Document};
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
     self as serenity,
