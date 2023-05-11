@@ -1,3 +1,17 @@
+# [1.32.0](https://github.com/revanced/revanced-discord-bot/compare/v1.31.0...v1.32.0) (2023-05-11)
+
+
+### Bug Fixes
+
+* use valid image links [skip ci] ([73d49dd](https://github.com/revanced/revanced-discord-bot/commit/73d49dd06ce511b4136507071b84f3eab74b531c))
+
+
+### Features
+
+* add new response to configuration [skip ci] ([47bcb41](https://github.com/revanced/revanced-discord-bot/commit/47bcb4103d4e01b1f9c1fab97754d86ee4481c3d))
+* improve auto response match [skip ci] ([5128258](https://github.com/revanced/revanced-discord-bot/commit/5128258e557a3c053549235fc54374c1e348c794))
+* use `go-parse-duration` for time parameters ([#69](https://github.com/revanced/revanced-discord-bot/issues/69)) ([2379130](https://github.com/revanced/revanced-discord-bot/commit/2379130c5ae212e1e557fd9310c9ba388872747c))
+
 # [1.31.0](https://github.com/revanced/revanced-discord-bot/compare/v1.30.1...v1.31.0) (2023-04-10)
 
 
