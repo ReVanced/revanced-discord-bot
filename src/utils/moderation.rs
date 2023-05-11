@@ -18,10 +18,10 @@ use crate::{Context, Error};
 pub enum ModerationKind {
     Mute(User, User, String, Option<String>, Option<Error>), /* User, Command author, Reason, Expires, Error */
     Unmute(User, User, Option<Error>),                       // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),               // User, Command author, Error
-    Lock(GuildChannel, User, Option<Error>),                // Channel name, Command author, Error
-    Unlock(GuildChannel, User, Option<Error>),              // Channel name, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
+    Lock(GuildChannel, User, Option<Error>),                 // Channel name, Command author, Error
+    Unlock(GuildChannel, User, Option<Error>),               // Channel name, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -399,3 +399,4 @@ pub async fn mute_moderation(
 
     Ok((is_currently_muted, removed_roles))
 }
+
