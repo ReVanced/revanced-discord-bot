@@ -1,3 +1,4 @@
+use std::cell::Cell;
 use std::cmp;
 use std::sync::Arc;
 
@@ -122,6 +123,7 @@ pub async fn respond_moderation<'a>(
     configuration: &Configuration,
 ) -> Result<(), Error> {
     let current_user = ctx.serenity_context().http.get_current_user().await?;
+    let send_as_ephemeral = Cell::new(false);
 
     let create_embed = |f: &mut serenity::CreateEmbed| {
         let mut moderated_user: Option<&User> = None;
@@ -131,18 +133,20 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
 
                 let embed = match error {
-                    Some(err) => f
-                        .title(format!("Failed to mute {}", user.tag()))
-                        .field("Exception", err.to_string(), false)
-                        .field(
-                            "Action",
-                            format!(
-                                "{} was muted by {} but failed",
-                                user.mention(),
-                                author.mention()
-                            ),
-                            false,
-                        ),
+                    Some(err) => {
+                        send_as_ephemeral.set(true);
+                        f.title(format!("Failed to mute {}", user.tag()))
+                            .field("Exception", err.to_string(), false)
+                            .field(
+                                "Action",
+                                format!(
+                                    "{} was muted by {} but failed",
+                                    user.mention(),
+                                    author.mention()
+                                ),
+                                false,
+                            )
+                    },
                     None => f.title(format!("Muted {}", user.tag())).field(
                         "Action",
                         format!("{} was muted by {}", user.mention(), author.mention()),
@@ -160,18 +164,20 @@ pub async fn respond_moderation<'a>(
             ModerationKind::Unmute(user, author, error) => {
                 moderated_user = Some(user);
                 match error {
-                    Some(err) => f
-                        .title(format!("Failed to unmute {}", user.tag()))
-                        .field("Exception", err.to_string(), false)
-                        .field(
-                            "Action",
-                            format!(
-                                "{} was unmuted by {} but failed",
-                                user.mention(),
-                                author.mention()
-                            ),
-                            false,
-                        ),
+                    Some(err) => {
+                        send_as_ephemeral.set(true);
+                        f.title(format!("Failed to unmute {}", user.tag()))
+                            .field("Exception", err.to_string(), false)
+                            .field(
+                                "Action",
+                                format!(
+                                    "{} was unmuted by {} but failed",
+                                    user.mention(),
+                                    author.mention()
+                                ),
+                                false,
+                            )
+                    },
                     None => f.title(format!("Unmuted {}", user.tag())).field(
                         "Action",
                         format!("{} was unmuted by {}", user.mention(), author.mention()),
@@ -182,18 +188,20 @@ pub async fn respond_moderation<'a>(
             ModerationKind::Ban(user, author, reason, error) => {
                 moderated_user = Some(user);
                 let f = match error {
-                    Some(err) => f
-                        .title(format!("Failed to ban {}", user.tag()))
-                        .field("Exception", err.to_string(), false)
-                        .field(
-                            "Action",
-                            format!(
-                                "{} was banned by {} but failed",
-                                user.mention(),
-                                author.mention()
-                            ),
-                            false,
-                        ),
+                    Some(err) => {
+                        send_as_ephemeral.set(true);
+                        f.title(format!("Failed to ban {}", user.tag()))
+                            .field("Exception", err.to_string(), false)
+                            .field(
+                                "Action",
+                                format!(
+                                    "{} was banned by {} but failed",
+                                    user.mention(),
+                                    author.mention()
+                                ),
+                                false,
+                            )
+                    },
                     None => f.title(format!("Banned {}", user.tag())).field(
                         "Action",
                         format!("{} was banned by {}", user.mention(), author.mention()),
@@ -209,18 +217,20 @@ pub async fn respond_moderation<'a>(
             ModerationKind::Unban(user, author, error) => {
                 moderated_user = Some(user);
                 match error {
-                    Some(err) => f
-                        .title(format!("Failed to unban {}", user.tag()))
-                        .field("Exception", err.to_string(), false)
-                        .field(
-                            "Action",
-                            format!(
-                                "{} was unbanned by {} but failed",
-                                user.mention(),
-                                author.mention()
-                            ),
-                            false,
-                        ),
+                    Some(err) => {
+                        send_as_ephemeral.set(true);
+                        f.title(format!("Failed to unban {}", user.tag()))
+                            .field("Exception", err.to_string(), false)
+                            .field(
+                                "Action",
+                                format!(
+                                    "{} was unbanned by {} but failed",
+                                    user.mention(),
+                                    author.mention()
+                                ),
+                                false,
+                            )
+                    },
                     None => f.title(format!("Unbanned {}", user.tag())).field(
                         "Action",
                         format!("{} was unbanned by {}", user.mention(), author.mention()),
@@ -229,18 +239,20 @@ pub async fn respond_moderation<'a>(
                 }
             },
             ModerationKind::Lock(channel, author, error) => match error {
-                Some(err) => f
-                    .title(format!("Failed to lock {} ", channel.name()))
-                    .field("Exception", err.to_string(), false)
-                    .field(
-                        "Action",
-                        format!(
-                            "{} was locked by {} but failed",
-                            channel.mention(),
-                            author.mention()
-                        ),
-                        false,
-                    ),
+                Some(err) => {
+                    send_as_ephemeral.set(true);
+                    f.title(format!("Failed to lock {} ", channel.name()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was locked by {} but failed",
+                                channel.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        )
+                },
                 None => f
                     .title(format!("Locked {}", channel.name()))
                     .description(
@@ -253,18 +265,20 @@ pub async fn respond_moderation<'a>(
                     ),
             },
             ModerationKind::Unlock(channel, author, error) => match error {
-                Some(err) => f
-                    .title(format!("Failed to unlock {}", channel.name()))
-                    .field("Exception", err.to_string(), false)
-                    .field(
-                        "Action",
-                        format!(
-                            "{} was unlocked by {} but failed",
-                            channel.mention(),
-                            author.mention()
-                        ),
-                        false,
-                    ),
+                Some(err) => {
+                    send_as_ephemeral.set(true);
+                    f.title(format!("Failed to unlock {}", channel.name()))
+                        .field("Exception", err.to_string(), false)
+                        .field(
+                            "Action",
+                            format!(
+                                "{} was unlocked by {} but failed",
+                                channel.mention(),
+                                author.mention()
+                            ),
+                            false,
+                        )
+                },
                 None => f
                     .title(format!("Unlocked {}", channel.name()))
                     .description("Restored original permission overwrites.")
@@ -291,7 +305,7 @@ pub async fn respond_moderation<'a>(
 
     let reply = ctx
         .send(|reply| {
-            reply.embed(|embed| {
+            reply.ephemeral(send_as_ephemeral.get()).embed(|embed| {
                 create_embed(embed);
                 embed
             })
