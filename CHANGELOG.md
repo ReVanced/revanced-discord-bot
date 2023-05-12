@@ -1,3 +1,10 @@
+# [1.33.0](https://github.com/revanced/revanced-discord-bot/compare/v1.32.0...v1.33.0) (2023-05-12)
+
+
+### Features
+
+* **parse-duration:** use better crate ([8f10edd](https://github.com/revanced/revanced-discord-bot/commit/8f10edd7dcd69293697630717c50efef4a429180))
+
 # [1.32.0](https://github.com/revanced/revanced-discord-bot/compare/v1.31.0...v1.32.0) (2023-05-11)
 
 
