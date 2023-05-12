@@ -11,7 +11,7 @@ pub mod media_channel;
 pub mod moderation;
 pub mod poll;
 
-pub fn parse_duration(duration: String) -> Result<Duration, go_parse_duration::Error> {
-    let d = go_parse_duration::parse_duration(&duration)?;
-    Ok(Duration::nanoseconds(d))
+pub fn parse_duration(duration: String) -> Result<Duration, parse_duration::parse::Error> {
+    let d = parse_duration::parse(&duration)?;
+    Ok(Duration::nanoseconds(d.as_nanos() as i64))
 }
