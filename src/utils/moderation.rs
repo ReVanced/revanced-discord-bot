@@ -1,8 +1,9 @@
-use std::cell::Cell;
 use std::cmp;
+use std::ops::DerefMut;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
+use std::sync::Mutex;
 use poise::serenity_prelude::{ChannelId, GuildChannel, GuildId, Mentionable, User, UserId};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, warn};
@@ -123,7 +124,7 @@ pub async fn respond_moderation<'a>(
     configuration: &Configuration,
 ) -> Result<(), Error> {
     let current_user = ctx.serenity_context().http.get_current_user().await?;
-    let send_as_ephemeral = Cell::new(false);
+    let send_as_ephemeral = Mutex::new(false);
 
     let create_embed = |f: &mut serenity::CreateEmbed| {
         let mut moderated_user: Option<&User> = None;
@@ -134,7 +135,8 @@ pub async fn respond_moderation<'a>(
 
                 let embed = match error {
                     Some(err) => {
-                        send_as_ephemeral.set(true);
+                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                        *send_as_ephemeral = true;
                         f.title(format!("Failed to mute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -165,7 +167,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        send_as_ephemeral.set(true);
+                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                        *send_as_ephemeral = true;
                         f.title(format!("Failed to unmute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -189,7 +192,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 let f = match error {
                     Some(err) => {
-                        send_as_ephemeral.set(true);
+                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                        *send_as_ephemeral = true;
                         f.title(format!("Failed to ban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -218,7 +222,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        send_as_ephemeral.set(true);
+                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                        *send_as_ephemeral = true;
                         f.title(format!("Failed to unban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -240,7 +245,8 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Lock(channel, author, error) => match error {
                 Some(err) => {
-                    send_as_ephemeral.set(true);
+                    let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                    *send_as_ephemeral = true;
                     f.title(format!("Failed to lock {} ", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
@@ -266,7 +272,8 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Unlock(channel, author, error) => match error {
                 Some(err) => {
-                    send_as_ephemeral.set(true);
+                    let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
+                    *send_as_ephemeral = true;
                     f.title(format!("Failed to unlock {}", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
@@ -305,7 +312,9 @@ pub async fn respond_moderation<'a>(
 
     let reply = ctx
         .send(|reply| {
-            reply.ephemeral(send_as_ephemeral.get()).embed(|embed| {
+            reply
+            .ephemeral(*send_as_ephemeral.lock().unwrap())
+            .embed(|embed| {
                 create_embed(embed);
                 embed
             })
