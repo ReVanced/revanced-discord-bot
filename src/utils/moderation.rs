@@ -1,5 +1,4 @@
 use std::cmp;
-use std::ops::DerefMut;
 use std::sync::Arc;
 
 use mongodb::options::FindOptions;
@@ -124,7 +123,9 @@ pub async fn respond_moderation<'a>(
     configuration: &Configuration,
 ) -> Result<(), Error> {
     let current_user = ctx.serenity_context().http.get_current_user().await?;
-    let send_as_ephemeral = Mutex::new(false);
+    let send_as_ephemeral = Arc::new(Mutex::new(false));
+
+    let send_as_ephemeral_clone = send_as_ephemeral.clone();
 
     let create_embed = |f: &mut serenity::CreateEmbed| {
         let mut moderated_user: Option<&User> = None;
@@ -135,8 +136,7 @@ pub async fn respond_moderation<'a>(
 
                 let embed = match error {
                     Some(err) => {
-                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                        *send_as_ephemeral = true;
+                        *send_as_ephemeral_clone.lock().unwrap() = true;
                         f.title(format!("Failed to mute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -167,8 +167,7 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                        *send_as_ephemeral = true;
+                        *send_as_ephemeral_clone.lock().unwrap() = true;
                         f.title(format!("Failed to unmute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -192,8 +191,7 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 let f = match error {
                     Some(err) => {
-                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                        *send_as_ephemeral = true;
+                        *send_as_ephemeral_clone.lock().unwrap() = true;
                         f.title(format!("Failed to ban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -222,8 +220,7 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                        *send_as_ephemeral = true;
+                        *send_as_ephemeral_clone.lock().unwrap() = true;
                         f.title(format!("Failed to unban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -245,8 +242,7 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Lock(channel, author, error) => match error {
                 Some(err) => {
-                    let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                    *send_as_ephemeral = true;
+                    *send_as_ephemeral_clone.lock().unwrap() = true;
                     f.title(format!("Failed to lock {} ", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
@@ -272,8 +268,7 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Unlock(channel, author, error) => match error {
                 Some(err) => {
-                    let mut send_as_ephemeral = send_as_ephemeral.lock().unwrap().deref_mut();
-                    *send_as_ephemeral = true;
+                    *send_as_ephemeral_clone.lock().unwrap() = true;
                     f.title(format!("Failed to unlock {}", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
