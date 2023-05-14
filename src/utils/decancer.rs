@@ -10,9 +10,15 @@ pub async fn cure(
     old_if_available: &Option<serenity::Member>,
     member: &serenity::Member,
 ) {
+    if member.user.bot {
+        trace!("Skipping decancer for bot {}.", member.user.tag());
+        return;
+    }
+
     let data_lock = get_data_lock(ctx).await;
-    let additions = &data_lock.read().await.configuration.general.censor.additions;
-    let removals = &data_lock.read().await.configuration.general.censor.removals;
+    let censor = &data_lock.read().await.configuration.general.censor;
+    let additions = &censor.additions;
+    let removals = &censor.removals;
 
     let mut censor = Standard;
 
@@ -22,11 +28,6 @@ pub async fn cure(
 
     for removal in removals {
         censor -= removal;
-    }
-
-    if member.user.bot {
-        trace!("Skipping decancer for bot {}.", member.user.tag());
-        return;
     }
 
     let name = member.display_name().to_string();
