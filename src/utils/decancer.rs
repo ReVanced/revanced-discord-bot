@@ -1,9 +1,44 @@
-extern crate decancer;
-
-use censor::*;
+use censor::Censor;
+use lazy_static::lazy_static;
+use once_cell::sync::OnceCell;
 use tracing::{error, info, trace};
 
-use super::{*, bot::get_data_lock};
+use super::{bot, serenity};
+
+lazy_static! {
+    static ref CENSOR: OnceCell<censor::Censor> = OnceCell::new();
+}
+
+// Initialize the censor
+async fn censor(ctx: &serenity::Context) -> &'static Censor {
+    let data_lock = bot::get_data_lock(ctx).await;
+    let censor_config = &data_lock.read().await.configuration.general.censor;
+    let additions = &censor_config.additions;
+    let removals = &censor_config.removals;
+
+    CENSOR.get_or_init(|| {
+        let mut censor = censor::Standard;
+
+        for addition in additions {
+            censor += addition;
+        }
+
+        for removal in removals {
+            censor -= removal;
+        }
+
+        censor
+    })
+}
+
+// Reinitialize the censor when the configuration is reloaded
+pub async fn reinit_censor(ctx: &serenity::Context) {
+    match CENSOR.set(censor(ctx).await.clone()) {
+        Ok(_) => info!("Reinitialized censor"),
+        Err(_) => error!("Failed to reinitialize censor"),
+    }
+}
+
 
 pub async fn cure(
     ctx: &serenity::Context,
@@ -14,21 +49,8 @@ pub async fn cure(
         trace!("Skipping decancer for bot {}.", member.user.tag());
         return;
     }
-
-    let data_lock = get_data_lock(ctx).await;
-    let censor = &data_lock.read().await.configuration.general.censor;
-    let additions = &censor.additions;
-    let removals = &censor.removals;
-
-    let mut censor = Standard;
-
-    for addition in additions {
-        censor += addition;
-    }
-
-    for removal in removals {
-        censor -= removal;
-    }
+    
+    let censor = censor(ctx).await;
 
     let name = member.display_name().to_string();
 
@@ -47,7 +69,10 @@ pub async fn cure(
         "",
     );
 
-    if cured_name.is_empty() || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic()) || censor.check(&cured_name) {
+    if cured_name.is_empty()
+        || !cured_name.starts_with(|c: char| c.is_ascii_alphabetic())
+        || censor.check(&cured_name)
+    {
         cured_name = "ReVanced member".to_string();
     }
 

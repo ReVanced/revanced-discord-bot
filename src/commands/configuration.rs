@@ -1,6 +1,7 @@
 use tracing::debug;
 
 use crate::utils::bot::load_configuration;
+use crate::utils::decancer::reinit_censor;
 use crate::{Context, Error};
 
 /// Reload the Discord bot.
@@ -12,6 +13,8 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     let embed_color = configuration.general.embed_color;
     // Also save the new configuration to the user data
     ctx.data().write().await.configuration = configuration;
+
+    reinit_censor(ctx.serenity_context()).await;
 
     debug!("{} reloaded the configuration.", ctx.author().name);
 
