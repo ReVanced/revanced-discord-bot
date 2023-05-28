@@ -1,3 +1,10 @@
+## [1.34.1](https://github.com/revanced/revanced-discord-bot/compare/v1.34.0...v1.34.1) (2023-05-28)
+
+
+### Bug Fixes
+
+* **config:** remove duplicate auto-response ([4cb2cb8](https://github.com/revanced/revanced-discord-bot/commit/4cb2cb8335ecdafe3fa89875be0d28f520c98e42))
+
 # [1.34.0](https://github.com/revanced/revanced-discord-bot/compare/v1.33.0...v1.34.0) (2023-05-28)
 
 
