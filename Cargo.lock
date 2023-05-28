@@ -1172,9 +1172,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "poise"
-version = "0.5.2"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ca787e4e516076de1995a83ee05fbdfed71d072ea0da3df018318db42a87803"
+checksum = "6d591af1c934c29adda172665f69b837e642d4fee85598baffb95dd98110467d"
 dependencies = [
  "async-trait",
  "derivative",
@@ -1191,9 +1191,9 @@ dependencies = [
 
 [[package]]
 name = "poise_macros"
-version = "0.5.2"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b80c1f4e04114527f9d41ed6bb31707a095276f51bb0aef3ca11f062b25a67c4"
+checksum = "40270099e1527efae99fdc0609d397e76310b529d4980ad38ab14d81803ca0fa"
 dependencies = [
  "darling 0.14.4",
  "proc-macro2",
@@ -1358,7 +1358,7 @@ dependencies = [
 
 [[package]]
 name = "revanced-discord-bot"
-version = "2.3.1"
+version = "2.4.2"
 dependencies = [
  "base64 0.21.0",
  "bson",

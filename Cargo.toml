@@ -1,11 +1,11 @@
 [package]
-authors = ["oSumAtrIX"]
+authors = ["ReVanced"]
 description = "The official Discord bot assisting the ReVanced Discord server."
 homepage = "https://revanced.app"
 license = "GPL-3.0"
 name = "revanced-discord-bot"
 repository = "https://github.com/revanced/revanced-discord-bot"
-version = "2.3.1"
+version = "2.4.2"
 edition = "2021"
 
 [profile.release]

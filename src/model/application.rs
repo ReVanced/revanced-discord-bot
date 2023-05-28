@@ -89,9 +89,9 @@ pub struct Introduction {
 
 #[derive(Serialize, Deserialize)]
 pub struct MessageResponse {
-    pub includes: Includes,
-    pub excludes: Excludes,
-    pub condition: Condition,
+    pub includes: Option<Includes>,
+    pub excludes: Option<Excludes>,
+    pub condition: Option<Condition>,
     pub response: Response,
 }
 
@@ -145,14 +145,14 @@ pub struct Author {
 
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
-    pub channels: Vec<u64>,
+    pub channels: Option<Vec<u64>>,
     #[serde(rename = "match", with = "serde_regex")]
     pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
-    pub roles: Vec<u64>,
+    pub roles: Option<Vec<u64>>,
     #[serde(rename = "match", with = "serde_regex")]
     pub match_field: Vec<Regex>,
 }
