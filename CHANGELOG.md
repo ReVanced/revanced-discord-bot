@@ -1,3 +1,12 @@
+# [1.34.0](https://github.com/revanced/revanced-discord-bot/compare/v1.33.0...v1.34.0) (2023-05-28)
+
+
+### Features
+
+* make configurations optional ([580235b](https://github.com/revanced/revanced-discord-bot/commit/580235beb890a60734284a0c7b6f9865f06b8d0a))
+* migrate responses from Dyno ([b86572f](https://github.com/revanced/revanced-discord-bot/commit/b86572f80f4590c89f4f76dbc73aaebc378e542e))
+* remove outdated auto response [skip ci] ([2f983ec](https://github.com/revanced/revanced-discord-bot/commit/2f983ecfe9266fd6714c2558fbc8c537dc6dde3d))
+
 # [1.33.0](https://github.com/revanced/revanced-discord-bot/compare/v1.32.0...v1.33.0) (2023-05-12)
 
 
