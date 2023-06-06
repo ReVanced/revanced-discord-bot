@@ -1,6 +1,6 @@
 {
 	"general": {
-		"embed_color": 14908858,
+		"embed_color": 5150960,
 		"mute": {
 			"role": 953984696491061289,
 			"take": [
@@ -52,7 +52,7 @@
 				"embed": {
 					"title": "I have a problem with ReVanced, can you help ❓",
 					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
@@ -101,7 +101,7 @@
 				"embed": {
 					"title": "What are the official links of ReVanced❓",
 					"description": "A list of official links can be found in <#954066838856273960>.",
-					"color": 14908858,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
@@ -137,7 +137,7 @@
 				"embed": {
 					"title": "Where or how to get ReVanced ❓",
 					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
@@ -173,7 +173,7 @@
 				"embed": {
 					"title": "Do you have a problem or need help ❓",
 					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
-					"color": 14908858,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
@@ -209,7 +209,7 @@
 				"embed": {
 					"title": "Steps to debug your issue",
 					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Read it, as it will answer many of your questions. After reading them, please attach a complete recording of the following steps to understand your issue better.",
-					"color": 13211573,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "1. Uninstall any patched app",
@@ -260,7 +260,7 @@
 				"embed": {
 					"title": "How to hide Litho components from YouTube ❓",
 					"description": "Use the custom filter included in the `hide-ads` patch for YouTube, to hide Litho components by their `pathBuilder` string. The string contains the names of the components which can be filtered with the custom filter.",
-					"color": 14908858,
+					"color": 5150960,
 					"fields": [
 						{
 							"name": "1. Preparation",
