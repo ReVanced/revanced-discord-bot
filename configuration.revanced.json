@@ -310,6 +310,49 @@
 					}
 				}
 			}
+		},
+        {
+			"includes": {
+				"channels": [952946952348270626, 954147049832603748],
+				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|endless|\\sload).*){2,})", "(?i)(((no|history).*){2,})"]
+			},
+			"excludes": {
+				"roles": [
+					965267139902705744, 955220417969262612, 952987191401926697,
+					1027874293192863765
+				],
+				"match": []
+			},
+			"response": {
+				"embed": {
+					"title": "Why do videos fail to play❓",
+					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"color": 5150960,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "Please refer to <#953993848374325269> `31`.",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "ReVanced",
+						"icon_url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+
+			}
 		}
 	]
 }
