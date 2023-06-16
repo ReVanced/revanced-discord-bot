@@ -314,7 +314,7 @@
         {
 			"includes": {
 				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|1:09|endless|\\sload).*){2,})""]
+				"match": ["(?i)(((video|buffer|play|stuck|work|time|infinite|1:09|endless|\\sload).*){2,})"]
 			},
 			"excludes": {
 				"roles": [
