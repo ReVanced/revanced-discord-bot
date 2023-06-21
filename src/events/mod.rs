@@ -10,7 +10,6 @@ mod guild_member_update;
 mod interaction;
 mod message_create;
 mod ready;
-mod thread_create;
 
 pub struct Handler<T> {
     options: poise::FrameworkOptions<T, Error>,

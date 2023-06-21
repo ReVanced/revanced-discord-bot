@@ -5,7 +5,7 @@ homepage = "https://revanced.app"
 license = "GPL-3.0"
 name = "revanced-discord-bot"
 repository = "https://github.com/revanced/revanced-discord-bot"
-version = "2.4.2"
+version = "2.5.0"
 edition = "2021"
 
 [profile.release]

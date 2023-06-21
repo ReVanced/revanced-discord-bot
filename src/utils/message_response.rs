@@ -78,8 +78,9 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
             }
         }
 
-        if let Err(err) = new_message
-            .channel_id
+        let channel_id = new_message.channel_id;
+
+        if let Err(err) = channel_id
             .send_message(&ctx.http, |m| {
                 m.reference_message(new_message);
                 match &response.response.embed {
@@ -108,6 +109,43 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                 new_message.author.tag(),
                 err
             );
+        } else if let Some(thread_options) = &response.thread_options {
+            let channel = channel_id
+                .to_channel(&ctx.http)
+                .await
+                .unwrap()
+                .guild()
+                .unwrap();
+
+            // only apply this thread if the channel is a thread
+            if channel.thread_metadata.is_none() {
+                return;
+            }
+
+            // only edit this thread if the message is the first one
+            if channel_id
+                .messages(&ctx.http, |b| b.limit(1).before(new_message))
+                .await
+                .unwrap()
+                .len()
+                != 0
+            {
+                return;
+            }
+
+            if let Err(err) = channel
+                .edit_thread(&ctx.http, |e| {
+                    e.locked(thread_options.lock_on_response)
+                        .archived(thread_options.close_on_response)
+                })
+                .await
+            {
+                error!(
+                    "Failed to edit the thread from {}. Error: {:?}",
+                    new_message.author.tag(),
+                    err
+                );
+            }
         }
     }
 }
