@@ -108,5 +108,10 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
 
     async fn thread_create(&self, ctx: serenity::Context, thread: serenity::GuildChannel) {
         thread_create::thread_create(&ctx, &thread).await;
+
+        self.dispatch_poise_event(&ctx, &poise::Event::ThreadCreate {
+            thread,
+        })
+        .await;
     }
 }
