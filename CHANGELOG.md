@@ -1,3 +1,28 @@
+# [1.35.0](https://github.com/revanced/revanced-discord-bot/compare/v1.34.1...v1.35.0) (2023-06-21)
+
+
+### Bug Fixes
+
+* check parent channels when `thread_option` is present ([88902ac](https://github.com/revanced/revanced-discord-bot/commit/88902ace64f888950a3606f0c5433db83deccc04))
+* dispatch `ThreadCreate` event to poise ([83c14c9](https://github.com/revanced/revanced-discord-bot/commit/83c14c9a1904de2b4919e11724f97924012767c9))
+* invalid JSON syntax [skip ci] ([5bbeca5](https://github.com/revanced/revanced-discord-bot/commit/5bbeca50f74eade70a877df2cb4faec7fc3eab17))
+* update branding color [skip ci] ([6f4a64c](https://github.com/revanced/revanced-discord-bot/commit/6f4a64c6a88c2596836e19262087d5cf27400e47))
+
+
+### Features
+
+* add new autoresponse [skip ci] ([4692fbd](https://github.com/revanced/revanced-discord-bot/commit/4692fbdc8de7412722be084213404104aafb3376))
+* add thread options to message responses ([b470563](https://github.com/revanced/revanced-discord-bot/commit/b470563aabe612bfbb3db7152f2201648c082701))
+* improve matching [skip ci] ([c9f9695](https://github.com/revanced/revanced-discord-bot/commit/c9f9695dd439364edfbb82f0de30c1ef94916dcb))
+* remove media channels ([26c3c5f](https://github.com/revanced/revanced-discord-bot/commit/26c3c5fedc14c60e9a14c3f29af3da7c2ff66847))
+* remove thread introductions ([bc6e00e](https://github.com/revanced/revanced-discord-bot/commit/bc6e00e15b8dc0bdeb99468773ea17d2e78d53c4))
+* update branding [skip ci] ([7bfeb1d](https://github.com/revanced/revanced-discord-bot/commit/7bfeb1da8bd33ccc882791b24c63668d8b387a6d))
+
+
+### Performance Improvements
+
+* run message handlers concurrently ([67a4c96](https://github.com/revanced/revanced-discord-bot/commit/67a4c963e08c319144a7584460c0c21ea7578444))
+
 ## [1.34.1](https://github.com/revanced/revanced-discord-bot/compare/v1.34.0...v1.34.1) (2023-05-28)
 
 
