@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 pub struct Configuration {
     pub general: General,
     pub administrators: Administrators,
-    pub thread_introductions: Vec<Introduction>,
     pub message_responses: Vec<MessageResponse>,
 }
 
@@ -66,7 +65,6 @@ impl Configuration {
 pub struct General {
     pub embed_color: i32,
     pub mute: Mute,
-    pub media_channels: Vec<u64>,
     pub logging_channel: u64,
 }
 
@@ -82,17 +80,18 @@ pub struct Administrators {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Introduction {
-    pub channels: Vec<u64>,
-    pub response: Response,
-}
-
-#[derive(Serialize, Deserialize)]
 pub struct MessageResponse {
     pub includes: Option<Includes>,
     pub excludes: Option<Excludes>,
     pub condition: Option<Condition>,
     pub response: Response,
+    pub thread_options: Option<ThreadOptions>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ThreadOptions {
+    pub close_on_response: bool,
+    pub lock_on_response: bool,
 }
 
 #[derive(Serialize, Deserialize)]
