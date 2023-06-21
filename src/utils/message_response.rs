@@ -9,7 +9,7 @@ pub fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
 }
 
-pub async fn auto_respond(ctx: &serenity::Context, new_message: &serenity::Message) {
+pub async fn handle_message_response(ctx: &serenity::Context, new_message: &serenity::Message) {
     if new_message.guild_id.is_none() || new_message.author.bot {
         return;
     }

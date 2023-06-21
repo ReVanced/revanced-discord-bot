@@ -1,7 +1,7 @@
 use chrono::Duration;
 use poise::serenity_prelude::{self as serenity, Member, RoleId};
 
-pub mod autorespond;
+pub mod message_response;
 pub mod bot;
 pub mod code_embed;
 pub mod decancer;
