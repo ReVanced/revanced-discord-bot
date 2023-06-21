@@ -19,7 +19,6 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
     let message = &new_message.content;
 
     for response in responses {
-        tracing::log::trace!("d");
         // check if the channel is whitelisted
         if let Some(includes) = &response.includes {
             if let Some(channels) = &includes.channels {
