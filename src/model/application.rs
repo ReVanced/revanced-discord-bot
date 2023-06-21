@@ -152,8 +152,6 @@ pub struct Includes {
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
     pub roles: Option<Vec<u64>>,
-    #[serde(rename = "match", with = "serde_regex")]
-    pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]

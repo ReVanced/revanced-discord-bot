@@ -1,34 +1,34 @@
 {
-	"$schema": "./configuration.schema.json",
 	"general": {
 		"embed_color": 0,
 		"mute": {
 			"role": 0,
-			"take": [0]
+			"take": [
+				0
+			]
 		},
-		"media_channels": [0],
 		"logging_channel": 0
 	},
 	"administrators": {
-		"roles": [0],
-		"users": [0]
+		"roles": [
+			0
+		],
+		"users": [
+			0
+		]
 	},
-	"thread_introductions": [
-		{
-			"channels": [0],
-			"response": {
-				"message": ""
-			}
-		}
-	],
 	"message_responses": [
 		{
 			"includes": {
-				"channels": [0],
+				"channels": [
+					0
+				],
 				"match": []
 			},
 			"excludes": {
-				"roles": [0],
+				"roles": [
+					0
+				],
 				"match": []
 			},
 			"condition": {
@@ -38,6 +38,10 @@
 			},
 			"response": {
 				"message": ""
+			},
+			"thread_options": {
+				"lock_on_response": false,
+				"close_on_response": false,
 			}
 		}
 	]

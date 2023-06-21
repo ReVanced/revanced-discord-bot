@@ -19,11 +19,18 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
     let message = &new_message.content;
 
     for response in responses {
-        // check if the channel is whitelisted
         if let Some(includes) = &response.includes {
             if let Some(channels) = &includes.channels {
+                // check if the channel is whitelisted, if not, check if the channel is a thread, if it is check if the parent id is whitelisted
                 if !channels.contains(&new_message.channel_id.0) {
-                    continue;
+                    if response.thread_options.is_some() {
+                        let Some(parent_id) = new_message.channel(&ctx.http).await.unwrap().guild().unwrap().parent_id else { continue; };
+                        if !channels.contains(&parent_id.0) {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
                 }
             }
 
@@ -45,11 +52,6 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                 }) {
                     continue;
                 }
-            }
-
-            // check if the message is not blacklisted
-            if contains_match(&excludes.match_field, message) {
-                continue;
             }
         }
 

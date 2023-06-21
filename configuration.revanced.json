@@ -14,13 +14,10 @@
 	},
 	"administrators": {
 		"roles": [
-			955220417969262612
-		],
-		"users": [
-			737323631117598811
+			955220417969262612,
+			973886585294704640
 		]
 	},
-	"thread_introductions": [],
 	"message_responses": [
 		{
 			"includes": {
@@ -40,8 +37,7 @@
 					955220417969262612,
 					952987191401926697,
 					1027874293192863765
-				],
-				"match": []
+				]
 			},
 			"condition": {
 				"user": {
@@ -94,8 +90,7 @@
 					955220417969262612,
 					952987191401926697,
 					1027874293192863765
-				],
-				"match": []
+				]
 			},
 			"response": {
 				"embed": {
@@ -311,17 +306,24 @@
 				}
 			}
 		},
-        {
+		{
 			"includes": {
-				"channels": [952946952348270626, 954147049832603748],
-				"match": ["(?i)(((video|buffer|play|stuck|work|time|freeze|infinite|1:09|endless|\\sload).*){2,})"]
+				"channels": [
+					952946952348270626,
+					1019635439272992868,
+					954147049832603748
+				],
+				"match": [
+					"(?i)(((video|buffer|play|stuck|work|time|freeze|infinite|1:09|endless|\\sload).*){2,})"
+				]
 			},
 			"excludes": {
 				"roles": [
-					965267139902705744, 955220417969262612, 952987191401926697,
+					965267139902705744,
+					955220417969262612,
+					952987191401926697,
 					1027874293192863765
-				],
-				"match": []
+				]
 			},
 			"response": {
 				"embed": {
@@ -351,7 +353,10 @@
 						"url": ""
 					}
 				}
-
+			},
+			"thread_options": {
+				"lock_on_response": true,
+				"close_on_response": true
 			}
 		}
 	]
