@@ -22,7 +22,9 @@ macro_rules! route {
 impl Endpoint<'_> {
     pub fn to_request(&self, server: &reqwest::Url) -> Request {
         match self {
-            Self::Authenticate { .. } => route!(self, server, "/auth/", POST),
+            Self::Authenticate {
+                ..
+            } => route!(self, server, "/auth/", POST),
         }
     }
 }

@@ -128,7 +128,8 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
             if !channel_id
                 .messages(&ctx.http, |b| b.limit(1).before(new_message))
                 .await
-                .unwrap().is_empty()
+                .unwrap()
+                .is_empty()
             {
                 return;
             }

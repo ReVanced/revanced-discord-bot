@@ -3,7 +3,6 @@ use reqwest::Client;
 use serde::de::DeserializeOwned;
 
 use super::model::auth::Authentication;
-
 use super::routing::Endpoint;
 
 pub struct Api {
@@ -32,7 +31,10 @@ impl Api {
         }
     }
 
-    async fn fire<T: DeserializeOwned>(&self, request_info: &RequestInfo<'_>) -> Result<T, reqwest::Error> {
+    async fn fire<T: DeserializeOwned>(
+        &self,
+        request_info: &RequestInfo<'_>,
+    ) -> Result<T, reqwest::Error> {
         let client = &self.client;
         let mut req = request_info.route.to_request(&self.server);
 
@@ -40,7 +42,12 @@ impl Api {
             *req.headers_mut() = headers.clone();
         }
 
-        client.execute(req).await?.error_for_status()?.json::<T>().await
+        client
+            .execute(req)
+            .await?
+            .error_for_status()?
+            .json::<T>()
+            .await
     }
 
     pub async fn authenticate(
@@ -52,11 +59,10 @@ impl Api {
             secret: &self.client_secret,
             discord_id_hash,
         };
-        self
-            .fire(&RequestInfo {
-                headers: None,
-                route,
-            })
-            .await
+        self.fire(&RequestInfo {
+            headers: None,
+            route,
+        })
+        .await
     }
 }
