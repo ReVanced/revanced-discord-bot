@@ -1,8 +1,7 @@
 use std::cmp;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use mongodb::options::FindOptions;
-use std::sync::Mutex;
 use poise::serenity_prelude::{ChannelId, GuildChannel, GuildId, Mentionable, User, UserId};
 use tokio::task::JoinHandle;
 use tracing::{debug, error, warn};
@@ -123,9 +122,8 @@ pub async fn respond_moderation<'a>(
     configuration: &Configuration,
 ) -> Result<(), Error> {
     let current_user = ctx.serenity_context().http.get_current_user().await?;
-    let send_as_ephemeral = Arc::new(Mutex::new(false));
 
-    let send_as_ephemeral_clone = send_as_ephemeral.clone();
+    let send_ephemeral = RwLock::new(false);
 
     let create_embed = |f: &mut serenity::CreateEmbed| {
         let mut moderated_user: Option<&User> = None;
@@ -136,7 +134,8 @@ pub async fn respond_moderation<'a>(
 
                 let embed = match error {
                     Some(err) => {
-                        *send_as_ephemeral_clone.lock().unwrap() = true;
+                        *send_ephemeral.write().unwrap() = true;
+
                         f.title(format!("Failed to mute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -167,7 +166,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        *send_as_ephemeral_clone.lock().unwrap() = true;
+                        *send_ephemeral.write().unwrap() = true;
+
                         f.title(format!("Failed to unmute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -191,7 +191,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 let f = match error {
                     Some(err) => {
-                        *send_as_ephemeral_clone.lock().unwrap() = true;
+                        *send_ephemeral.write().unwrap() = true;
+
                         f.title(format!("Failed to ban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -220,7 +221,8 @@ pub async fn respond_moderation<'a>(
                 moderated_user = Some(user);
                 match error {
                     Some(err) => {
-                        *send_as_ephemeral_clone.lock().unwrap() = true;
+                        *send_ephemeral.write().unwrap() = true;
+
                         f.title(format!("Failed to unban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
@@ -242,7 +244,8 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Lock(channel, author, error) => match error {
                 Some(err) => {
-                    *send_as_ephemeral_clone.lock().unwrap() = true;
+                    *send_ephemeral.write().unwrap() = true;
+
                     f.title(format!("Failed to lock {} ", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
@@ -268,7 +271,8 @@ pub async fn respond_moderation<'a>(
             },
             ModerationKind::Unlock(channel, author, error) => match error {
                 Some(err) => {
-                    *send_as_ephemeral_clone.lock().unwrap() = true;
+                    *send_ephemeral.write().unwrap() = true;
+
                     f.title(format!("Failed to unlock {}", channel.name()))
                         .field("Exception", err.to_string(), false)
                         .field(
@@ -308,11 +312,11 @@ pub async fn respond_moderation<'a>(
     let reply = ctx
         .send(|reply| {
             reply
-            .ephemeral(*send_as_ephemeral.lock().unwrap())
-            .embed(|embed| {
-                create_embed(embed);
-                embed
-            })
+                .embed(|embed| {
+                    create_embed(embed);
+                    embed
+                })
+                .ephemeral(*send_ephemeral.read().unwrap())
         })
         .await?;
 
