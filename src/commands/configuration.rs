@@ -1,20 +1,19 @@
 use tracing::debug;
 
 use crate::utils::bot::load_configuration;
-use crate::utils::decancer::reinit_censor;
+use crate::utils::cure_names::init_censor;
 use crate::{Context, Error};
 
 /// Reload the Discord bot.
 #[poise::command(slash_command)]
 pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
-    // Update the configuration
     let configuration = load_configuration();
-    // Use the embed color from the updated configuration
-    let embed_color = configuration.general.embed_color;
-    // Also save the new configuration to the user data
-    ctx.data().write().await.configuration = configuration;
 
-    reinit_censor(ctx.serenity_context()).await;
+    let embed_color = configuration.general.embed_color;
+
+    init_censor(&configuration.general.censor);
+
+    ctx.data().write().await.configuration = configuration;
 
     debug!("{} reloaded the configuration.", ctx.author().name);
 

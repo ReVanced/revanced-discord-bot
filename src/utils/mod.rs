@@ -3,7 +3,7 @@ use poise::serenity_prelude::{self as serenity, Member, RoleId};
 
 pub mod bot;
 pub mod code_embed;
-pub mod decancer;
+pub mod cure_names;
 pub mod macros;
 pub mod message;
 pub mod message_response;
