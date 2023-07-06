@@ -10,7 +10,7 @@
 		"logging_channel": 0,
 		"censor": {
 			"additions": ["word", "another word"],
-			"excludes": ["word", "another word"]
+			"removals": ["word", "another word"]
 		}
 	},
 	"administrators": {
