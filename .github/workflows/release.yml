@@ -38,18 +38,18 @@ jobs:
         with:
           cache-on-failure: "true"
 
+      - name: cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --no-deps -- -D warnings
+
       - name: cargo build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target=x86_64-unknown-linux-musl
           use-cross: true
-
-      - name: cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --no-deps -- -D warnings
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
