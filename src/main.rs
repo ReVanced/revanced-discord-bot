@@ -56,6 +56,7 @@ async fn main() {
         moderation::unban(),
         moderation::lock(),
         moderation::unlock(),
+        moderation::cure(),
         misc::reply(),
         misc::poll(),
     ];

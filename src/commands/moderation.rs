@@ -2,7 +2,12 @@ use bson::{doc, Document};
 use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity, Member, Mentionable, PermissionOverwrite, Permissions, UserId,
+    self as serenity,
+    Member,
+    Mentionable,
+    PermissionOverwrite,
+    Permissions,
+    UserId,
 };
 use tracing::{debug, error, trace};
 
@@ -11,7 +16,11 @@ use crate::utils::bot::get_member;
 use crate::utils::decancer::cure as cure_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
-    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
+    ban_moderation,
+    queue_unmute_member,
+    respond_moderation,
+    BanKind,
+    ModerationKind,
 };
 use crate::utils::parse_duration;
 use crate::{Context, Error};
@@ -91,14 +100,11 @@ pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
         let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
 
         if let Err(err) = channel
-            .create_permission(
-                http,
-                &PermissionOverwrite {
-                    allow: permission_overwrite.allow & !permission,
-                    deny: permission_overwrite.deny | permission,
-                    kind: permission_overwrite.kind,
-                },
-            )
+            .create_permission(http, &PermissionOverwrite {
+                allow: permission_overwrite.allow & !permission,
+                deny: permission_overwrite.deny | permission,
+                kind: permission_overwrite.kind,
+            })
             .await
         {
             error!("Failed to create the new permission: {:?}", err);
