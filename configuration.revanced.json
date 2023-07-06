@@ -318,7 +318,7 @@
 					954147049832603748
 				],
 				"match": [
-					"(?i)(((video|buffer|play|stuck|work|time|freeze|infinite|1:09|endless|\\sload).*){2,})"
+					"(?i)(((video|buffer|stops play|stuck|time |freeze|infinite|1:09|endless|\\sload).*){2,})"
 				]
 			},
 			"excludes": {
