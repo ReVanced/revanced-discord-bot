@@ -1,3 +1,17 @@
+# [1.36.0](https://github.com/revanced/revanced-discord-bot/compare/v1.35.0...v1.36.0) (2023-07-08)
+
+
+### Bug Fixes
+
+* send error replies as ephemeral ([#71](https://github.com/revanced/revanced-discord-bot/issues/71)) ([cc83a39](https://github.com/revanced/revanced-discord-bot/commit/cc83a390dfd6777b7904476d2435541319bef2d7))
+
+
+### Features
+
+* reduce false positives [skip ci] ([#74](https://github.com/revanced/revanced-discord-bot/issues/74)) ([770f61f](https://github.com/revanced/revanced-discord-bot/commit/770f61f50202387a270a9931172e3328b758b9b8))
+* remove unused response [skip ci] ([32630c7](https://github.com/revanced/revanced-discord-bot/commit/32630c7434fbcc2fedc2a8618239f592bbefb8ca))
+* respond to message reference ([aba93d8](https://github.com/revanced/revanced-discord-bot/commit/aba93d89cd70a6610a29db1d8606717baf4dd7f9))
+
 # [1.35.0](https://github.com/revanced/revanced-discord-bot/compare/v1.34.1...v1.35.0) (2023-06-21)
 
 
