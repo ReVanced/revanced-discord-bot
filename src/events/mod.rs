@@ -3,6 +3,8 @@ use std::sync::Arc;
 use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
 use tracing::log::error;
 
+use crate::utils::bot::get_data_lock;
+use crate::utils::cure_names::init_censor;
 use crate::{Data, Error};
 
 mod guild_member_addition;
@@ -90,6 +92,16 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
 
     async fn ready(&self, ctx: serenity::Context, ready: serenity::Ready) {
         *self.bot_id.write().await = Some(ready.user.id);
+
+        init_censor(
+            &get_data_lock(&ctx)
+                .await
+                .read()
+                .await
+                .configuration
+                .general
+                .censor,
+        );
 
         ready::load_muted_members(&ctx, &ready).await;
     }

@@ -66,12 +66,18 @@ pub struct General {
     pub embed_color: i32,
     pub mute: Mute,
     pub logging_channel: u64,
+    pub censor: Censor
 }
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Mute {
     pub role: u64,
     pub take: Vec<u64>,
+}
+#[derive(Default, Serialize, Deserialize)]
+pub struct Censor {
+    pub additions: Vec<String>,
+    pub removals: Vec<String>,
 }
 #[derive(Default, Serialize, Deserialize)]
 pub struct Administrators {

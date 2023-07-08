@@ -10,7 +10,15 @@
 			]
 		},
 		"media_channels": [],
-		"logging_channel": 1027892160797872179
+		"logging_channel": 1027892160797872179,
+		"censor": {
+			"additions": [
+				"nigga"
+			],
+			"removals": [
+				"ass"
+			]
+		}
 	},
 	"administrators": {
 		"roles": [

@@ -7,7 +7,11 @@
 				0
 			]
 		},
-		"logging_channel": 0
+		"logging_channel": 0,
+		"censor": {
+			"additions": ["word", "another word"],
+			"removals": ["word", "another word"]
+		}
 	},
 	"administrators": {
 		"roles": [
@@ -41,7 +45,7 @@
 			},
 			"thread_options": {
 				"lock_on_response": false,
-				"close_on_response": false,
+				"close_on_response": false
 			}
 		}
 	]

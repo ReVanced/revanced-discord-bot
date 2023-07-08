@@ -1,5 +1,5 @@
 use super::*;
-use crate::utils::decancer::cure;
+use crate::utils::cure_names::cure;
 
 pub async fn guild_member_update(
     ctx: &serenity::Context,
