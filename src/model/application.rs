@@ -86,6 +86,7 @@ pub struct MessageResponse {
     pub condition: Option<Condition>,
     pub response: Response,
     pub thread_options: Option<ThreadOptions>,
+    pub respond_to_reference: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]

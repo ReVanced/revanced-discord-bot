@@ -160,7 +160,8 @@
 						"url": ""
 					}
 				}
-			}
+			},
+			"respond_to_reference": true
 		},
 		{
 			"includes": {
@@ -196,7 +197,8 @@
 						"url": ""
 					}
 				}
-			}
+			},
+			"respond_to_reference": true
 		},
 		{
 			"includes": {
@@ -247,7 +249,8 @@
 						"url": ""
 					}
 				}
-			}
+			},
+			"respond_to_reference": true
 		},
 		{
 			"includes": {
@@ -308,7 +311,8 @@
 						"url": ""
 					}
 				}
-			}
+			},
+			"respond_to_reference": true
 		}
 	]
 }

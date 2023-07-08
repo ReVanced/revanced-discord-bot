@@ -41,8 +41,9 @@
 			},
 			"thread_options": {
 				"lock_on_response": false,
-				"close_on_response": false,
-			}
+				"close_on_response": false
+			},
+			"respond_to_reference": false
 		}
 	]
 }

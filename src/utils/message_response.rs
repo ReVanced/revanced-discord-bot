@@ -82,9 +82,32 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
 
         let channel_id = new_message.channel_id;
 
+        let mut message_reference: Option<&serenity::Message> = None;
+
+        // If the message has a reference and the response is set to respond to references, respond to the reference
+        if let Some(respond_to_reference) = response.respond_to_reference {
+            if respond_to_reference {
+                if let Some(reference) = &new_message.referenced_message {
+                    message_reference = Some(reference.as_ref());
+                    if let Err(err) = new_message.delete(&ctx.http).await {
+                        error!(
+                            "Failed to delete the message from {}. Error: {:?}",
+                            new_message.author.tag(),
+                            err
+                        );
+                    }
+                }
+            }
+        }
+
         if let Err(err) = channel_id
             .send_message(&ctx.http, |m| {
-                m.reference_message(new_message);
+                if let Some(reference) = message_reference {
+                    m.reference_message(reference);
+                } else {
+                    m.reference_message(new_message);
+                }
+
                 match &response.response.embed {
                     Some(embed) => m.embed(|e| {
                         e.title(&embed.title)
