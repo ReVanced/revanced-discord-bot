@@ -313,6 +313,41 @@
 				}
 			},
 			"respond_to_reference": true
+		},
+		{
+			"includes": {
+				"match": [
+					"\\?close"
+				],
+				"roles": [1019903194941362198]
+			},
+			"response": {
+				"embed": {
+					"title": "Closing ✅",
+					"description": "This thread has been closed. You can reopen it by sending `?open`.",
+					"color": 5150960,
+					"fields": [],
+					"footer": {
+						"text": "ReVanced",
+						"icon_url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			},
+			"respond_to_reference": true,
+			"thread_options": {
+				"close_on_response": true
+			}
 		}
 	]
 }
