@@ -18,13 +18,46 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
     let responses = &data_lock.read().await.configuration.message_responses;
     let message = &new_message.content;
 
+    let mut guild_message = None;
+
+    let member = &new_message.member.as_ref().unwrap();
+    let member_roles = &member.roles;
+
+    let joined_at = member.joined_at.unwrap().unix_timestamp();
+    let must_joined_at = DateTime::<Utc>::from_utc(
+        NaiveDateTime::from_timestamp_opt(joined_at, 0).unwrap(),
+        Utc,
+    );
+
     for response in responses {
         if let Some(includes) = &response.includes {
+            if let Some(roles) = &includes.roles {
+                // check if the role is whitelisted
+                if !roles.iter().any(|&role_id| {
+                    member_roles
+                        .iter()
+                        .any(|&member_role| role_id == member_role.0)
+                }) {
+                    continue;
+                }
+            }
+
             if let Some(channels) = &includes.channels {
                 // check if the channel is whitelisted, if not, check if the channel is a thread, if it is check if the parent id is whitelisted
                 if !channels.contains(&new_message.channel_id.0) {
                     if response.thread_options.is_some() {
-                        let Some(parent_id) = new_message.channel(&ctx.http).await.unwrap().guild().unwrap().parent_id else { continue; };
+                        if guild_message.is_none() {
+                            guild_message = Some(
+                                new_message
+                                    .channel(&ctx.http)
+                                    .await
+                                    .unwrap()
+                                    .guild()
+                                    .unwrap(),
+                            );
+                        };
+
+                        let Some(parent_id) = guild_message.as_ref().unwrap().parent_id else { continue; };
                         if !channels.contains(&parent_id.0) {
                             continue;
                         }
@@ -44,7 +77,6 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
         if let Some(excludes) = &response.excludes {
             // check if the role is blacklisted
             if let Some(roles) = &excludes.roles {
-                let member_roles = &new_message.member.as_ref().unwrap().roles;
                 if roles.iter().any(|&role_id| {
                     member_roles
                         .iter()
@@ -59,19 +91,6 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
             let min_age = condition.user.server_age;
 
             if min_age != 0 {
-                let joined_at = ctx
-                    .http
-                    .get_member(new_message.guild_id.unwrap().0, new_message.author.id.0)
-                    .await
-                    .unwrap()
-                    .joined_at
-                    .unwrap()
-                    .unix_timestamp();
-
-                let must_joined_at = DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp_opt(joined_at, 0).unwrap(),
-                    Utc,
-                );
                 let but_joined_at = Utc::now() - Duration::days(min_age);
 
                 if must_joined_at <= but_joined_at {

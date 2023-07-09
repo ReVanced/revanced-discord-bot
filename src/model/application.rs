@@ -146,6 +146,7 @@ pub struct Author {
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
     pub channels: Option<Vec<u64>>,
+    pub roles: Option<Vec<u64>>,
     #[serde(rename = "match", with = "serde_regex")]
     pub match_field: Vec<Regex>,
 }
