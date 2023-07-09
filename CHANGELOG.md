@@ -1,3 +1,15 @@
+# [1.37.0](https://github.com/revanced/revanced-discord-bot/compare/v1.36.0...v1.37.0) (2023-07-09)
+
+
+### Bug Fixes
+
+* only whitelist support channel ([55af350](https://github.com/revanced/revanced-discord-bot/commit/55af3503e9bef80bd0056b902cbe8dd430f882ae))
+
+
+### Features
+
+* add response to close threads ([3fcc9f0](https://github.com/revanced/revanced-discord-bot/commit/3fcc9f050da894f117f91711e80f448a066b53e8))
+
 # [1.36.0](https://github.com/revanced/revanced-discord-bot/compare/v1.35.0...v1.36.0) (2023-07-08)
 
 
