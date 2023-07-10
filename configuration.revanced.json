@@ -1,5 +1,4 @@
-{
-	"general": {
+{	"general": {
 		"embed_color": 5150960,
 		"mute": {
 			"role": 953984696491061289,
@@ -271,7 +270,7 @@
 						},
 						{
 							"name": "2. Prerequisites",
-							"value": "Use  a terminal such as Termux and run the command `logcat | grep AdsFilter | grep Unblocked`. You might need root or have to use ADB. Alternatively, any application from the Play Store can display logcat logs as well.",
+							"value": "Use  a terminal such as Termux and run the command `logcat | grep LithoFilterPatch | grep Unfiltered`. You might need root or have to use ADB. Alternatively, any application from the Play Store can display logcat logs as well.",
 							"inline": false
 						},
 						{
