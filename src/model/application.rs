@@ -93,6 +93,7 @@ pub struct MessageResponse {
 pub struct ThreadOptions {
     pub close_on_response: bool,
     pub lock_on_response: bool,
+    pub only_on_first_message: bool,
 }
 
 #[derive(Serialize, Deserialize)]

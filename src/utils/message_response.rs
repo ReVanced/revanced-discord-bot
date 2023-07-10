@@ -167,11 +167,13 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
             }
 
             // only edit this thread if the message is the first one
-            if !channel_id
-                .messages(&ctx.http, |b| b.limit(1).before(new_message))
-                .await
-                .unwrap()
-                .is_empty()
+
+            if thread_options.only_on_first_message
+                && !channel_id
+                    .messages(&ctx.http, |b| b.limit(1).before(new_message))
+                    .await
+                    .unwrap()
+                    .is_empty()
             {
                 return;
             }

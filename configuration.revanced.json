@@ -352,7 +352,8 @@
 			"respond_to_reference": true,
 			"thread_options": {
 				"close_on_response": true,
-				"lock_on_response": false
+				"lock_on_response": false,
+				"only_on_first_message": false
 			}
 		}
 	]

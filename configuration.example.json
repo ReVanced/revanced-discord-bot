@@ -41,7 +41,8 @@
 			},
 			"thread_options": {
 				"lock_on_response": false,
-				"close_on_response": false
+				"close_on_response": false,
+				"only_on_first_message": false
 			},
 			"respond_to_reference": false
 		}
