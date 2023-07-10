@@ -1,3 +1,16 @@
+# [1.38.0](https://github.com/revanced/revanced-discord-bot/compare/v1.37.0...v1.38.0) (2023-07-10)
+
+
+### Bug Fixes
+
+* add missing configuration field [skip ci] ([c95c125](https://github.com/revanced/revanced-discord-bot/commit/c95c12591ad46c366dd2b876d5a43d0cff6e838b))
+* use correct response embed description [skip ci] ([6867816](https://github.com/revanced/revanced-discord-bot/commit/6867816272ad49317bb6cbedea9f2f93bf9d0b96))
+
+
+### Features
+
+* add option to check for first thread message only ([cbc336c](https://github.com/revanced/revanced-discord-bot/commit/cbc336cc6326c782ca0e01ed934ed86f5b5ffda0))
+
 # [1.37.0](https://github.com/revanced/revanced-discord-bot/compare/v1.36.0...v1.37.0) (2023-07-09)
 
 
