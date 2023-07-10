@@ -329,7 +329,7 @@
 			"response": {
 				"embed": {
 					"title": "Closing ✅",
-					"description": "This thread has been closed. You can reopen it by sending `?open`.",
+					"description": "This thread has been closed. If you still need help, you can still write in this thread and it will be re-opened.",
 					"color": 5150960,
 					"fields": [],
 					"footer": {
