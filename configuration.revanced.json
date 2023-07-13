@@ -410,7 +410,7 @@
 					954147049832603748
 				],
 				"match": [
-					"(?i)(((seekbar|preview|timeline|time|thumbnail).*){2,})"
+					"(?i)(((seek|preview|timeline|time |thumbnail).*){2,})"
 				]
 			},
 			"excludes": {
@@ -449,6 +449,11 @@
 						"url": ""
 					}
 				}
+			},
+			"thread_options": {
+				"close_on_response": true,
+				"lock_on_response": false,
+				"only_on_first_message": false
 			}
 		}
 	]
