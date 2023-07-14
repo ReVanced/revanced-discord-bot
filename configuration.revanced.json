@@ -455,6 +455,43 @@
 				"lock_on_response": false,
 				"only_on_first_message": false
 			}
+		},
+		{
+			"includes": {
+				"match": [
+					"\\?manager"
+				]
+			},
+			"response": {
+				"embed": {
+					"title": "How to use ReVanced Manager ❓",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"color": 5150960,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "Please refer to the [ReVanced Manager documentation](https://github.com/revanced/revanced-manager/tree/main/docs).",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "ReVanced",
+						"icon_url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			},
+			"respond_to_reference": true
 		}
 	]
 }
