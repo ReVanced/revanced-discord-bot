@@ -260,12 +260,12 @@
 			"response": {
 				"embed": {
 					"title": "How to hide Litho components from YouTube ❓",
-					"description": "Use the custom filter included in the `hide-ads` patch for YouTube, to hide Litho components by their `pathBuilder` string. The string contains the names of the components which can be filtered with the custom filter.",
+					"description": "Use the custom filter included in the `Hide layout components` patch for YouTube, to hide Litho components by their `pathBuilder` string. The string contains the names of the components which can be filtered with the custom filter.",
 					"color": 5150960,
 					"fields": [
 						{
 							"name": "1. Preparation",
-							"value": "Enable debugging in the ReVanced settings. If the option does not exist, including the `debugging` before patching YouTube.",
+							"value": "Enable debugging in the ReVanced settings. If the option does not exist, including the `Debugging` patch before patching YouTube.",
 							"inline": false
 						},
 						{
