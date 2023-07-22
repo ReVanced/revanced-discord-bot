@@ -208,7 +208,7 @@
 			"response": {
 				"embed": {
 					"title": "Steps to debug your issue",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Read it, as it will answer many of your questions. After reading them, please attach a complete recording of the following steps to understand your issue better.",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Read it, as it will answer many of your questions. After reading them, please **attach a complete recording** of the following steps to understand your issue better.",
 					"color": 5150960,
 					"fields": [
 						{
