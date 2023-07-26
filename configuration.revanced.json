@@ -50,7 +50,7 @@
 			"response": {
 				"embed": {
 					"title": "I have a problem with ReVanced, can you help ❓",
-					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -134,7 +134,7 @@
 			"response": {
 				"embed": {
 					"title": "Where or how to get ReVanced ❓",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -171,7 +171,7 @@
 			"response": {
 				"embed": {
 					"title": "Do you have a problem or need help ❓",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -260,12 +260,12 @@
 			"response": {
 				"embed": {
 					"title": "How to hide Litho components from YouTube ❓",
-					"description": "Use the custom filter included in the `Hide layout components` patch for YouTube, to hide Litho components by their `pathBuilder` string. The string contains the names of the components which can be filtered with the custom filter.",
+					"description": "Use the custom filter included in the `Hide layout components` patch for YouTube to hide Litho components by their `pathBuilder` string. The string contains the names of the components which can be filtered with the custom filter.",
 					"color": 5150960,
 					"fields": [
 						{
 							"name": "1. Preparation",
-							"value": "Enable debugging in the ReVanced settings. If the option does not exist, including the `Debugging` patch before patching YouTube.",
+							"value": "Enable debugging in the ReVanced settings. If the option does not exist, include the `Debugging` patch before patching YouTube.",
 							"inline": false
 						},
 						{
@@ -275,7 +275,7 @@
 						},
 						{
 							"name": "3. Log the component name",
-							"value": "Open YouTube and make sure the component is not visible yet. You will have to make it appear/ render for example by scrolling the component out of view and back into view.",
+							"value": "Open YouTube and ensure the component is not visible. You will have to make it appear/ render, for example, by scrolling the component out of view and back into view.",
 							"inline": false
 						},
 						{
@@ -285,12 +285,12 @@
 						},
 						{
 							"name": "5. Hide the component",
-							"value": "Once you figure out the name of the component, add it to the custom filter setting of ReVanced. You can find the setting in the Ads sub preference. Don't forget to enable the custom filter. Multiple component names can be added, separated by a comma, with no spaces.",
+							"value": "Once you figure out the component's name, add it to the custom filter setting of ReVanced. You can find the setting in the Ads sub preference. Don't forget to enable the custom filter. Multiple component names can be added, separated by a comma, with no spaces.",
 							"inline": false
 						},
 						{
 							"name": "6. Test the custom filter",
-							"value": "After the prompt to restart the app, check, if the component was hidden. If you were unsuccessful, you might want to find the correct component name in the logs.",
+							"value": "After the prompt to restart the app, check if the component was hidden. If you were unsuccessful, you might want to find the correct component name in the logs.",
 							"inline": false
 						}
 					],
@@ -328,7 +328,7 @@
 			"response": {
 				"embed": {
 					"title": "Closing ✅",
-					"description": "This thread has been closed. If you still need help, you can write in this thread and it will be re-opened.",
+					"description": "This thread has been closed. If you still need help, you can write in this thread, and it will be re-opened.",
 					"color": 5150960,
 					"fields": [],
 					"footer": {
@@ -376,7 +376,7 @@
 			"response": {
 				"embed": {
 					"title": "Does ReVanced have this feature ❓",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -423,8 +423,8 @@
 			},
 			"response": {
 				"embed": {
-					"title": "Why is the seekbar preview missing in YouTube ❓",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"title": "Why is the seek bar preview missing in YouTube ❓",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -465,7 +465,7 @@
 			"response": {
 				"embed": {
 					"title": "How to use ReVanced Manager ❓",
-					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions guaranteed.",
+					"description": "You might have asked a question that has already been answered in <#953993848374325269>. Make sure to read it as it will answer a lot of your questions, guaranteed.",
 					"color": 5150960,
 					"fields": [
 						{
@@ -492,6 +492,59 @@
 				}
 			},
 			"respond_to_reference": true
+		},
+		{
+			"includes": {
+				"channels": [
+					952946952348270626,
+					1019635439272992868,
+					954147049832603748
+				],
+				"match": [
+					"(?i)(((video|buffer|stops play|stuck|time |freeze|infinite|1:09|endless|\\sload).*){2,})"
+				]
+			},
+			"excludes": {
+				"roles": [
+					965267139902705744,
+					955220417969262612,
+					952987191401926697,
+					1027874293192863765
+				]
+			},
+			"response": {
+				"embed": {
+					"title": "Why do videos fail to play❓",
+					"description": "You might have asked a question that has been answered in the <#953993848374325269> channel already. Make sure to read it as it will answer a lot of your questions, guaranteed.",
+					"color": 5150960,
+					"fields": [
+						{
+							"name": "🔸 Regarding your question",
+							"value": "Please refer to <#953993848374325269> `32`.",
+							"inline": false
+						}
+					],
+					"footer": {
+						"text": "ReVanced",
+						"icon_url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			},
+			"thread_options": {
+				"lock_on_response": true,
+				"close_on_response": true
+			},
 		}
 	]
 }
