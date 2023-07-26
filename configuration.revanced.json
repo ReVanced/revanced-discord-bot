@@ -545,7 +545,7 @@
 				"close_on_response": true,
 				"lock_on_response": false,
 				"only_on_first_message": true
-			},
+			}
 		}
 	]
 }
