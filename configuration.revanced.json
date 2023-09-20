@@ -139,7 +139,7 @@
 					"fields": [
 						{
 							"name": "🔸 Regarding your question",
-							"value": "You can download prebuild packages to build ReVanced. For now, please follow the documentation in <#953993848374325269> `3`.",
+							"value": "You can use ReVanced CLI or ReVanced Manager to get ReVanced. Refer to the documentation in <#953993848374325269> `3`.",
 							"inline": false
 						}
 					],
