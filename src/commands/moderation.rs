@@ -3,6 +3,7 @@ use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
     self as serenity,
+    Member,
     Mentionable,
     PermissionOverwrite,
     Permissions,
@@ -12,6 +13,7 @@ use tracing::{debug, error, trace};
 
 use crate::db::model::{LockedChannel, Muted};
 use crate::utils::bot::get_member;
+use crate::utils::decancer::cure as cure_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
     ban_moderation,
@@ -468,4 +470,14 @@ async fn handle_ban(ctx: &Context<'_>, kind: &BanKind) -> Result<(), Error> {
         &data.configuration,
     )
     .await
+}
+
+/// Cure a member.
+#[poise::command(slash_command)]
+pub async fn cure(
+    ctx: Context<'_>,
+    #[description = "The member to cure"] member: Member,
+) -> Result<(), Error> {
+    cure_member(ctx.serenity_context(), &None, &member).await;
+    Ok(())
 }
