@@ -17,6 +17,7 @@ mod guild_member_addition;
 mod guild_member_update;
 mod interaction;
 mod message_create;
+mod presence_update;
 mod ready;
 
 pub struct Handler<T> {
@@ -61,6 +62,10 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         mut new_member: serenity::Member,
     ) {
         guild_member_addition::guild_member_addition(&ctx, &mut new_member).await;
+    }
+
+    async fn presence_update(&self, ctx: serenity::Context, new_data: Presence) {
+        presence_update::presence_update(&ctx, &new_data).await;
     }
 
     async fn guild_member_update(

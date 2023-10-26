@@ -9,7 +9,8 @@
 			]
 		},
 		"media_channels": [],
-		"logging_channel": 1027892160797872179
+		"logging_channel": 1027892160797872179,
+		"cure_on_presence_update": true
 	},
 	"administrators": {
 		"roles": [
