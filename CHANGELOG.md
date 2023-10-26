@@ -1,3 +1,24 @@
+# [1.39.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.38.0...v1.39.0) (2023-10-26)
+
+
+### Bug Fixes
+
+* include necessary fields [skip ci] ([54b6e34](https://github.com/ReVanced/revanced-discord-bot/commit/54b6e348122d12053b741aab03b8387fc541f6f0))
+* remove trailing comma [skip ci] ([cfd2948](https://github.com/ReVanced/revanced-discord-bot/commit/cfd294863812f20bc8f2b33719f9e2f2eeb606f3))
+* show correct command [skip ci] ([8d5219c](https://github.com/ReVanced/revanced-discord-bot/commit/8d5219c167c33bfe784ffad5fac56657c3e0dd23))
+* use correct patch names [skip ci] ([b128fc0](https://github.com/ReVanced/revanced-discord-bot/commit/b128fc0d663b65400b45d4cb4e8e8f96fe7819ed))
+
+
+### Features
+
+* add new response [skip ci] ([6657e65](https://github.com/ReVanced/revanced-discord-bot/commit/6657e65026019a39cfdf350b22df05afc3b45795))
+* add new responses [skip ci] ([91374d6](https://github.com/ReVanced/revanced-discord-bot/commit/91374d6e24f529e8f7418851bc408692290d9b74))
+* add ReVanced Manager documentation response [skip ci] ([7b84d6d](https://github.com/ReVanced/revanced-discord-bot/commit/7b84d6dc975f70de27c9893d40c6244630cd03bd))
+* Cure on presence update ([55a5ddf](https://github.com/ReVanced/revanced-discord-bot/commit/55a5ddfe5ef9dcf0dcb0f1e620f265a731c89f69))
+* highlight important text [skip ci] ([19a171d](https://github.com/ReVanced/revanced-discord-bot/commit/19a171d2a61289e600c36ff45bae4b96d37761a9))
+* improve matching [skip ci] ([1269b91](https://github.com/ReVanced/revanced-discord-bot/commit/1269b91ebb74424ae564df9b53b035f5c908ace0))
+* Improve response [skip ci] ([21dd21c](https://github.com/ReVanced/revanced-discord-bot/commit/21dd21c3771957246915956760fae328bf5ebad8))
+
 # [1.38.0](https://github.com/revanced/revanced-discord-bot/compare/v1.37.0...v1.38.0) (2023-07-10)
 
 
