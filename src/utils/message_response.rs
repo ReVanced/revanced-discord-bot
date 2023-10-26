@@ -1,4 +1,12 @@
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use poise::serenity_prelude::{
+    CreateEmbed,
+    CreateEmbedAuthor,
+    CreateEmbedFooter,
+    CreateMessage,
+    EditThread,
+    GetMessages,
+};
 use regex::Regex;
 use tracing::log::error;
 
@@ -24,7 +32,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
     let member_roles = &member.roles;
 
     let joined_at = member.joined_at.unwrap().unix_timestamp();
-    let must_joined_at = DateTime::<Utc>::from_utc(
+    let must_joined_at = DateTime::<Utc>::from_naive_utc_and_offset(
         NaiveDateTime::from_timestamp_opt(joined_at, 0).unwrap(),
         Utc,
     );
@@ -36,7 +44,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                 if !roles.iter().any(|&role_id| {
                     member_roles
                         .iter()
-                        .any(|&member_role| role_id == member_role.0)
+                        .any(|&member_role| role_id == member_role.get())
                 }) {
                     continue;
                 }
@@ -44,7 +52,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
 
             if let Some(channels) = &includes.channels {
                 // check if the channel is whitelisted, if not, check if the channel is a thread, if it is check if the parent id is whitelisted
-                if !channels.contains(&new_message.channel_id.0) {
+                if !channels.contains(&new_message.channel_id.get()) {
                     if response.thread_options.is_some() {
                         if guild_message.is_none() {
                             guild_message = Some(
@@ -57,8 +65,10 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                             );
                         };
 
-                        let Some(parent_id) = guild_message.as_ref().unwrap().parent_id else { continue; };
-                        if !channels.contains(&parent_id.0) {
+                        let Some(parent_id) = guild_message.as_ref().unwrap().parent_id else {
+                            continue;
+                        };
+                        if !channels.contains(&parent_id.get()) {
                             continue;
                         }
                     } else {
@@ -80,7 +90,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                 if roles.iter().any(|&role_id| {
                     member_roles
                         .iter()
-                        .any(|&member_role| role_id == member_role.0)
+                        .any(|&member_role| role_id == member_role.get())
                 }) {
                     continue;
                 }
@@ -120,32 +130,40 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
         }
 
         if let Err(err) = channel_id
-            .send_message(&ctx.http, |m| {
-                if let Some(reference) = message_reference {
-                    m.reference_message(reference);
-                } else {
-                    m.reference_message(new_message);
-                }
+            .send_message(
+                &ctx.http,
+                {
+                    let mut message = CreateMessage::default();
+                    message = if let Some(reference) = message_reference {
+                        message.reference_message(reference)
+                    } else {
+                        message.reference_message(new_message)
+                    };
 
-                match &response.response.embed {
-                    Some(embed) => m.embed(|e| {
-                        e.title(&embed.title)
-                            .description(&embed.description)
-                            .color(embed.color)
-                            .fields(embed.fields.iter().map(|field| {
-                                (field.name.clone(), field.value.clone(), field.inline)
-                            }))
-                            .footer(|f| {
-                                f.text(&embed.footer.text);
-                                f.icon_url(&embed.footer.icon_url)
-                            })
-                            .thumbnail(&embed.thumbnail.url)
-                            .image(&embed.image.url)
-                            .author(|a| a.name(&embed.author.name).icon_url(&embed.author.icon_url))
-                    }),
-                    None => m.content(response.response.message.as_ref().unwrap()),
-                }
-            })
+                    match &response.response.embed {
+                        Some(embed) => message.embed(
+                            CreateEmbed::new()
+                                .title(&embed.title)
+                                .description(&embed.description)
+                                .color(embed.color)
+                                .fields(embed.fields.iter().map(|field| {
+                                    (field.name.clone(), field.value.clone(), field.inline)
+                                }))
+                                .footer(
+                                    CreateEmbedFooter::new(&embed.footer.text)
+                                        .icon_url(&embed.footer.icon_url),
+                                )
+                                .thumbnail(&embed.thumbnail.url)
+                                .image(&embed.image.url)
+                                .author(
+                                    CreateEmbedAuthor::new(&embed.author.name)
+                                        .icon_url(&embed.author.icon_url),
+                                ),
+                        ),
+                        None => message.content(response.response.message.as_ref().unwrap()),
+                    }
+                },
+            )
             .await
         {
             error!(
@@ -154,7 +172,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
                 err
             );
         } else if let Some(thread_options) = &response.thread_options {
-            let channel = channel_id
+            let mut channel = channel_id
                 .to_channel(&ctx.http)
                 .await
                 .unwrap()
@@ -170,7 +188,7 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
 
             if thread_options.only_on_first_message
                 && !channel_id
-                    .messages(&ctx.http, |b| b.limit(1).before(new_message))
+                    .messages(&ctx.http, GetMessages::new().limit(1).before(new_message))
                     .await
                     .unwrap()
                     .is_empty()
@@ -179,10 +197,12 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
             }
 
             if let Err(err) = channel
-                .edit_thread(&ctx.http, |e| {
-                    e.locked(thread_options.lock_on_response)
-                        .archived(thread_options.close_on_response)
-                })
+                .edit_thread(
+                    &ctx.http,
+                    EditThread::new()
+                        .locked(thread_options.lock_on_response)
+                        .archived(thread_options.close_on_response),
+                )
                 .await
             {
                 error!(

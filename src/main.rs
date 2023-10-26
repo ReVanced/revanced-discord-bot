@@ -6,7 +6,9 @@ use api::client::Api;
 use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::Handler;
-use poise::serenity_prelude::{self as serenity, RwLock, UserId};
+use poise::serenity_prelude::prelude::{RwLock, TypeMapKey};
+use poise::serenity_prelude::{CreateEmbed, UserId};
+use poise::CreateReply;
 use tokio::task::JoinHandle;
 use tracing::{error, trace};
 use utils::bot::load_configuration;
@@ -24,7 +26,7 @@ mod utils;
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Arc<RwLock<Data>>, Error>;
 
-impl serenity::TypeMapKey for Data {
+impl TypeMapKey for Data {
     type Value = Arc<RwLock<Data>>;
 }
 
@@ -54,8 +56,6 @@ async fn main() {
         moderation::purge(),
         moderation::ban(),
         moderation::unban(),
-        moderation::lock(),
-        moderation::unlock(),
         misc::reply(),
         misc::poll(),
     ];
@@ -68,7 +68,7 @@ async fn main() {
         .users
         .iter()
         .cloned()
-        .map(UserId)
+        .map(UserId::from)
         .collect::<Vec<UserId>>()
         .into_iter()
         .collect();
@@ -116,7 +116,7 @@ async fn main() {
                         if !(administrators
                             .users
                             // Check if the user is an administrator
-                            .contains(&member.user.id.0)
+                            .contains(&member.user.id.get())
                             || administrators
                                 .roles
                                 .iter()
@@ -125,22 +125,23 @@ async fn main() {
                                     member
                                         .roles
                                         .iter()
-                                        .any(|member_role| member_role.0 == role_id)
+                                        .any(|member_role| member_role.get() == role_id)
                                 }))
                         {
                             if let Err(e) = ctx
-                                .send(|m| {
-                                    m.ephemeral(true).embed(|e| {
-                                        e.title("Permission error")
+                                .send(
+                                    CreateReply::new().ephemeral(true).embed(
+                                        CreateEmbed::new()
+                                            .title("Permission error")
                                             .description(
                                                 "You do not have permission to use this command.",
                                             )
                                             .color(configuration.general.embed_color)
                                             .thumbnail(member.user.avatar_url().unwrap_or_else(
                                                 || member.user.default_avatar_url(),
-                                            ))
-                                    })
-                                })
+                                            )),
+                                    ),
+                                )
                                 .await
                             {
                                 error!("Error sending message: {:?}", e)
@@ -152,9 +153,9 @@ async fn main() {
                     Ok(true)
                 })
             }),
-            event_handler: |_ctx, event, _framework, _data| {
+            event_handler: |event, _framework, _data| {
                 Box::pin(async move {
-                    tracing::trace!("{:?}", event.name());
+                    tracing::trace!("{:?}", event.snake_case_name());
                     Ok(())
                 })
             },
@@ -163,12 +164,13 @@ async fn main() {
         data.clone(), // Pass configuration as user data for the framework
     ));
 
-    let mut client = serenity::Client::builder(
+    let mut client = poise::serenity_prelude::Client::builder(
         env::var("DISCORD_AUTHORIZATION_TOKEN")
             .expect("DISCORD_AUTHORIZATION_TOKEN environment variable not set"),
-        serenity::GatewayIntents::non_privileged()
-            | serenity::GatewayIntents::MESSAGE_CONTENT
-            | serenity::GatewayIntents::GUILD_MEMBERS,
+        poise::serenity_prelude::GatewayIntents::non_privileged()
+            | poise::serenity_prelude::GatewayIntents::MESSAGE_CONTENT
+            | poise::serenity_prelude::GatewayIntents::GUILD_MEMBERS
+            | poise::serenity_prelude::GatewayIntents::GUILD_PRESENCES,
     )
     .event_handler_arc(handler.clone())
     .await

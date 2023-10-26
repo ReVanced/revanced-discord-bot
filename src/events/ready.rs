@@ -25,7 +25,9 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
 
     while cursor.advance().await.unwrap() {
         let current: Muted = cursor.deserialize_current().unwrap();
-        let Some(expires) = current.expires else { continue };
+        let Some(expires) = current.expires else {
+            continue;
+        };
         let guild_id = current.guild_id.unwrap().parse::<u64>().unwrap();
         let user_id = current.user_id.unwrap().parse::<u64>().unwrap();
 
@@ -36,8 +38,8 @@ pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
             queue_unmute_member(
                 ctx.clone(),
                 data.database.clone(),
-                serenity::GuildId(guild_id),
-                serenity::UserId(user_id),
+                guild_id.into(),
+                user_id.into(),
                 mute_role_id,
                 amount_left as u64, // i64 as u64 is handled properly here
             ),

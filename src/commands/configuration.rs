@@ -1,3 +1,5 @@
+use poise::serenity_prelude::CreateEmbed;
+use poise::CreateReply;
 use tracing::debug;
 
 use crate::utils::bot::load_configuration;
@@ -15,12 +17,13 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
 
     debug!("{} reloaded the configuration.", ctx.author().name);
 
-    ctx.send(|f| {
-        f.ephemeral(true).embed(|f| {
-            f.description("Successfully reloaded configuration.")
-                .color(embed_color)
-        })
-    })
+    ctx.send(
+        CreateReply::new().ephemeral(true).embed(
+            CreateEmbed::new()
+                .description("Successfully reloaded configuration.")
+                .color(embed_color),
+        ),
+    )
     .await?;
 
     Ok(())
@@ -32,18 +35,17 @@ pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
     debug!("{} stopped the bot.", ctx.author().name);
 
     let color = ctx.data().read().await.configuration.general.embed_color;
-    ctx.send(|f| {
-        f.ephemeral(true)
-            .embed(|f| f.description("Stopped the bot.").color(color))
-    })
+
+    ctx.send(
+        CreateReply::new().ephemeral(true).embed(
+            CreateEmbed::new()
+                .description("Stopped the bot.")
+                .color(color),
+        ),
+    )
     .await?;
 
-    ctx.framework()
-        .shard_manager()
-        .lock()
-        .await
-        .shutdown_all()
-        .await;
+    ctx.framework().shard_manager().shutdown_all().await;
 
     Ok(())
 }

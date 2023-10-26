@@ -1,8 +1,8 @@
 use chrono::{Duration, Utc};
 use poise::serenity_prelude::{
-    ComponentType,
-    MessageComponentInteraction,
-    MessageComponentInteractionData,
+    ComponentInteraction,
+    ComponentInteractionData,
+    ComponentInteractionDataKind,
 };
 
 use super::*;
@@ -10,11 +10,11 @@ use crate::utils;
 pub async fn interaction_create(
     ctx: &serenity::Context,
     interaction: &serenity::Interaction,
-) -> Result<(), crate::serenity::SerenityError> {
-    if let serenity::Interaction::MessageComponent(MessageComponentInteraction {
+) -> Result<(), serenity::prelude::SerenityError> {
+    if let serenity::Interaction::Component(ComponentInteraction {
         data:
-            MessageComponentInteractionData {
-                component_type: ComponentType::Button,
+            ComponentInteractionData {
+                kind: ComponentInteractionDataKind::Button,
                 custom_id,
                 ..
             },
@@ -33,7 +33,7 @@ pub async fn handle_poll(
     ctx: &serenity::Context,
     interaction: &serenity::Interaction,
     custom_id: &str,
-) -> Result<(), crate::serenity::SerenityError> {
+) -> Result<(), serenity::prelude::SerenityError> {
     fn parse<T>(str: &str) -> T
     where
         <T as std::str::FromStr>::Err: std::fmt::Debug,

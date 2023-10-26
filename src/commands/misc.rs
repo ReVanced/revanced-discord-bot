@@ -1,5 +1,5 @@
-use poise::serenity_prelude::{self as serenity, MessageId, ParseValue, ReactionType};
-use poise::ReplyHandle;
+use poise::serenity_prelude::{CreateActionRow, CreateAllowedMentions, CreateButton, ReactionType};
+use poise::{CreateReply, ReplyHandle};
 
 use crate::utils::message::clone_message;
 use crate::{Context, Error};
@@ -14,8 +14,9 @@ pub async fn reply(
     async fn send_ephermal<'a>(
         ctx: &Context<'a>,
         content: &str,
-    ) -> Result<ReplyHandle<'a>, serenity::Error> {
-        ctx.send(|f| f.ephemeral(true).content(content)).await
+    ) -> Result<ReplyHandle<'a>, poise::serenity_prelude::Error> {
+        ctx.send(CreateReply::new().ephemeral(true).content(content))
+            .await
     }
 
     let http = &ctx.serenity_context().http;
@@ -23,7 +24,7 @@ pub async fn reply(
 
     if let Some(reply_message) = reply_message {
         if let Ok(reply_message) = reply_message.parse::<u64>() {
-            match channel.message(http, MessageId(reply_message)).await {
+            match channel.message(http, reply_message).await {
                 Ok(reply_message) => {
                     reply_message.reply(http, &message).await?;
                 },
@@ -71,29 +72,24 @@ pub async fn poll(
     let message = ctx
         .serenity_context()
         .http
-        .get_message(channel_id, message_id)
+        .get_message(channel_id.into(), message_id.into())
         .await?;
 
-    ctx.send(|m| {
-        let mut clone = clone_message(&message, m).components(|c| {
-            c.create_action_row(|r| {
-                r.create_button(|b| {
-                    b.label("Vote")
-                        .emoji(ReactionType::Unicode("🗳️".to_string()))
-                        .custom_id(format!("poll:{id}:{age}"))
-                })
-            })
-        });
+    let message = clone_message(&message).components(vec![CreateActionRow::Buttons(vec![
+        CreateButton::new(format!("poll:{id}:{age}"))
+            .label("Vote")
+            .emoji(ReactionType::Unicode("🗳️".to_string())),
+    ])]);
 
-        if ping {
-            clone = clone.allowed_mentions(|am| {
-                am.parse(ParseValue::Users)
-                    .parse(ParseValue::Roles)
-                    .parse(ParseValue::Everyone)
-            });
-        }
-
-        clone
+    ctx.send(if ping {
+        message.allowed_mentions(
+            CreateAllowedMentions::default()
+                .all_roles(true)
+                .all_users(true)
+                .everyone(true),
+        )
+    } else {
+        message
     })
     .await?;
 

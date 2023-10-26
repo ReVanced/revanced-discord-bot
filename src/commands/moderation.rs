@@ -1,16 +1,22 @@
+
+
+
 use bson::{doc, Document};
 use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
     self as serenity,
+    CreateEmbed,
+    CreateEmbedFooter,
+    EditMessage,
+    GetMessages,
     Mentionable,
-    PermissionOverwrite,
-    Permissions,
     UserId,
 };
-use tracing::{debug, error, trace};
+use poise::CreateReply;
+use tracing::{debug, trace};
 
-use crate::db::model::{LockedChannel, Muted};
+use crate::db::model::{Muted};
 use crate::utils::bot::get_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
@@ -22,145 +28,6 @@ use crate::utils::moderation::{
 };
 use crate::utils::parse_duration;
 use crate::{Context, Error};
-
-/// Lock a channel.
-#[poise::command(slash_command)]
-pub async fn lock(ctx: Context<'_>) -> Result<(), Error> {
-    let data = &ctx.data().read().await;
-    let configuration = &data.configuration;
-    let database = &data.database;
-    let discord = &ctx.serenity_context();
-    let cache = &discord.cache;
-    let http = &discord.http;
-
-    let channel_id = ctx.channel_id().0;
-    let channel = &cache.guild_channel(channel_id).unwrap();
-
-    let author = ctx.author();
-
-    let query: Document = LockedChannel {
-        channel_id: Some(channel_id.to_string()),
-        ..Default::default()
-    }
-    .into();
-
-    // Check if channel is already muted, if so succeed.
-    if let Ok(mut cursor) = database
-        .find::<LockedChannel>("locked", query.clone(), None)
-        .await
-    {
-        if cursor.advance().await.unwrap() {
-            respond_moderation(
-                &ctx,
-                &ModerationKind::Lock(
-                    channel.clone(),
-                    author.clone(),
-                    Some(Error::from("Channel already locked")),
-                ),
-                configuration,
-            )
-            .await?;
-            return Ok(());
-        }
-    }
-
-    // accumulate all roles with write permissions
-    let permission_overwrites: Vec<_> = channel
-        .permission_overwrites
-        .iter()
-        .filter_map(|r| {
-            if r.allow.send_messages() || !r.deny.send_messages() {
-                Some(r.clone())
-            } else {
-                None
-            }
-        })
-        .collect();
-
-    // save the original overwrites
-    let updated: Document = LockedChannel {
-        overwrites: Some(permission_overwrites.clone()),
-        ..Default::default()
-    }
-    .into();
-
-    database
-        .update::<LockedChannel>(
-            "locked",
-            query,
-            UpdateModifications::Document(doc! { "$set": updated}),
-            Some(UpdateOptions::builder().upsert(true).build()),
-        )
-        .await?;
-
-    // lock the channel by and creating the new permission overwrite
-    for permission_overwrite in &permission_overwrites {
-        let permission = Permissions::SEND_MESSAGES & Permissions::ADD_REACTIONS;
-
-        if let Err(err) = channel
-            .create_permission(http, &PermissionOverwrite {
-                allow: permission_overwrite.allow & !permission,
-                deny: permission_overwrite.deny | permission,
-                kind: permission_overwrite.kind,
-            })
-            .await
-        {
-            error!("Failed to create the new permission: {:?}", err);
-        }
-    }
-
-    respond_moderation(
-        &ctx,
-        &ModerationKind::Lock(channel.clone(), author.clone(), None),
-        configuration,
-    )
-    .await
-}
-
-/// Unlock a channel.
-#[poise::command(slash_command)]
-pub async fn unlock(ctx: Context<'_>) -> Result<(), Error> {
-    let data = &ctx.data().read().await;
-    let configuration = &data.configuration;
-    let database = &data.database;
-    let discord = &ctx.serenity_context();
-    let cache = &discord.cache;
-    let http = &discord.http;
-
-    let channel_id = ctx.channel_id().0;
-
-    let delete_result = database
-        .find_and_delete::<LockedChannel>(
-            "locked",
-            LockedChannel {
-                channel_id: Some(channel_id.to_string()),
-                ..Default::default()
-            }
-            .into(),
-            None,
-        )
-        .await;
-
-    let channel = cache.guild_channel(channel_id).unwrap();
-
-    let author = ctx.author();
-
-    let mut error = None;
-    if let Ok(Some(locked_channel)) = delete_result {
-        for overwrite in &locked_channel.overwrites.unwrap() {
-            channel.create_permission(http, overwrite).await?;
-        }
-    } else {
-        error = Some(Error::from("Channel already unlocked"))
-    }
-
-    respond_moderation(
-        &ctx,
-        &ModerationKind::Unlock(channel.clone(), author.clone(), error), // TODO: handle error
-        configuration,
-    )
-    .await
-}
 
 /// Unmute a member.
 #[poise::command(slash_command)]
@@ -175,8 +42,8 @@ pub async fn unmute(
     let data = &ctx.data().read().await;
     let configuration = &data.configuration;
 
-    if let Some(pending_unmute) = data.pending_unmutes.get(&id.0) {
-        trace!("Cancelling pending unmute for {}", id.0);
+    if let Some(pending_unmute) = data.pending_unmutes.get(&id.get()) {
+        trace!("Cancelling pending unmute for {}", id);
         pending_unmute.abort();
     }
 
@@ -231,7 +98,7 @@ pub async fn mute(
     };
 
     let mut updated = Muted {
-        guild_id: Some(guild_id.0.to_string()),
+        guild_id: Some(guild_id.to_string()),
         expires: unmute_time,
         reason: Some(reason.clone()),
         ..Default::default()
@@ -265,8 +132,8 @@ pub async fn mute(
             )
             .await?;
 
-        if let Some(pending_unmute) = data.pending_unmutes.get(&id.0) {
-            trace!("Cancelling pending unmute for {}", id.0);
+        if let Some(pending_unmute) = data.pending_unmutes.get(&id.get()) {
+            trace!("Cancelling pending unmute for {}", id);
             pending_unmute.abort();
         }
 
@@ -281,7 +148,7 @@ pub async fn mute(
                 .await?;
         } else {
             data.pending_unmutes.insert(
-                id.0,
+                id.get(),
                 queue_unmute_member(
                     discord.clone(),
                     data.database.clone(),
@@ -341,14 +208,15 @@ pub async fn purge(
     let author = ctx.author();
 
     let handle = ctx
-        .send(|f| {
-            f.embed(|f| {
-                f.title("Purging messages")
+        .send(
+            CreateReply::new().embed(
+                CreateEmbed::new()
+                    .title("Purging messages")
                     .description("Accumulating...")
                     .color(embed_color)
-                    .thumbnail(&image)
-            })
-        })
+                    .thumbnail(&image),
+            ),
+        )
         .await?;
     let mut response = handle.message().await?;
 
@@ -361,9 +229,12 @@ pub async fn purge(
     loop {
         // Filter out messages that are too old
         let mut messages = channel
-            .messages(&ctx.serenity_context(), |m| {
-                m.limit(count_to_delete as u64).before(response.id)
-            })
+            .messages(
+                &ctx.serenity_context(),
+                GetMessages::new()
+                    .limit(count_to_delete as u8)
+                    .before(response.id),
+            )
             .await?
             .into_iter()
             .take_while(|m| m.timestamp.timestamp() > too_old_timestamp)
@@ -384,7 +255,7 @@ pub async fn purge(
             if let Ok(message_id) = message_id.parse::<u64>() {
                 messages = messages
                     .into_iter()
-                    .take_while(|m| m.id.0 > message_id)
+                    .take_while(|m| m.id.get() > message_id)
                     .collect::<Vec<_>>();
                 debug!(
                     "Filtered messages until {}. Left: {}",
@@ -411,21 +282,19 @@ pub async fn purge(
 
     response
         .to_mut()
-        .edit(&ctx.serenity_context(), |e| {
-            e.set_embed(
+        .edit(
+            &ctx.serenity_context(),
+            EditMessage::new().embed(
                 serenity::CreateEmbed::default()
                     .title("Purge successful")
                     .field("Deleted messages", deleted_amount.to_string(), false)
-                    .field("Action by", author.mention(), false)
+                    .field("Action by", author.mention().to_string(), false)
                     .color(embed_color)
                     .thumbnail(&image)
-                    .footer(|f| {
-                        f.text("ReVanced");
-                        f.icon_url(image)
-                    })
+                    .footer(CreateEmbedFooter::new("ReVanced").icon_url(image))
                     .clone(),
-            )
-        })
+            ),
+        )
         .await?;
     Ok(())
 }

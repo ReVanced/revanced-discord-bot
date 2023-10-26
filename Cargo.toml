@@ -5,7 +5,7 @@ homepage = "https://revanced.app"
 license = "GPL-3.0"
 name = "revanced-discord-bot"
 repository = "https://github.com/revanced/revanced-discord-bot"
-version = "2.5.1"
+version = "2.5.2"
 edition = "2021"
 
 [profile.release]
@@ -17,9 +17,9 @@ panic = "abort"
 
 [dependencies]
 bson = "2.4"
-serde_with_macros = "2.0.1"
+serde_with_macros = "3.4.0"
 mongodb = "2.4.0"
-poise = "0.5.2"
+poise = { git = "https://github.com/serenity-rs/poise.git", branch = "serenity-next" }
 decancer = "1.5.4"
 tokio = { version = "1.26.0", features = ["rt-multi-thread"] }
 dotenv = "0.15.0"
@@ -27,10 +27,16 @@ serde = { version = "1.0.158", features = ["derive"] }
 serde_json = "1.0.94"
 regex = "1.7.3"
 serde_regex = "1.1.0"
-reqwest = { version = "0.11.15", features= ["rustls-tls"], default-features = false }
+reqwest = { version = "0.11.15", features = [
+	"rustls-tls",
+	"json",
+], default-features = false }
 chrono = "0.4.24"
 dirs = "5.0.0"
-tracing = { version = "0.1.37", features = ["max_level_debug", "release_max_level_info"] }
+tracing = { version = "0.1.37", features = [
+	"max_level_debug",
+	"release_max_level_info",
+] }
 tracing-subscriber = "0.3.16"
 hmac-sha256 = "1.1.6"
 base64 = "0.21.0"

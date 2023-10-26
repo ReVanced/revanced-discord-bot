@@ -66,6 +66,7 @@ pub struct General {
     pub embed_color: i32,
     pub mute: Mute,
     pub logging_channel: u64,
+    pub cure_on_presence_update: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]

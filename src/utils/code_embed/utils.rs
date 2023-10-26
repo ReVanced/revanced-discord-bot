@@ -1,3 +1,4 @@
+use poise::serenity_prelude::{CreateAttachment, CreateMessage, EditMessage};
 use reqwest::Url;
 use tracing::{debug, error, trace};
 
@@ -63,26 +64,29 @@ pub async fn code_preview(ctx: &serenity::Context, new_message: &serenity::Messa
         return; // Nothing to do
     }
 
-    if let Err(err) = new_message
+    if let Err(err) = &new_message
         .channel_id
-        .send_message(&ctx.http, |message| {
-            let mut message = message.reference_message(new_message);
+        .send_message(
+            &ctx.http,
+            {
+                let mut message = CreateMessage::new();
 
-            for preview in code_previews.iter() {
-                let language = match preview.code.language.as_ref() {
-                    Some(language) => language,
-                    None => "txt",
-                };
+                for preview in code_previews.iter() {
+                    let language = match preview.code.language.as_ref() {
+                        Some(language) => language,
+                        None => "txt",
+                    };
 
-                let name = format!("{}.{}", &preview.code.branch_or_sha, language);
+                    let name = format!("{}.{}", &preview.code.branch_or_sha, language);
 
-                let content = preview.preview.as_ref().unwrap().as_bytes();
+                    let content = preview.preview.as_ref().unwrap().as_bytes();
 
-                message = message.add_file((content, name.as_str()));
-            }
+                    message = message.add_file(CreateAttachment::bytes(content, name.as_str()));
+                }
 
-            message
-        })
+                message
+            },
+        )
         .await
     {
         error!(
@@ -93,7 +97,11 @@ pub async fn code_preview(ctx: &serenity::Context, new_message: &serenity::Messa
         return;
     }
 
-    if let Err(err) = new_message.clone().suppress_embeds(&ctx.http).await {
+    if let Err(err) = new_message
+        .clone()
+        .edit(&ctx.http, EditMessage::new().suppress_embeds(true))
+        .await
+    {
         error!("Failed to remove embeds. Error: {:?}", err);
     }
 }

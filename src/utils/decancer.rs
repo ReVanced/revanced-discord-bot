@@ -1,5 +1,6 @@
 extern crate decancer;
 
+use poise::serenity_prelude::EditMember;
 use tracing::{error, info, trace};
 
 use super::*;
@@ -17,7 +18,7 @@ pub async fn cure(
     let name = member.display_name().to_string();
 
     if let Some(old) = old_if_available {
-        if old.display_name().to_string() == name {
+        if *old.display_name() == name {
             trace!(
                 "Skipping decancer for {} because their name hasn't changed",
                 member.user.tag()
@@ -41,9 +42,11 @@ pub async fn cure(
 
     match member
         .guild_id
-        .edit_member(&ctx.http, member.user.id, |edit_member| {
-            edit_member.nickname(cured_name)
-        })
+        .edit_member(
+            &ctx.http,
+            member.user.id,
+            EditMember::default().nickname(cured_name),
+        )
         .await
     {
         Ok(_) => info!("Cured user {}", member.user.tag()),

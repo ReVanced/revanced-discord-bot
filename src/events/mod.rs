@@ -1,6 +1,14 @@
 use std::sync::Arc;
 
-use poise::serenity_prelude::{self as serenity, Mutex, RwLock, ShardManager, UserId};
+use poise::serenity_prelude::prelude::RwLock;
+use poise::serenity_prelude::{
+    self as serenity,
+    GuildMemberUpdateEvent,
+    Member,
+    Presence,
+    ShardManager,
+    UserId,
+};
 use tracing::log::error;
 
 use crate::{Data, Error};
@@ -15,7 +23,7 @@ pub struct Handler<T> {
     options: poise::FrameworkOptions<T, Error>,
     data: T,
     bot_id: RwLock<Option<UserId>>,
-    shard_manager: RwLock<Option<Arc<Mutex<ShardManager>>>>,
+    shard_manager: RwLock<Option<Arc<ShardManager>>>,
 }
 
 // Custom handler to dispatch poise events
@@ -29,18 +37,18 @@ impl<T: Send + Sync> Handler<T> {
         }
     }
 
-    pub async fn set_shard_manager(&self, shard_manager: Arc<Mutex<serenity::ShardManager>>) {
+    pub async fn set_shard_manager(&self, shard_manager: Arc<serenity::ShardManager>) {
         *self.shard_manager.write().await = Some(shard_manager);
     }
 
-    async fn dispatch_poise_event(&self, ctx: &serenity::Context, event: &poise::Event<'_>) {
+    async fn dispatch_poise_event(&self, event: &serenity::FullEvent) {
         let framework_data = poise::FrameworkContext {
             bot_id: self.bot_id.read().await.unwrap(),
             options: &self.options,
             user_data: &self.data,
             shard_manager: &(*self.shard_manager.read().await).clone().unwrap(), /* Shard manager can be read between all poise events without locks */
         };
-        poise::dispatch_event(framework_data, ctx, event).await;
+        poise::dispatch_event(framework_data, event).await;
     }
 }
 
@@ -58,16 +66,18 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
     async fn guild_member_update(
         &self,
         ctx: serenity::Context,
-        old_if_available: Option<serenity::Member>,
-        new: serenity::Member,
+        old_if_available: Option<Member>,
+        new: Option<Member>,
+        event: GuildMemberUpdateEvent,
     ) {
-        guild_member_update::guild_member_update(&ctx, &old_if_available, &new).await;
+        guild_member_update::guild_member_update(&ctx, &old_if_available, &new, &event).await;
     }
 
     async fn message(&self, ctx: serenity::Context, new_message: serenity::Message) {
         message_create::message_create(&ctx, &new_message).await;
 
-        self.dispatch_poise_event(&ctx, &poise::Event::Message {
+        self.dispatch_poise_event(&serenity::FullEvent::Message {
+            ctx,
             new_message,
         })
         .await;
@@ -80,7 +90,8 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
         new: Option<serenity::Message>,
         event: serenity::MessageUpdateEvent,
     ) {
-        self.dispatch_poise_event(&ctx, &poise::Event::MessageUpdate {
+        self.dispatch_poise_event(&serenity::FullEvent::MessageUpdate {
+            ctx,
             old_if_available,
             new,
             event,
@@ -99,7 +110,8 @@ impl serenity::EventHandler for Handler<Arc<RwLock<Data>>> {
             error!("Failed to handle interaction: {:?}.", e);
         }
 
-        self.dispatch_poise_event(&ctx, &poise::Event::InteractionCreate {
+        self.dispatch_poise_event(&serenity::FullEvent::InteractionCreate {
+            ctx,
             interaction,
         })
         .await;

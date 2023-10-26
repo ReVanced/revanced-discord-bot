@@ -1,5 +1,13 @@
 use base64::Engine;
-use poise::serenity_prelude::{ButtonStyle, ReactionType, Timestamp};
+use poise::serenity_prelude::{
+    CreateActionRow,
+    CreateButton,
+    CreateEmbed,
+    CreateEmbedFooter,
+    CreateInteractionResponseMessage,
+    ReactionType,
+    Timestamp,
+};
 use reqwest::StatusCode;
 use tracing::log::{error, trace};
 
@@ -11,7 +19,7 @@ pub async fn handle_poll(
     interaction: &serenity::Interaction,
     poll_id: u64,
     min_join_date: Timestamp,
-) -> Result<(), crate::serenity::SerenityError> {
+) -> Result<(), serenity::prelude::SerenityError> {
     trace!("Handling poll: {}.", poll_id);
 
     let data = get_data_lock(ctx).await;
@@ -52,40 +60,32 @@ pub async fn handle_poll(
         .unwrap();
 
     component
-        .create_interaction_response(&ctx.http, |r| {
-            r.interaction_response_data(|m| {
-                if let Ok(token) = result.as_deref() {
-                    let url = format!("https://revanced.app/poll#{token}");
-                    m.components(|c| {
-                        c.create_action_row(|r| {
-                            r.create_button(|b| {
-                                b.label("Vote")
-                                    .emoji(ReactionType::Unicode("🗳️".to_string()))
-                                    .style(ButtonStyle::Link)
-                                    .url(&url)
-                            })
-                        })
-                    })
-                } else {
-                    m
-                }
-                .ephemeral(true)
-                .embed(|e| {
-                    match result {
-                        Ok(_) => e
-                            .title("Cast your vote")
-                            .description("You can now vote on the poll."),
-                        Err(msg) => e.title("Error").description(msg),
-                    }
-                    .color(data.configuration.general.embed_color)
-                    .thumbnail(&icon_url)
-                    .footer(|f| {
-                        f.text("ReVanced");
-                        f.icon_url(&icon_url)
-                    })
-                })
-            })
-        })
+        .create_response(
+            &ctx.http,
+            serenity::CreateInteractionResponse::Message(if let Ok(token) = result.as_deref() {
+                let url = format!("https://revanced.app/poll#{token}");
+
+                CreateInteractionResponseMessage::new().components(vec![CreateActionRow::Buttons(
+                    vec![CreateButton::new_link(url)
+                        .label("Vote")
+                        .emoji(ReactionType::Unicode("🗳️".to_string()))],
+                )])
+            } else {
+                CreateInteractionResponseMessage::new()
+                    .ephemeral(true)
+                    .embed(
+                        match result {
+                            Ok(_) => CreateEmbed::new()
+                                .title("Cast your vote")
+                                .description("You can now vote on the poll."),
+                            Err(msg) => CreateEmbed::new().title("Error").description(msg),
+                        }
+                        .color(data.configuration.general.embed_color)
+                        .thumbnail(&icon_url)
+                        .footer(CreateEmbedFooter::new("ReVanced").icon_url(&icon_url)),
+                    )
+            }),
+        )
         .await?;
 
     Ok(())
