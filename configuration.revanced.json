@@ -340,7 +340,7 @@
 							"name": "3. Report",
 							"value": "Once you have narrowed down the exact patch that is causing issues, report it. Please refer to <#953993848374325269> `11`.",
 							"inline": false
-						},
+						}
 					],
 					"footer": {
 						"text": "ReVanced",
