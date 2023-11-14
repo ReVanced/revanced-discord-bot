@@ -317,6 +317,53 @@
 		{
 			"includes": {
 				"match": [
+					"\\?cause"
+				]
+			},
+			"response": {
+				"embed": {
+					"title": "How to find out the cause of your issue ❓",
+					"description": "Because ReVanced is modular, you can disable patches individually to find the patch causing trouble.",
+					"color": 5150960,
+					"fields": [
+						{
+							"name": "1. Sanity check",
+							"value": "Check if the issue occurs in the unpatched app. If it does, then the issue is not caused by ReVanced and you should report the issue to the vendor of the app. Otherwise, proceed with step 2.",
+							"inline": false
+						},
+						{
+							"name": "2. Binary search",
+							"value": "Disable or repatch your app with one **half** of the patches, you experience the issue with. If the issue **still** occurs, proceed to disable or repatch your app with the **next half** of the patches. If the issue does not occur anymore, one of the patches from **the other half** is responsible for the issue. Proceed to **narrow down the exact patch**. For more information on binary search check [this](https://en.wikipedia.org/wiki/Binary_search_algorithm).",
+							"inline": false
+						},
+						{
+							"name": "3. Report",
+							"value": "Once you have narrowed down the exact patch that is causing issues, report it. Please refer to <#953993848374325269> `11`.",
+							"inline": false
+						},
+					],
+					"footer": {
+						"text": "ReVanced",
+						"icon_url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"image": {
+						"url": ""
+					},
+					"thumbnail": {
+						"url": "https://cdn.discordapp.com/attachments/1095487869923119144/1115436493050224660/revanced-logo.png"
+					},
+					"author": {
+						"name": "",
+						"icon_url": "",
+						"url": ""
+					}
+				}
+			},
+			"respond_to_reference": true
+		},
+		{
+			"includes": {
+				"match": [
 					"\\?close"
 				],
 				"roles": [
