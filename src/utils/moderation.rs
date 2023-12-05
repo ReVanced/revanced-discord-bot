@@ -3,14 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{
-    ChannelId,
-    CreateEmbed,
-    CreateEmbedFooter,
-    CreateMessage,
-    GuildId,
-    Mentionable,
-    User,
-    UserId,
+    ChannelId, CreateEmbed, CreateEmbedFooter, CreateMessage, GuildId, Mentionable, User, UserId,
 };
 use poise::CreateReply;
 use serenity::prelude::SerenityError;
@@ -28,8 +21,9 @@ use crate::{Context, Error};
 pub enum ModerationKind {
     Mute(User, User, String, Option<String>, Option<Error>), /* User, Command author, Reason, Expires, Error */
     Unmute(User, User, Option<Error>),                       // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),               // User, Command author, Error
+    Kick(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
+    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
@@ -191,6 +185,35 @@ pub async fn respond_moderation<'a>(
                     false,
                 ),
             },
+            ModerationKind::Kick(user, author, reason, error) => {
+                let f = match error {
+                    Some(err) => {
+                        *send_ephemeral.lock().unwrap() = true;
+
+                        f.title(format!("Failed to kick {}", user.tag()))
+                            .field("Exception", err.to_string(), false)
+                            .field(
+                                "Action",
+                                format!(
+                                    "{} was kicked by {} but failed",
+                                    user.mention(),
+                                    author.mention()
+                                ),
+                                false,
+                            )
+                    },
+                    None => f.title(format!("Kicked {}", user.tag())).field(
+                        "Action",
+                        format!("{} was kicked by {}", user.mention(), author.mention()),
+                        false,
+                    ),
+                };
+                if let Some(reason) = reason {
+                    f.field("Reason", reason, true)
+                } else {
+                    f
+                }
+            },
             ModerationKind::Ban(user, author, reason, error) => {
                 let f = match error {
                     Some(err) => {
@@ -281,6 +304,23 @@ pub async fn respond_moderation<'a>(
         .await?;
 
     Ok(())
+}
+
+pub async fn kick_moderation(ctx: &Context<'_>) -> Option<SerenityError> {
+    let guild_id = ctx.guild_id().unwrap();
+
+    let http = &ctx.serenity_context().http;
+
+    let reason = reason.as_deref().or(Some("None specified"));
+
+    let kick_result = http.kick_user(guild_id, user.id, reason).await;
+
+    if let Err(err) = kick_result {
+        error!("Failed to kick user {}: {}", user.id, err);
+        Some(err)
+    } else {
+        None
+    }
 }
 
 pub async fn ban_moderation(ctx: &Context<'_>, kind: &BanKind) -> Option<SerenityError> {
