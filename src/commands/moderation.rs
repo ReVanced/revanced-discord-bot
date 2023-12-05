@@ -1,30 +1,17 @@
-
-
-
 use bson::{doc, Document};
 use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity,
-    CreateEmbed,
-    CreateEmbedFooter,
-    EditMessage,
-    GetMessages,
-    Mentionable,
-    UserId,
+    self as serenity, CreateEmbed, CreateEmbedFooter, EditMessage, GetMessages, Mentionable, UserId,
 };
 use poise::CreateReply;
 use tracing::{debug, trace};
 
-use crate::db::model::{Muted};
+use crate::db::model::Muted;
 use crate::utils::bot::get_member;
 use crate::utils::macros::to_user;
 use crate::utils::moderation::{
-    ban_moderation,
-    queue_unmute_member,
-    respond_moderation,
-    BanKind,
-    ModerationKind,
+    ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
 };
 use crate::utils::parse_duration;
 use crate::{Context, Error};
@@ -297,6 +284,23 @@ pub async fn purge(
         )
         .await?;
     Ok(())
+}
+
+/// Kick a member.
+#[poise::command(slash_command)]
+pub async fn kick(
+    ctx: Context<'_>,
+    #[description = "Member"] user: UserId,
+    #[description = "Reason for the ban"] reason: Option<String>,
+) -> Result<(), Error> {
+    // We cannot use `User` as a parameter for the moderation commands because of a bug in serenity. See: https://github.com/revanced/revanced-discord-bot/issues/38
+    let user = to_user!(user, ctx);
+
+    let kick_result = kick_moderation(ctx).await;
+
+    let author = ctx.author();
+
+    ModerationKind::Kick(user.clone(), author.clone(), reason.clone(), kick_result)
 }
 
 /// Ban a member.
