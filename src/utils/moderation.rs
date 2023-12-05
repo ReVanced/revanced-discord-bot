@@ -313,7 +313,7 @@ pub async fn kick_moderation(ctx: &Context<'_>) -> Option<SerenityError> {
 
     let reason = reason.as_deref().or(Some("None specified"));
 
-    let kick_result = http.kick_user(guild_id, user.id, reason).await;
+    let kick_result = http.kick_member(guild_id, user.id, reason).await;
 
     if let Err(err) = kick_result {
         error!("Failed to kick user {}: {}", user.id, err);
