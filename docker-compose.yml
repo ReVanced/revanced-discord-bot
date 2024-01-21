@@ -6,7 +6,4 @@ services:
     environment:
       - DISCORD_AUTHORIZATION_TOKEN=$DISCORD_AUTHORIZATION_TOKEN
       - MONGODB_URI=$MONGODB_URI
-      - API_SERVER=$API_SERVER
-      - API_CLIENT_ID=$API_CLIENT_ID
-      - API_CLIENT_SECRET=$API_CLIENT_SECRET
     restart: unless-stopped
