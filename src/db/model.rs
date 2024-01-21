@@ -23,21 +23,6 @@ pub struct LockedChannel {
     pub overwrites: Option<Vec<PermissionOverwrite>>,
 }
 
-#[skip_serializing_none]
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Poll {
-    pub author: Option<PollAuthor>,
-    pub image_url: Option<String>,
-    pub votes: Option<u16>,
-}
-
-#[skip_serializing_none]
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct PollAuthor {
-    pub name: Option<String>,
-    pub id: Option<u64>,
-}
-
 impl From<Muted> for Document {
     fn from(muted: Muted) -> Self {
         to_document(&muted)

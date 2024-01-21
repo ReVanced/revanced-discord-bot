@@ -39,7 +39,7 @@ pub async fn load_muted_members(ctx: &serenity::Context, data: &Arc<RwLock<Data>
                 guild_id.into(),
                 user_id.into(),
                 mute_role_id,
-                amount_left as u64, // i64 as u64 is handled properly here
+                amount_left as u64,
             ),
         );
     }

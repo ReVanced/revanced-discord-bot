@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::Arc;
 
-use api::client::Api;
 use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::event_handler;
@@ -15,7 +14,6 @@ use utils::bot::load_configuration;
 
 use crate::model::application::Configuration;
 
-mod api;
 mod commands;
 mod db;
 mod events;
@@ -35,8 +33,6 @@ pub struct Data {
     configuration: Configuration,
     database: Arc<Database>,
     pending_unmutes: HashMap<u64, JoinHandle<Result<(), Error>>>,
-    poll_secret: String,
-    api: Api,
 }
 
 #[tokio::main]
@@ -54,7 +50,6 @@ async fn main() {
         moderation::ban(),
         moderation::unban(),
         misc::reply(),
-        misc::poll(),
     ];
     poise::set_qualified_names(&mut commands);
 
@@ -92,12 +87,6 @@ async fn main() {
                             .unwrap(),
                         ),
                         pending_unmutes: HashMap::new(),
-                        poll_secret: env::var("POLL_SECRET").unwrap(),
-                        api: Api::new(
-                            reqwest::Url::parse(&env::var("API_SERVER").unwrap()).unwrap(),
-                            env::var("API_CLIENT_ID").unwrap(),
-                            env::var("API_CLIENT_SECRET").unwrap(),
-                        ),
                     })))
                 })
             })

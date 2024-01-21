@@ -6,7 +6,6 @@ use tokio::sync::RwLock;
 
 mod guild_member_addition;
 mod guild_member_update;
-mod interaction;
 mod message_create;
 mod ready;
 
@@ -28,9 +27,6 @@ pub async fn event_handler(
             new,
             ..
         } => guild_member_update::guild_member_update(ctx, old_if_available, new).await,
-        serenity::FullEvent::InteractionCreate { interaction } => {
-            interaction::interaction_create(ctx, interaction, data).await?
-        },
         _ => {},
     }
     Ok(())
