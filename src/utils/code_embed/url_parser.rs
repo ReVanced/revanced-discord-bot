@@ -151,7 +151,7 @@ impl CodeUrlParser for GitHubCodeUrl {
 #[derive(Debug, Clone)]
 pub enum ParserError {
     Error(String),
-    WrongParserError(String, String),
+    WrongParser(String, String),
     ConversionError(String),
     InvalidFragment(String),
     FailedToGetCode(String),
@@ -165,7 +165,7 @@ impl fmt::Display for ParserError {
             ParserError::Error(e) => {
                 write!(f, "Error: {e}")
             },
-            ParserError::WrongParserError(expected, got) => {
+            ParserError::WrongParser(expected, got) => {
                 write!(f, "Expected parser {expected}, got {got}")
             },
             ParserError::ConversionError(conversion_error) => {

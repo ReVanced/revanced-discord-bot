@@ -2,7 +2,7 @@ macro_rules! assert_correct_domain {
     ($url:expr, $expected:expr) => {{
         if let Some(domain) = $url.domain() {
             if domain != $expected {
-                return Err(ParserError::WrongParserError(
+                return Err(ParserError::WrongParser(
                     $expected.to_string(),
                     domain.to_string(),
                 ));
