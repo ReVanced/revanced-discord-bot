@@ -1,3 +1,18 @@
+# [1.40.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.39.0...v1.40.0) (2024-1-21)
+
+
+### Bug Fixes
+
+* Adjust Docker configuration files to latest changes ([5e09942](https://github.com/ReVanced/revanced-discord-bot/commit/5e09942a5102b9fccc7dfb1a7b89e4404d00a763))
+* Remove trailing comma [skip ci] ([bf214c9](https://github.com/ReVanced/revanced-discord-bot/commit/bf214c964d68188510a103a2e730b8ef536dcfd4))
+
+
+### Features
+
+* Add new response [skip ci] ([e4f97f5](https://github.com/ReVanced/revanced-discord-bot/commit/e4f97f53e5d1202babe8f33850a5850914140c10))
+* Remove poll command ([dc0b760](https://github.com/ReVanced/revanced-discord-bot/commit/dc0b760714780840967fc488553c892d4199db45))
+* Use better cure message ([b9b7eee](https://github.com/ReVanced/revanced-discord-bot/commit/b9b7eee6a37503b7e6ca4c933871cb1f639f3e6a))
+
 # [1.39.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.38.0...v1.39.0) (2023-10-26)
 
 
