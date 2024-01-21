@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::{Read, Result, Write};
 use std::path::Path;
@@ -66,18 +67,17 @@ pub struct General {
     pub embed_color: i32,
     pub mute: Mute,
     pub logging_channel: u64,
-    pub cure_on_presence_update: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Mute {
     pub role: u64,
-    pub take: Vec<u64>,
+    pub take: HashSet<u64>,
 }
 #[derive(Default, Serialize, Deserialize)]
 pub struct Administrators {
-    pub roles: Vec<u64>,
-    pub users: Vec<u64>,
+    pub roles: HashSet<u64>,
+    pub users: HashSet<u64>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -147,15 +147,15 @@ pub struct Author {
 
 #[derive(Serialize, Deserialize)]
 pub struct Includes {
-    pub channels: Option<Vec<u64>>,
-    pub roles: Option<Vec<u64>>,
+    pub channels: Option<HashSet<u64>>,
+    pub roles: Option<HashSet<u64>>,
     #[serde(rename = "match", with = "serde_regex")]
     pub match_field: Vec<Regex>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Excludes {
-    pub roles: Option<Vec<u64>>,
+    pub roles: Option<HashSet<u64>>,
 }
 
 #[derive(Serialize, Deserialize)]

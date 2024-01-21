@@ -18,11 +18,15 @@ pub async fn reload(ctx: Context<'_>) -> Result<(), Error> {
     debug!("{} reloaded the configuration.", ctx.author().name);
 
     ctx.send(
-        CreateReply::new().ephemeral(true).embed(
-            CreateEmbed::new()
-                .description("Successfully reloaded configuration.")
-                .color(embed_color),
-        ),
+        CreateReply {
+            embeds: vec![
+                CreateEmbed::new()
+                    .description("Reloading configuration...")
+                    .color(embed_color),
+            ],
+            ephemeral: Some(true),
+            ..Default::default()
+        }
     )
     .await?;
 
@@ -37,11 +41,15 @@ pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
     let color = ctx.data().read().await.configuration.general.embed_color;
 
     ctx.send(
-        CreateReply::new().ephemeral(true).embed(
-            CreateEmbed::new()
-                .description("Stopped the bot.")
-                .color(color),
-        ),
+        CreateReply {
+            ephemeral: Some(true),
+            embeds: vec![
+                CreateEmbed::new()
+                    .description("Stopping the bot...")
+                    .color(color),
+            ],
+            ..Default::default()
+        }
     )
     .await?;
 

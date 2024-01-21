@@ -1,15 +1,15 @@
 use chrono::{Duration, Utc};
 use poise::serenity_prelude::{
-    ComponentInteraction,
-    ComponentInteractionData,
-    ComponentInteractionDataKind,
+    ComponentInteraction, ComponentInteractionData, ComponentInteractionDataKind,
 };
 
 use super::*;
-use crate::utils;
+use crate::{utils, BotData};
+
 pub async fn interaction_create(
     ctx: &serenity::Context,
     interaction: &serenity::Interaction,
+    data: &BotData,
 ) -> Result<(), serenity::prelude::SerenityError> {
     if let serenity::Interaction::Component(ComponentInteraction {
         data:
@@ -22,7 +22,7 @@ pub async fn interaction_create(
     }) = interaction
     {
         if custom_id.starts_with("poll") {
-            handle_poll(ctx, interaction, custom_id).await?
+            handle_poll(ctx, interaction, custom_id, data).await?
         }
     }
 
@@ -33,6 +33,7 @@ pub async fn handle_poll(
     ctx: &serenity::Context,
     interaction: &serenity::Interaction,
     custom_id: &str,
+    data: &BotData,
 ) -> Result<(), serenity::prelude::SerenityError> {
     fn parse<T>(str: &str) -> T
     where
@@ -49,5 +50,5 @@ pub async fn handle_poll(
 
     let min_join_date = serenity::Timestamp::from(Utc::now() - Duration::days(min_age));
 
-    utils::poll::handle_poll(ctx, interaction, poll_id, min_join_date).await
+    utils::poll::handle_poll(ctx, interaction, poll_id, min_join_date, data).await
 }

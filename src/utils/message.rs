@@ -3,7 +3,10 @@ use poise::serenity_prelude::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
 use poise::CreateReply;
 
 pub fn clone_message(message: &Message) -> CreateReply {
-    let mut reply = CreateReply::new().content(message.content.as_str());
+    let mut reply = CreateReply {
+        content: Some(message.content.clone()),
+        ..Default::default()
+    };
 
     if let Some(embed) = message.embeds.first() {
         let mut new_embed = CreateEmbed::new();

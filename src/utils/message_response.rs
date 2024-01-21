@@ -1,29 +1,30 @@
+
+
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use poise::serenity_prelude::{
-    CreateEmbed,
-    CreateEmbedAuthor,
-    CreateEmbedFooter,
-    CreateMessage,
-    EditThread,
-    GetMessages,
+    CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, EditThread, GetMessages,
 };
 use regex::Regex;
+
 use tracing::log::error;
 
 use super::*;
-use crate::utils::bot::get_data_lock;
+use crate::{BotData};
 
 pub fn contains_match(regex: &[Regex], text: &str) -> bool {
     regex.iter().any(|r| r.is_match(text))
 }
 
-pub async fn handle_message_response(ctx: &serenity::Context, new_message: &serenity::Message) {
+pub async fn handle_message_response(
+    ctx: &serenity::Context,
+    new_message: &serenity::Message,
+    data: &BotData,
+) {
     if new_message.guild_id.is_none() || new_message.author.bot {
         return;
     }
 
-    let data_lock = get_data_lock(ctx).await;
-    let responses = &data_lock.read().await.configuration.message_responses;
+    let responses = &data.read().await.configuration.message_responses;
     let message = &new_message.content;
 
     let mut guild_message = None;
@@ -130,40 +131,37 @@ pub async fn handle_message_response(ctx: &serenity::Context, new_message: &sere
         }
 
         if let Err(err) = channel_id
-            .send_message(
-                &ctx.http,
-                {
-                    let mut message = CreateMessage::default();
-                    message = if let Some(reference) = message_reference {
-                        message.reference_message(reference)
-                    } else {
-                        message.reference_message(new_message)
-                    };
+            .send_message(&ctx.http, {
+                let mut message = CreateMessage::default();
+                message = if let Some(reference) = message_reference {
+                    message.reference_message(reference)
+                } else {
+                    message.reference_message(new_message)
+                };
 
-                    match &response.response.embed {
-                        Some(embed) => message.embed(
-                            CreateEmbed::new()
-                                .title(&embed.title)
-                                .description(&embed.description)
-                                .color(embed.color)
-                                .fields(embed.fields.iter().map(|field| {
-                                    (field.name.clone(), field.value.clone(), field.inline)
-                                }))
-                                .footer(
-                                    CreateEmbedFooter::new(&embed.footer.text)
-                                        .icon_url(&embed.footer.icon_url),
-                                )
-                                .thumbnail(&embed.thumbnail.url)
-                                .image(&embed.image.url)
-                                .author(
-                                    CreateEmbedAuthor::new(&embed.author.name)
-                                        .icon_url(&embed.author.icon_url),
-                                ),
-                        ),
-                        None => message.content(response.response.message.as_ref().unwrap()),
-                    }
-                },
-            )
+                match &response.response.embed {
+                    Some(embed) => message.embed(
+                        CreateEmbed::new()
+                            .title(&embed.title)
+                            .description(&embed.description)
+                            .color(embed.color)
+                            .fields(embed.fields.iter().map(|field| {
+                                (field.name.clone(), field.value.clone(), field.inline)
+                            }))
+                            .footer(
+                                CreateEmbedFooter::new(&embed.footer.text)
+                                    .icon_url(&embed.footer.icon_url),
+                            )
+                            .thumbnail(&embed.thumbnail.url)
+                            .image(&embed.image.url)
+                            .author(
+                                CreateEmbedAuthor::new(&embed.author.name)
+                                    .icon_url(&embed.author.icon_url),
+                            ),
+                    ),
+                    None => message.content(response.response.message.as_ref().unwrap()),
+                }
+            })
             .await
         {
             error!(

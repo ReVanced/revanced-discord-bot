@@ -3,40 +3,32 @@ use std::sync::{Arc, Mutex};
 
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{
-    ChannelId,
-    CreateEmbed,
-    CreateEmbedFooter,
-    CreateMessage,
-    GuildId,
-    Mentionable,
-    User,
-    UserId,
+    ChannelId, CreateEmbed, CreateEmbedFooter, CreateMessage, GuildId, Mentionable, User, UserId,
 };
 use poise::CreateReply;
 use serenity::prelude::SerenityError;
+
 use tokio::task::JoinHandle;
 use tracing::{debug, error, warn};
 
-use super::bot::get_data_lock;
 use super::*;
 use crate::db::database::Database;
 use crate::db::model::Muted;
 use crate::model::application::{Configuration, Mute};
 use crate::utils::bot::get_member;
-use crate::{Context, Error};
+use crate::{BotData, Context, Error};
 
 pub enum ModerationKind {
     Mute(User, User, String, Option<String>, Option<Error>), /* User, Command author, Reason, Expires, Error */
     Unmute(User, User, Option<Error>),                       // User, Command author, Error
-    Ban(User, User, Option<String>, Option<SerenityError>), // User, Command author, Reason, Error
-    Unban(User, User, Option<SerenityError>),               // User, Command author, Error
+    Ban(User, User, Option<String>, Option<SerenityError>),  // User, Command author, Reason, Error
+    Unban(User, User, Option<SerenityError>),                // User, Command author, Error
 }
 pub enum BanKind {
     Ban(User, Option<u8>, Option<String>), // User, Amount of days to delete messages, Reason
     Unban(User),                           // User
 }
-pub async fn mute_on_join(ctx: &serenity::Context, new_member: &mut serenity::Member) {
-    let data = get_data_lock(ctx).await;
+pub async fn mute_on_join(ctx: &serenity::Context, new_member: &serenity::Member, data: &BotData) {
     let data = data.read().await;
 
     if let Ok(mut cursor) = data
@@ -103,7 +95,7 @@ pub fn queue_unmute_member(
             .ok_or("User was not muted.")?;
 
         // Update roles if they didn't leave the guild.
-        if let Some(mut member) = get_member(&ctx, guild_id, user_id).await? {
+        if let Some(member) = get_member(&ctx, guild_id, user_id).await? {
             let http = &ctx.http;
 
             if let Some(taken_roles) = db_result.taken_roles {
@@ -255,11 +247,11 @@ pub async fn respond_moderation<'a>(
     let send_ephemeral = *send_ephemeral.lock().unwrap();
 
     let reply = ctx
-        .send(
-            CreateReply::new()
-                .embed(create_embed())
-                .ephemeral(send_ephemeral),
-        )
+        .send(CreateReply {
+            ephemeral: Some(send_ephemeral),
+            embeds: vec![create_embed()],
+            ..Default::default()
+        })
         .await?;
 
     let response = reply.message().await?;

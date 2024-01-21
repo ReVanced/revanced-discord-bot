@@ -2,11 +2,9 @@ use chrono::Utc;
 
 use super::*;
 use crate::db::model::Muted;
-use crate::utils::bot::get_data_lock;
 use crate::utils::moderation::queue_unmute_member;
 
-pub async fn load_muted_members(ctx: &serenity::Context, _: &serenity::Ready) {
-    let data = get_data_lock(ctx).await;
+pub async fn load_muted_members(ctx: &serenity::Context, data: &Arc<RwLock<Data>>) {
     let data = &mut *data.write().await;
     let mute_role_id = data.configuration.general.mute.role;
 

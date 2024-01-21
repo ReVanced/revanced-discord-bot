@@ -7,8 +7,7 @@
 				0
 			]
 		},
-		"logging_channel": 0,
-		"cure_on_presence_update": false
+		"logging_channel": 0
 	},
 	"administrators": {
 		"roles": [

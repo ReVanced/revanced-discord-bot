@@ -1,4 +1,5 @@
-{	"general": {
+{
+	"general": {
 		"embed_color": 5150960,
 		"mute": {
 			"role": 953984696491061289,
@@ -9,8 +10,7 @@
 			]
 		},
 		"media_channels": [],
-		"logging_channel": 1027892160797872179,
-		"cure_on_presence_update": true
+		"logging_channel": 1027892160797872179
 	},
 	"administrators": {
 		"roles": [

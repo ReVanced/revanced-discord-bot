@@ -1,17 +1,16 @@
+
+
 use base64::Engine;
 use poise::serenity_prelude::{
-    CreateActionRow,
-    CreateButton,
-    CreateEmbed,
-    CreateEmbedFooter,
-    CreateInteractionResponseMessage,
-    ReactionType,
-    Timestamp,
+    CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter,
+    CreateInteractionResponseMessage, ReactionType, Timestamp,
 };
 use reqwest::StatusCode;
+
 use tracing::log::{error, trace};
 
-use super::bot::get_data_lock;
+use crate::{BotData};
+
 use super::*;
 
 pub async fn handle_poll(
@@ -19,10 +18,10 @@ pub async fn handle_poll(
     interaction: &serenity::Interaction,
     poll_id: u64,
     min_join_date: Timestamp,
+    data: &BotData,
 ) -> Result<(), serenity::prelude::SerenityError> {
     trace!("Handling poll: {}.", poll_id);
 
-    let data = get_data_lock(ctx).await;
     let data = data.read().await;
 
     let component = &interaction.clone().message_component().unwrap();

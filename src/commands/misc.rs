@@ -15,8 +15,12 @@ pub async fn reply(
         ctx: &Context<'a>,
         content: &str,
     ) -> Result<ReplyHandle<'a>, poise::serenity_prelude::Error> {
-        ctx.send(CreateReply::new().ephemeral(true).content(content))
-            .await
+        ctx.send(CreateReply {
+            ephemeral: Some(true),
+            content: Some(content.to_string()),
+            ..Default::default()
+        })
+        .await
     }
 
     let http = &ctx.serenity_context().http;

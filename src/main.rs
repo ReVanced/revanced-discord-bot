@@ -5,7 +5,7 @@ use std::sync::Arc;
 use api::client::Api;
 use commands::{configuration, misc, moderation};
 use db::database::Database;
-use events::Handler;
+use events::event_handler;
 use poise::serenity_prelude::prelude::{RwLock, TypeMapKey};
 use poise::serenity_prelude::{CreateEmbed, UserId};
 use poise::CreateReply;
@@ -23,11 +23,12 @@ mod logger;
 mod model;
 mod utils;
 
+type BotData = Arc<RwLock<Data>>;
 type Error = Box<dyn std::error::Error + Send + Sync>;
-type Context<'a> = poise::Context<'a, Arc<RwLock<Data>>, Error>;
+type Context<'a> = poise::Context<'a, BotData, Error>;
 
 impl TypeMapKey for Data {
-    type Value = Arc<RwLock<Data>>;
+    type Value = BotData;
 }
 
 pub struct Data {
@@ -40,13 +41,9 @@ pub struct Data {
 
 #[tokio::main]
 async fn main() {
-    // Initialize the logging framework
     logger::init();
-
-    // Load environment variables from .env file
     dotenv::dotenv().ok();
 
-    // Define poise framework commands (also in src/commands/mod.rs for serenity framework's manually dispatched events)
     let mut commands = vec![
         configuration::register(),
         configuration::reload(),
@@ -73,65 +70,73 @@ async fn main() {
         .into_iter()
         .collect();
 
-    let data = Arc::new(RwLock::new(Data {
-        configuration,
-        database: Arc::new(
-            Database::new(
-                &env::var("MONGODB_URI").expect("MONGODB_URI environment variable not set"),
-                "revanced_discord_bot",
-            )
-            .await
-            .unwrap(),
-        ),
-        pending_unmutes: HashMap::new(),
-        poll_secret: env::var("POLL_SECRET").expect("POLL_SECRET environment variable not set"),
-        api: Api::new(
-            reqwest::Url::parse(
-                &env::var("API_SERVER").expect("API_SERVER environment variable not set"),
-            )
-            .expect("Invalid API_SERVER"),
-            env::var("API_CLIENT_ID").expect("API_CLIENT_ID environment variable not set"),
-            env::var("API_CLIENT_SECRET").expect("API_CLIENT_SECRET environment variable not set"),
-        ),
-    }));
-
-    let handler = Arc::new(Handler::new(
-        poise::FrameworkOptions {
-            owners,
-            commands,
-            on_error: |error| {
-                Box::pin(async {
-                    poise::samples::on_error(error)
-                        .await
-                        .unwrap_or_else(|error| tracing::error!("{}", error));
-                })
-            },
-            command_check: Some(|ctx| {
+    poise::serenity_prelude::ClientBuilder::new(
+        env::var("DISCORD_AUTHORIZATION_TOKEN").unwrap(),
+        poise::serenity_prelude::GatewayIntents::non_privileged()
+            | poise::serenity_prelude::GatewayIntents::MESSAGE_CONTENT
+            | poise::serenity_prelude::GatewayIntents::GUILD_MEMBERS
+            | poise::serenity_prelude::GatewayIntents::GUILD_PRESENCES,
+    )
+    .framework(
+        poise::Framework::builder()
+            .setup(move |_ctx, _ready, _framework| {
                 Box::pin(async move {
-                    if let Some(member) = ctx.author_member().await {
-                        let data_lock = &ctx.data().read().await;
-                        let configuration = &data_lock.configuration;
-                        let administrators = &configuration.administrators;
+                    Ok(Arc::new(RwLock::new(Data {
+                        configuration,
+                        database: Arc::new(
+                            Database::new(
+                                &env::var("MONGODB_URI").unwrap(),
+                                "revanced_discord_bot",
+                            )
+                            .await
+                            .unwrap(),
+                        ),
+                        pending_unmutes: HashMap::new(),
+                        poll_secret: env::var("POLL_SECRET").unwrap(),
+                        api: Api::new(
+                            reqwest::Url::parse(&env::var("API_SERVER").unwrap()).unwrap(),
+                            env::var("API_CLIENT_ID").unwrap(),
+                            env::var("API_CLIENT_SECRET").unwrap(),
+                        ),
+                    })))
+                })
+            })
+            .options(poise::FrameworkOptions {
+                owners,
+                commands,
+                on_error: |error| {
+                    Box::pin(async {
+                        poise::samples::on_error(error)
+                            .await
+                            .unwrap_or_else(|error| tracing::error!("{}", error));
+                    })
+                },
+                command_check: Some(|ctx| {
+                    Box::pin(async move {
+                        if let Some(member) = ctx.author_member().await {
+                            let data_lock = &ctx.data().read().await;
+                            let configuration = &data_lock.configuration;
+                            let administrators = &configuration.administrators;
 
-                        if !(administrators
-                            .users
-                            // Check if the user is an administrator
-                            .contains(&member.user.id.get())
-                            || administrators
-                                .roles
-                                .iter()
-                                // Has one of the administative roles
-                                .any(|&role_id| {
-                                    member
-                                        .roles
-                                        .iter()
-                                        .any(|member_role| member_role.get() == role_id)
-                                }))
-                        {
-                            if let Err(e) = ctx
-                                .send(
-                                    CreateReply::new().ephemeral(true).embed(
-                                        CreateEmbed::new()
+                            if !(administrators
+                                .users
+                                // Check if the user is an administrator
+                                .contains(&member.user.id.get())
+                                || administrators
+                                    .roles
+                                    .iter()
+                                    // Has one of the administative roles
+                                    .any(|&role_id| {
+                                        member
+                                            .roles
+                                            .iter()
+                                            .any(|member_role| member_role.get() == role_id)
+                                    }))
+                            {
+                                if let Err(e) = ctx
+                                    .send(CreateReply {
+                                        ephemeral: Some(true),
+                                        embeds: vec![CreateEmbed::new()
                                             .title("Permission error")
                                             .description(
                                                 "You do not have permission to use this command.",
@@ -139,48 +144,30 @@ async fn main() {
                                             .color(configuration.general.embed_color)
                                             .thumbnail(member.user.avatar_url().unwrap_or_else(
                                                 || member.user.default_avatar_url(),
-                                            )),
-                                    ),
-                                )
-                                .await
-                            {
-                                error!("Error sending message: {:?}", e)
+                                            ))],
+                                        ..Default::default()
+                                    })
+                                    .await
+                                {
+                                    error!("Error sending message: {:?}", e)
+                                }
+                                trace!("{} is not an administrator.", member.user.name);
+                                return Ok(false); // Not an administrator, don't allow command execution
                             }
-                            trace!("{} is not an administrator.", member.user.name);
-                            return Ok(false); // Not an administrator, don't allow command execution
                         }
-                    }
-                    Ok(true)
-                })
-            }),
-            event_handler: |event, _framework, _data| {
-                Box::pin(async move {
-                    tracing::trace!("{:?}", event.snake_case_name());
-                    Ok(())
-                })
-            },
-            ..Default::default()
-        },
-        data.clone(), // Pass configuration as user data for the framework
-    ));
-
-    let mut client = poise::serenity_prelude::Client::builder(
-        env::var("DISCORD_AUTHORIZATION_TOKEN")
-            .expect("DISCORD_AUTHORIZATION_TOKEN environment variable not set"),
-        poise::serenity_prelude::GatewayIntents::non_privileged()
-            | poise::serenity_prelude::GatewayIntents::MESSAGE_CONTENT
-            | poise::serenity_prelude::GatewayIntents::GUILD_MEMBERS
-            | poise::serenity_prelude::GatewayIntents::GUILD_PRESENCES,
+                        Ok(true)
+                    })
+                }),
+                event_handler: |ctx, event, _framework, data| {
+                    Box::pin(event_handler(ctx, event, data))
+                },
+                ..Default::default()
+            })
+            .build(),
     )
-    .event_handler_arc(handler.clone())
+    .await
+    .unwrap()
+    .start()
     .await
     .unwrap();
-
-    client.data.write().await.insert::<Data>(data);
-
-    handler
-        .set_shard_manager(client.shard_manager.clone())
-        .await;
-
-    client.start().await.unwrap();
 }
