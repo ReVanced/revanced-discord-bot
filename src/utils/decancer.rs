@@ -49,7 +49,7 @@ pub async fn cure(
         )
         .await
     {
-        Ok(_) => info!("Cured user {}", member.user.tag()),
+        Ok(_) => info!("Cured user {} from {}", member.user.tag(), name),
         Err(err) => error!("Failed to cure user {}: {}", name, err),
     }
 }
