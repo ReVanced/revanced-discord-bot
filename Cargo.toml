@@ -17,27 +17,27 @@ panic = "abort"
 
 [dependencies]
 bson = "2.4"
-serde_with_macros = "3.4.0"
-mongodb = "2.4.0"
-poise = "0.6.1"
-decancer = "1.5.4"
-tokio = { version = "1.26.0", features = ["rt-multi-thread"] }
-dotenv = "0.15.0"
-serde = { version = "1.0.158", features = ["derive"] }
-serde_json = "1.0.94"
-regex = "1.7.3"
-serde_regex = "1.1.0"
-reqwest = { version = "0.11.15", features = [
-	"rustls-tls-native-roots",
+serde_with_macros = "3.4"
+mongodb = "2.4"
+poise = "0.6"
+decancer = "1.5"
+tokio = { version = "1.26", features = ["rt-multi-thread"] }
+dotenv = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.7"
+serde_regex = "1.1"
+reqwest = { version = "0.11", features = [
+	"rustls-tls",
 	"json",
 ], default-features = false }
-chrono = "0.4.24"
-dirs = "5.0.0"
-tracing = { version = "0.1.37", features = [
+chrono = "0.4"
+dirs = "5.0"
+tracing = { version = "0.1", features = [
 	"max_level_debug",
 	"release_max_level_info",
 ] }
-tracing-subscriber = "0.3.16"
-hmac-sha256 = "1.1.6"
-base64 = "0.21.0"
-parse_duration = "2.1.1"
+tracing-subscriber = "0.3"
+hmac-sha256 = "1.1"
+base64 = "0.21"
+parse_duration = "2.1"
