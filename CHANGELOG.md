@@ -1,3 +1,10 @@
+# [1.41.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.40.0...v1.41.0) (2024-06-04)
+
+
+### Features
+
+* Don't delete triggering message when replying to message ([b87c601](https://github.com/ReVanced/revanced-discord-bot/commit/b87c601e5391971adb7dab600c71e2d792150f01))
+
 # [1.40.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.39.0...v1.40.0) (2024-1-21)
 
 
