@@ -27,7 +27,7 @@ pub async fn cure(
         }
     }
 
-    let mut cured_name = decancer::cure(&name).replace(
+    let mut cured_name = decancer::cure!(&name).unwrap().as_str().replace(
         |c: char| !(c == ' ' || c == '-' || c == '_' || c.is_ascii_alphanumeric()),
         "",
     );

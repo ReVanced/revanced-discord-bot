@@ -1,48 +1,28 @@
 {
-	"general": {
-		"embed_color": 0,
-		"mute": {
-			"role": 0,
-			"take": [
-				0
-			]
-		},
-		"logging_channel": 0
+	"default_embed": {
+		"color": 0
 	},
+	"mute": {
+		"role": 0,
+		"take": [0]
+	},
+	"log_channel": 0,
 	"administrators": {
-		"roles": [
-			0
-		],
-		"users": [
-			0
-		]
+		"roles": [0],
+		"users": [0]
 	},
-	"message_responses": [
+	"responses": [
 		{
-			"includes": {
-				"channels": [
-					0
-				],
-				"match": []
+			"whitelist": {
+				"channels": [0],
+				"regex": [""]
 			},
-			"excludes": {
-				"roles": [
-					0
-				],
-				"match": []
+			"blacklist": {
+				"roles": [0],
+				"regex": [""]
 			},
-			"condition": {
-				"user": {
-					"server_age": 2
-				}
-			},
-			"response": {
-				"message": ""
-			},
-			"thread_options": {
-				"lock_on_response": false,
-				"close_on_response": false,
-				"only_on_first_message": false
+			"message": {
+				"content": ""
 			},
 			"respond_to_reference": false
 		}

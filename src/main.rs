@@ -6,11 +6,12 @@ use commands::{configuration, misc, moderation};
 use db::database::Database;
 use events::event_handler;
 use poise::serenity_prelude::prelude::{RwLock, TypeMapKey};
-use poise::serenity_prelude::{CreateEmbed, UserId};
+use poise::serenity_prelude::{UserId};
 use poise::CreateReply;
 use tokio::task::JoinHandle;
 use tracing::{error, trace};
 use utils::bot::load_configuration;
+use utils::create_default_embed;
 
 use crate::model::application::Configuration;
 
@@ -125,12 +126,11 @@ async fn main() {
                                 if let Err(e) = ctx
                                     .send(CreateReply {
                                         ephemeral: Some(true),
-                                        embeds: vec![CreateEmbed::new()
+                                        embeds: vec![create_default_embed(configuration)
                                             .title("Permission error")
                                             .description(
                                                 "You do not have permission to use this command.",
                                             )
-                                            .color(configuration.general.embed_color)
                                             .thumbnail(member.user.avatar_url().unwrap_or_else(
                                                 || member.user.default_avatar_url(),
                                             ))],

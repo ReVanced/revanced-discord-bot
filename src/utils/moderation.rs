@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use mongodb::options::FindOptions;
 use poise::serenity_prelude::{
-    ChannelId, CreateEmbed, CreateEmbedFooter, CreateMessage, GuildId, Mentionable, User, UserId,
+    ChannelId, CreateEmbedFooter, CreateMessage, GuildId, Mentionable, User, UserId,
 };
 use poise::CreateReply;
 use serenity::prelude::SerenityError;
@@ -48,7 +48,7 @@ pub async fn mute_on_join(ctx: &serenity::Context, new_member: &serenity::Member
             if found {
                 debug!("Muted member {} rejoined the server", new_member.user.tag());
                 if new_member
-                    .add_role(&ctx.http, data.configuration.general.mute.role)
+                    .add_role(&ctx.http, data.configuration.mute.role)
                     .await
                     .is_ok()
                 {
@@ -126,15 +126,16 @@ pub async fn respond_moderation<'a>(
     let send_ephemeral = Arc::new(Mutex::new(false));
 
     let create_embed = || {
-        let f = CreateEmbed::new();
+        let mut create_embed = create_default_embed(configuration);
 
-        let result = match moderation {
+        create_embed = match moderation {
             ModerationKind::Mute(user, author, reason, expires, error) => {
                 let embed = match error {
                     Some(err) => {
                         *send_ephemeral.lock().unwrap() = true;
 
-                        f.title(format!("Failed to mute {}", user.tag()))
+                        create_embed
+                            .title(format!("Failed to mute {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
                                 "Action",
@@ -146,7 +147,7 @@ pub async fn respond_moderation<'a>(
                                 false,
                             )
                     },
-                    None => f.title(format!("Muted {}", user.tag())).field(
+                    None => create_embed.title(format!("Muted {}", user.tag())).field(
                         "Action",
                         format!("{} was muted by {}", user.mention(), author.mention()),
                         false,
@@ -165,7 +166,8 @@ pub async fn respond_moderation<'a>(
                 Some(err) => {
                     *send_ephemeral.lock().unwrap() = true;
 
-                    f.title(format!("Failed to unmute {}", user.tag()))
+                    create_embed
+                        .title(format!("Failed to unmute {}", user.tag()))
                         .field("Exception", err.to_string(), false)
                         .field(
                             "Action",
@@ -177,7 +179,7 @@ pub async fn respond_moderation<'a>(
                             false,
                         )
                 },
-                None => f.title(format!("Unmuted {}", user.tag())).field(
+                None => create_embed.title(format!("Unmuted {}", user.tag())).field(
                     "Action",
                     format!("{} was unmuted by {}", user.mention(), author.mention()),
                     false,
@@ -188,7 +190,8 @@ pub async fn respond_moderation<'a>(
                     Some(err) => {
                         *send_ephemeral.lock().unwrap() = true;
 
-                        f.title(format!("Failed to ban {}", user.tag()))
+                        create_embed
+                            .title(format!("Failed to ban {}", user.tag()))
                             .field("Exception", err.to_string(), false)
                             .field(
                                 "Action",
@@ -200,7 +203,7 @@ pub async fn respond_moderation<'a>(
                                 false,
                             )
                     },
-                    None => f.title(format!("Banned {}", user.tag())).field(
+                    None => create_embed.title(format!("Banned {}", user.tag())).field(
                         "Action",
                         format!("{} was banned by {}", user.mention(), author.mention()),
                         false,
@@ -216,7 +219,8 @@ pub async fn respond_moderation<'a>(
                 Some(err) => {
                     *send_ephemeral.lock().unwrap() = true;
 
-                    f.title(format!("Failed to unban {}", user.tag()))
+                    create_embed
+                        .title(format!("Failed to unban {}", user.tag()))
                         .field("Exception", err.to_string(), false)
                         .field(
                             "Action",
@@ -228,18 +232,19 @@ pub async fn respond_moderation<'a>(
                             false,
                         )
                 },
-                None => f.title(format!("Unbanned {}", user.tag())).field(
-                    "Action",
-                    format!("{} was unbanned by {}", user.mention(), author.mention()),
-                    false,
-                ),
+                None => create_embed
+                    .title(format!("Unbanned {}", user.tag()))
+                    .field(
+                        "Action",
+                        format!("{} was unbanned by {}", user.mention(), author.mention()),
+                        false,
+                    ),
             },
-        }
-        .color(configuration.general.embed_color);
+        };
 
         let user = current_user.face();
 
-        result
+        create_embed
             .thumbnail(&user)
             .footer(CreateEmbedFooter::new("ReVanced").icon_url(&user))
     };
@@ -256,7 +261,7 @@ pub async fn respond_moderation<'a>(
 
     let response = reply.message().await?;
 
-    ChannelId::from(configuration.general.logging_channel)
+    ChannelId::from(configuration.log_channel)
         .send_message(
             &ctx.serenity_context().http,
             CreateMessage::new().embed(create_embed().field(

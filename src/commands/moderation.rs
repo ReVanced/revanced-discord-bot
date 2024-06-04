@@ -2,7 +2,7 @@ use bson::{doc, Document};
 use chrono::Utc;
 use mongodb::options::{UpdateModifications, UpdateOptions};
 use poise::serenity_prelude::{
-    self as serenity, CreateEmbed, CreateEmbedFooter, EditMessage, GetMessages, Mentionable, UserId,
+    CreateEmbedFooter, EditMessage, GetMessages, Mentionable, UserId,
 };
 use poise::CreateReply;
 use tracing::{debug, trace};
@@ -13,7 +13,7 @@ use crate::utils::macros::to_user;
 use crate::utils::moderation::{
     ban_moderation, queue_unmute_member, respond_moderation, BanKind, ModerationKind,
 };
-use crate::utils::parse_duration;
+use crate::utils::{create_default_embed, parse_duration};
 use crate::{Context, Error};
 
 /// Unmute a member.
@@ -41,7 +41,7 @@ pub async fn unmute(
         data.database.clone(),
         ctx.guild_id().unwrap(),
         id,
-        configuration.general.mute.role,
+        configuration.mute.role,
         0,
     )
     .await
@@ -73,7 +73,7 @@ pub async fn mute(
     let configuration = &data.configuration;
     let author = ctx.author();
 
-    let mute = &configuration.general.mute;
+    let mute = &configuration.mute;
     let guild_id = ctx.guild_id().unwrap();
 
     let discord = ctx.serenity_context();
@@ -185,7 +185,6 @@ pub async fn purge(
 
     let data = ctx.data().read().await;
     let configuration = &data.configuration;
-    let embed_color = configuration.general.embed_color;
     let channel = ctx.channel_id();
     let too_old_timestamp = Utc::now().timestamp() - MAX_BULK_DELETE_AGO_SECS;
 
@@ -196,10 +195,9 @@ pub async fn purge(
 
     let handle = ctx
         .send(CreateReply {
-            embeds: vec![CreateEmbed::new()
+            embeds: vec![create_default_embed(configuration)
                 .title("Purging messages")
                 .description("Accumulating...")
-                .color(embed_color)
                 .thumbnail(&image)],
             ..Default::default()
         })
@@ -271,14 +269,12 @@ pub async fn purge(
         .edit(
             &ctx.serenity_context(),
             EditMessage::new().embed(
-                serenity::CreateEmbed::default()
+                create_default_embed(configuration)
                     .title("Purge successful")
                     .field("Deleted messages", deleted_amount.to_string(), false)
                     .field("Action by", author.mention().to_string(), false)
-                    .color(embed_color)
                     .thumbnail(&image)
-                    .footer(CreateEmbedFooter::new("ReVanced").icon_url(image))
-                    .clone(),
+                    .footer(CreateEmbedFooter::new("ReVanced").icon_url(image)),
             ),
         )
         .await?;

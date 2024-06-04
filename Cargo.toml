@@ -5,12 +5,11 @@ homepage = "https://revanced.app"
 license = "GPL-3.0"
 name = "revanced-discord-bot"
 repository = "https://github.com/revanced/revanced-discord-bot"
-version = "2.7.0"
+version = "2.8.0"
 edition = "2021"
 
 [profile.release]
 strip = true
-opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
@@ -20,14 +19,14 @@ bson = "2.4"
 serde_with_macros = "3.4"
 mongodb = "2.4"
 poise = "0.6"
-decancer = "1.5"
+decancer = "3.2"
 tokio = { version = "1.26", features = ["rt-multi-thread"] }
 dotenv = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 regex = "1.7"
 serde_regex = "1.1"
-reqwest = { version = "0.11", features = [
+reqwest = { version = "0.12", features = [
 	"rustls-tls",
 	"json",
 ], default-features = false }
@@ -39,5 +38,5 @@ tracing = { version = "0.1", features = [
 ] }
 tracing-subscriber = "0.3"
 hmac-sha256 = "1.1"
-base64 = "0.21"
+base64 = "0.22"
 parse_duration = "2.1"

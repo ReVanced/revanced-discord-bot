@@ -9,9 +9,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Configuration {
-    pub general: General,
     pub administrators: Administrators,
-    pub message_responses: Vec<MessageResponse>,
+    pub default_embed: Embed,
+    pub mute: Mute,
+    pub log_channel: u64,
+    pub responses: Vec<Response>,
 }
 
 const CONFIG_PATH: &str = "configuration.json";
@@ -39,15 +41,15 @@ impl Configuration {
             sys_config_dir.to_string_lossy()
         );
 
-        // config file in current dir
+        // Config file in the current directory.
         let mut file = if Path::new(CONFIG_PATH).exists() {
             File::open(CONFIG_PATH)?
         }
-        // config file in system dir (on *nix: `~/.config/revanced-discord-bot/`)
+        // Config file in the system directory.
         else if Path::new(&sys_config).exists() {
             File::open(sys_config)?
         }
-        // create defalt config
+        // Create a default config file.
         else {
             let default_config = Configuration::default();
             default_config.save()?;
@@ -63,13 +65,6 @@ impl Configuration {
 }
 
 #[derive(Default, Serialize, Deserialize)]
-pub struct General {
-    pub embed_color: i32,
-    pub mute: Mute,
-    pub logging_channel: u64,
-}
-
-#[derive(Default, Serialize, Deserialize)]
 pub struct Mute {
     pub role: u64,
     pub take: HashSet<u64>,
@@ -81,89 +76,57 @@ pub struct Administrators {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct MessageResponse {
-    pub includes: Option<Includes>,
-    pub excludes: Option<Excludes>,
-    pub condition: Option<Condition>,
-    pub response: Response,
-    pub thread_options: Option<ThreadOptions>,
+pub struct Response {
+    pub whitelist: Option<Trigger>,
+    pub blacklist: Option<Trigger>,
+    pub message: Message,
     pub respond_to_reference: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct ThreadOptions {
-    pub close_on_response: bool,
-    pub lock_on_response: bool,
-    pub only_on_first_message: bool,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Response {
-    pub message: Option<String>,
+pub struct Message {
+    pub content: Option<String>,
     pub embed: Option<Embed>,
 }
 
 #[derive(Serialize, Deserialize)]
+#[derive(Default)]
 pub struct Embed {
-    pub title: String,
-    pub description: String,
-    pub color: i32,
-    pub fields: Vec<Field>,
-    pub footer: Footer,
-    pub image: Image,
-    pub thumbnail: Thumbnail,
-    pub author: Author,
+    pub author: Option<Author>,
+    pub color: Option<i32>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub fields: Option<Vec<Field>>,
+    pub footer: Option<Footer>,
+    pub image_url: Option<String>,
+    pub thumbnail_url: Option<String>,
 }
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Field {
     pub name: String,
     pub value: String,
-    pub inline: bool,
+    pub inline: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Footer {
     pub text: String,
-    pub icon_url: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Image {
-    pub url: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Thumbnail {
-    pub url: String,
+    pub icon_url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Author {
     pub name: String,
-    pub icon_url: String,
-    pub url: String,
+    pub icon_url: Option<String>,
+    pub url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Includes {
+pub struct Trigger {
     pub channels: Option<HashSet<u64>>,
     pub roles: Option<HashSet<u64>>,
-    #[serde(rename = "match", with = "serde_regex")]
-    pub match_field: Vec<Regex>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Excludes {
-    pub roles: Option<HashSet<u64>>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Condition {
-    pub user: User,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct User {
-    pub server_age: i64,
+    #[serde(with = "serde_regex")]
+    pub regex: Vec<Regex>,
 }

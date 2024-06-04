@@ -6,7 +6,7 @@ use crate::utils::moderation::queue_unmute_member;
 
 pub async fn load_muted_members(ctx: &serenity::Context, data: &Arc<RwLock<Data>>) {
     let data = &mut *data.write().await;
-    let mute_role_id = data.configuration.general.mute.role;
+    let mute_role_id = data.configuration.mute.role;
 
     let mut cursor = data
         .database
