@@ -36,6 +36,9 @@ jobs:
           command: build
           args: --release --target aarch64-unknown-linux-gnu
 
+      - name: Print directory tree
+        run: find .
+
       - name: Setup QEMU
         id: qemu
         uses: docker/setup-qemu-action@v3
