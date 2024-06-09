@@ -1,3 +1,5 @@
+## [1.41.2](https://github.com/ReVanced/revanced-discord-bot/compare/v1.41.1...v1.41.2) (2024-06-09)
+
 ## [1.41.1](https://github.com/ReVanced/revanced-discord-bot/compare/v1.41.0...v1.41.1) (2024-06-06)
 
 # [1.41.0](https://github.com/ReVanced/revanced-discord-bot/compare/v1.40.0...v1.41.0) (2024-06-04)
