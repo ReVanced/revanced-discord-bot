@@ -39,9 +39,6 @@ jobs:
       - name: Setup QEMU
         id: qemu
         uses: docker/setup-qemu-action@v3
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: all
 
       - name: Setup Docker Buildx
         id: buildx
