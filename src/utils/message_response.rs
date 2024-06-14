@@ -4,16 +4,13 @@ use serenity::Message;
 use tracing::log::error;
 
 use super::*;
-use crate::{
-    model::application::Trigger,
-    BotData,
-};
+use crate::{model::application::Trigger, BotData};
 
 impl Trigger {
     fn matches(&self, new_message: &Message, member_roles: &[RoleId]) -> bool {
         if let Some(channels) = &self.channels {
             if !channels.contains(&new_message.channel_id.get()) {
-                return true;
+                return false;
             }
         }
 
@@ -22,11 +19,11 @@ impl Trigger {
                 .iter()
                 .any(|&member_role| roles.contains(&member_role.get()))
             {
-                return true;
+                return false;
             }
         }
 
-        if !self.regex.iter().any(|r| r.is_match(&new_message.content)) {
+        if !self.regex.is_empty() && self.regex.iter().any(|r| r.is_match(&new_message.content)) {
             return true;
         }
 
@@ -49,7 +46,7 @@ pub async fn handle_message_response(
 
     for response in &configuration.responses {
         if let Some(whitelist) = &response.whitelist {
-            if whitelist.matches(new_message, member_roles) {
+            if !whitelist.matches(new_message, member_roles) {
                 continue;
             }
         }
